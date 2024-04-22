@@ -8,18 +8,18 @@ def initialize_llm(
     model_path: str,
     chat_format: str,
     n_gpu_layers: int = -1,
-    n_ctx: int = 512 * 2,
-    n_batch=512 * 1,
+    n_ctx: int = 512 * 16,
+    n_batch=512 * 8,
 ) -> Llama:
     """
-    Initializes a Llama language model.
+    Initializes a Llama language model. Default values tweaked for RTX 2070 Super.
 
     Args:
         model_path (str): The path to the model file.
         chat_format (str): The format of the chat.
         n_gpu_layers (int, optional): The number of GPU layers. Defaults to -1.
-        n_ctx (int, optional): The context size. Defaults to 1024.
-        n_batch (int, optional): The batch size. Defaults to 512.
+        n_ctx (int, optional): The context size. Defaults to 8192.
+        n_batch (int, optional): The batch size. Defaults to 4096.
 
     Returns:
         Llama: The initialized Llama language model.

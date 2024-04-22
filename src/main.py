@@ -1,75 +1,32 @@
 # %%
-from language_model import (
-    initialize_llm,
-    create_chat_completion,
-    get_message_content,
+from language_model import initialize_llm
+from utils import (
+    get_model_dict,
+    describe_unique_values,
+    describe_strong_correlations,
+    describe_transformations,
 )
-from utils import get_model_dict
-from response_schemas import schemas
-from sklearn.datasets import load_iris
-import pandas as pd
-import json
-import pprint
+from sklearn import datasets
 
 # %%
-iris = load_iris()
-df = pd.DataFrame(iris.data, columns=iris.feature_names)
-df["target"] = iris.target
+X, y = datasets.load_iris(return_X_y=True, as_frame=True)
 # %%
-model_dict = get_model_dict(use_cache=False)
+function_headers = describe_transformations(
+    filename="preprocessing_tools.py", skip_args=["df", "drop_old"], if_def=False
+)
+unqiue_values = describe_unique_values(X, 5)
+correlations = describe_strong_correlations(X, 0.3)
+
+prompt = f"Useful information about columns:\n{unqiue_values}\n{correlations}\n\nAvailable column transformations (tools):\n{function_headers}\n\nLets think step by step about what new features we can create using available columns and tools:\n"
+print(prompt)
+# %%
+
 # %%
 llm = initialize_llm(
-    model_path=model_dict["MISTRAL-7B-INSTRUCT-V0.2.Q6_K"],
+    model_path=get_model_dict(use_cache=False)["MISTRAL-7B-INSTRUCT-V0.2.Q6_K"],
     chat_format="mistral-instruct",
+    n_gpu_layers=-1,
+    n_ctx=512 * 16,
+    n_batch=512 * 8,
 )
-# %%
-column_names = df.columns.tolist()
-transformations = [
-    "standard_scaler",
-    "min_max_scaler",
-    "max_abs_scaler",
-    "quantile_transformer",
-    "power_transformer",
-    "normalizer",
-    "binarizer",
-    "polynomial_features",
-    "k_bins_discretizer",
-    "ordinal_encoder",
-    "one_hot_encoder",
-    "apply_math_function",
-]
-# %%
-response_format = {
-    "type": "json_object",
-    "schema": schemas["dual_argument_schema"],
-}
-response_format["schema"]["properties"]["column_name_1"]["enum"] = column_names
-response_format["schema"]["properties"]["column_name_2"]["enum"] = column_names
-
-pp = pprint.PrettyPrinter()
-pp.pprint(response_format)
-# %%
-messages = [
-    {
-        "role": "user",
-        "content": f"""
-You are an expert in data preprocessing. I have a dataset and I would like to create new features that will make my machine learning models more accurate. Can you help me with that? I will show you list of available transformations and column names. You can choose one of the transformations and 2 of the columns. I will then apply the transformation to the selected column. Respond with valid json. Here is the information you need:
-
-Column names: {column_names}
-
-Available transformations: {transformations}
-""",
-    },
-]
-
-print(messages[0]["content"])
-# %%
-response = create_chat_completion(
-    llm=llm,
-    messages=messages,
-    response_format=response_format,
-)
-
-content = get_message_content(response)
-json.loads(content)
 # %%
