@@ -50,13 +50,16 @@ def extract_functions_with_args_and_values(filename: str) -> Dict[str, Dict[str,
     return functions
 
 
-def describe_transformations(filename: str, skip_args=[], if_def=False) -> str:
+def describe_transformations(
+    filename: str, skip_args=[], if_def=False, if_backtick=False
+) -> str:
     """Extracts function names and their arguments from a given Python file. Then, it returns a string with the function names and their arguments.
 
     Args:
         filename (str): The name of the Python file.
         skip_args (list, optional): Arguments to skip. Defaults to [].
         if_def (bool, optional): Whether to include 'def' before the function name. Defaults to False.
+        if_backtick (bool, optional): Whether to include backticks around the function name. Defaults to False.
 
     Returns:
         str: A string with the function names and their arguments.
@@ -64,7 +67,7 @@ def describe_transformations(filename: str, skip_args=[], if_def=False) -> str:
     functions = extract_functions_with_args_and_values(filename)
 
     function_headers = "\n".join(
-        f"""{"def " if if_def else "- "}{func}({', '.join(f'{arg}:{functions[func][arg] if functions[func][arg] is not None else "undefined"}' for arg in args if arg not in skip_args)})"""
+        f"""{"def " if if_def else "- "}{'`' if if_backtick else ''}{func}({', '.join(f'{arg}:{functions[func][arg] if functions[func][arg] is not None else "any"}' for arg in args if arg not in skip_args)}){'`' if if_backtick else ''}"""
         for func, args in functions.items()
     )
     return function_headers
@@ -132,12 +135,38 @@ def get_model_dict(use_cache: bool = True) -> Dict[str, str]:
     return model_dict
 
 
-def describe_unique_values(df: DataFrame, n: int) -> str:
+def round_to_percent_digits(number: float, perc: int) -> float:
+    """
+    Rounds a float number to a percentage of its decimal digits.
+
+    Args:
+        number (float): The number to round.
+        perc (int): The percentage of decimal digits to keep.
+
+    Returns:
+        float: The rounded number.
+    """
+    # Convert the number to a string
+    number_str = str(number)
+    # Split the string into the integer and fractional parts
+    parts = number_str.split(".")
+    if len(parts) == 2:
+        # Calculate the number of digits to keep
+        digits_to_keep = int(len(parts[1]) * (perc / 100))
+        # Convert the number back to a float and round it
+        number = round(number, max(2, digits_to_keep))
+    return number
+
+
+def describe_unique_values(
+    df: DataFrame, n: int, perc_digits_after_decimal: int = 25
+) -> str:
     """This function describes the unique values in each column of a DataFrame.
 
     Args:
         df (DataFrame): The DataFrame to describe.
         n (int): The number of unique values to display.
+        perc_digits_after_decimal (int, optional): The percentage of decimal digits to keep. Defaults to 25%.
 
     Returns:
         str: A string containing descriptions of the unique values in each column.
@@ -145,7 +174,10 @@ def describe_unique_values(df: DataFrame, n: int) -> str:
     result = ""
 
     for column in df.columns:
-        unique_values = list(df[column].unique())
+        unique_values = [
+            round_to_percent_digits(number=value, perc=perc_digits_after_decimal)
+            for value in df[column].unique()
+        ]
         if len(unique_values) > n:
             result += f"example unique values in '{column}': {str(random.sample(unique_values, n))[1:-1]} ...\n"
         else:
