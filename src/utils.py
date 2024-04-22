@@ -64,7 +64,7 @@ def describe_transformations(filename: str, skip_args=[], if_def=False) -> str:
     functions = extract_functions_with_args_and_values(filename)
 
     function_headers = "\n".join(
-        f"""{"def " if if_def else ""}{func}({', '.join(f'{arg}:{functions[func][arg] if functions[func][arg] is not None else "undefined"}' for arg in args if arg not in skip_args)})"""
+        f"""{"def " if if_def else "- "}{func}({', '.join(f'{arg}:{functions[func][arg] if functions[func][arg] is not None else "undefined"}' for arg in args if arg not in skip_args)})"""
         for func, args in functions.items()
     )
     return function_headers

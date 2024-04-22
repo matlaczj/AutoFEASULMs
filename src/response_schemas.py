@@ -6,6 +6,54 @@
 #     "schema": schemas["single_argument_schema"],
 # }
 
+general = {
+    "type": "object",
+    "properties": {
+        "transformations": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "function": {
+                        "type": "string",
+                        "enum": [
+                            "standard_scaler",
+                            "min_max_scaler",
+                            "max_abs_scaler",
+                            "quantile_transformer",
+                            "power_transformer",
+                            "normalizer",
+                            "binarizer",
+                            "polynomial_features",
+                            "k_bins_discretizer",
+                            "ordinal_encoder",
+                            "one_hot_encoder",
+                            "apply_math_function",
+                            "linear_combination",
+                            "create_interaction",
+                        ],
+                    },
+                    "columns": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "petal_length",
+                                "petal_width",
+                                "sepal_length",
+                                "sepal_width",
+                                "species",
+                            ],
+                        },
+                    },
+                },
+                "required": ["function", "columns"],
+            },
+        }
+    },
+    "required": ["transformations"],
+}
+
 schemas = {
     "single_argument_schema": {
         "type": "object",
@@ -125,38 +173,4 @@ schemas = {
         "required": ["function"],
     },
     "create_interaction_schema": {"type": "object", "properties": {}, "required": []},
-}
-
-{
-    "type": "json_object",
-    "schema": {
-        "type": "object",
-        "properties": {
-            "function_name": {
-                "type": "string",
-                "enum": ["linear_combination", "create_interaction"],
-            },
-            "column_name_1": {
-                "type": "string",
-                "enum": [
-                    "sepal length (cm)",
-                    "sepal width (cm)",
-                    "petal length (cm)",
-                    "petal width (cm)",
-                    "target",
-                ],
-            },
-            "column_name_2": {
-                "type": "string",
-                "enum": [
-                    "sepal length (cm)",
-                    "sepal width (cm)",
-                    "petal length (cm)",
-                    "petal width (cm)",
-                    "target",
-                ],
-            },
-        },
-        "required": ["function_name", "column_name_1", "column_name_2"],
-    },
 }
