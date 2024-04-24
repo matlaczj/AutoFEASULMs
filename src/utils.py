@@ -1,11 +1,9 @@
-import ast
-import os
-from typing import Dict
+import ast, os, random
 from functools import lru_cache
 from pandas import DataFrame
-import random
 import numpy as np
 from typing import Dict, List, Any
+from sklearn import datasets
 
 
 def extract_functions_with_args_and_values(filename: str) -> Dict[str, Dict[str, Any]]:
@@ -67,7 +65,7 @@ def describe_transformations(
     functions = extract_functions_with_args_and_values(filename)
 
     function_headers = "\n".join(
-        f"""{"def " if if_def else "- "}{'`' if if_backtick else ''}{func}({', '.join(f'{arg}:{functions[func][arg] if functions[func][arg] is not None else "any"}' for arg in args if arg not in skip_args)}){'`' if if_backtick else ''}"""
+        f"""{"def " if if_def else "- "}{'`' if if_backtick else ''}{func}({', '.join(f'{arg}:{functions[func][arg] if functions[func][arg] is not None else ""}' for arg in args if arg not in skip_args)}){'`' if if_backtick else ''}"""
         for func, args in functions.items()
     )
     return function_headers
@@ -122,7 +120,7 @@ def get_model_dict(use_cache: bool = True) -> Dict[str, str]:
         """
         return get_model_dict_no_cache(base_dir)
 
-    from config import config
+    from src.config import config
 
     base_dir = config["model_base_dir"]
     if use_cache:
@@ -232,3 +230,69 @@ def describe_strong_correlations(df: DataFrame, threshold: float) -> str:
             for corr in sorted_correlations
         ]
     )
+
+
+def check_dtype(df, column_name):
+    numeric_types = [
+        "int8",
+        "int16",
+        "int32",
+        "int64",
+        "uint8",
+        "uint16",
+        "uint32",
+        "uint64",
+        "float16",
+        "float32",
+        "float64",
+        "complex64",
+        "complex128",
+    ]
+    non_numeric_types = [
+        "object",
+        "bool",
+        "datetime64[ns]",
+        "timedelta[ns]",
+        "category",
+        "period",
+        "sparse",
+        "interval",
+    ]
+
+    if df[column_name].dtypes in numeric_types:
+        return "Numeric"
+    elif df[column_name].dtypes in non_numeric_types:
+        return "Non-numeric"
+    else:
+        return "Unknown"
+
+
+def check_if_dtype(df, column_name, dtype):
+    if check_dtype(df, column_name) == dtype:
+        return True
+    else:
+        print(f"Column '{column_name}' should be of type '{dtype}'")
+        return False
+
+
+def load_dataset_by_name(name: str) -> DataFrame:
+    """Load a dataset by name from the `sklearn.datasets` module.
+
+    Args:
+        name (str): The name of the dataset to load. Possible values are: "breast_cancer", "diabetes", "digits", "files", "iris", "linnerud", "sample_image", "sample_images", "wine".
+
+    Returns:
+        DataFrame: The loaded dataset with target variable.
+
+    Example:
+        >>> df = load_dataset_by_name("diabetes")
+    """
+
+    try:
+        load_func = getattr(datasets, f"load_{name}")
+        X, y = load_func(return_X_y=True, as_frame=True)
+        X["target"] = y
+        return X
+    except AttributeError:
+        print(f"No dataset found with name: {name}")
+        return None
