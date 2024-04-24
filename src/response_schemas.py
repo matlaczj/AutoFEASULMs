@@ -67,8 +67,6 @@ schema = {
                                 "l1",
                                 "l2",
                                 "max",
-                                "onehot",
-                                "onehot-dense",
                                 "ordinal",
                                 "quantile",
                                 "kmeans",

@@ -1,9 +1,18 @@
 import ast, os, random
 from functools import lru_cache
-from pandas import DataFrame
+from pandas import DataFrame, Series
 import numpy as np
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Tuple
 from sklearn import datasets
+from src import tool_handlers
+from sklearn.model_selection import cross_val_score
+from sklearn.metrics import (
+    make_scorer,
+    r2_score,
+    f1_score,
+    explained_variance_score,
+    mean_absolute_percentage_error,
+)
 
 
 def extract_functions_with_args_and_values(filename: str) -> Dict[str, Dict[str, Any]]:
@@ -275,14 +284,14 @@ def check_if_dtype(df, column_name, dtype):
         return False
 
 
-def load_dataset_by_name(name: str) -> DataFrame:
+def load_dataset_by_name(name: str) -> Tuple[DataFrame, Series]:
     """Load a dataset by name from the `sklearn.datasets` module.
 
     Args:
         name (str): The name of the dataset to load. Possible values are: "breast_cancer", "diabetes", "digits", "files", "iris", "linnerud", "sample_image", "sample_images", "wine".
 
     Returns:
-        DataFrame: The loaded dataset with target variable.
+        Tuple[DataFrame, Series]: A tuple containing the features DataFrame and the target Series.
 
     Example:
         >>> df = load_dataset_by_name("diabetes")
@@ -292,7 +301,144 @@ def load_dataset_by_name(name: str) -> DataFrame:
         load_func = getattr(datasets, f"load_{name}")
         X, y = load_func(return_X_y=True, as_frame=True)
         X["target"] = y
-        return X
+        return X, y
     except AttributeError:
         print(f"No dataset found with name: {name}")
+        return None, None
+
+
+def run_function_by_name(module, function_name: str, *args, **kwargs):
+    """Run a function by its name from a specified module.
+
+    Args:
+        module: The name of the module where the function is located.
+        function_name (str): The name of the function to run.
+        *args: Variable length argument list to pass to the function.
+        **kwargs: Arbitrary keyword arguments to pass to the function.
+
+    Returns:
+        The return value of the function call.
+
+    Example:
+        >>> result = run_function_by_name("math", "sqrt", 16)
+    """
+    try:
+        func = getattr(module, function_name)
+        return func(*args, **kwargs)
+    except AttributeError:
+        print(f"No function '{function_name}' found in module: {module.__name__}")
         return None
+    except ImportError:
+        print(f"No module found with name: {module.__name__}")
+        return None
+
+
+def execute_transformations(
+    df: DataFrame,
+    transformations: Dict[str, List],
+    drop_old: bool = False,
+):
+    for tr in transformations["transformations"]:
+        try:
+            columns_before = df.columns
+            print(f"Executing transformation: {tr['function']}")
+            returned = run_function_by_name(
+                tool_handlers,
+                tr["function"] + "_handler",
+                df,
+                tr,
+                drop_old,
+            )
+            if returned is not None:
+                column_after = returned.columns
+                print(f"Added columns: {set(column_after) - set(columns_before)}")
+                df = returned
+        except (ValueError, AttributeError) as e:
+            print(f"Error in executing transformation: {tr['function']}")
+            print(e)
+    return df
+
+
+def cross_validate_model(
+    df,
+    target,
+    target_variable,
+    model,
+    problem_type,
+    cross_val=5,
+):
+    # Split the dataset into features (X) and target variable (y)
+    try:
+        X = df.drop(target_variable, axis=1)
+    except KeyError:
+        X = df
+    y = target
+
+    # Perform cross-validation on the model
+    scores = cross_val_score(
+        model,
+        X,
+        y,
+        cv=cross_val,
+        scoring=make_scorer(
+            f1_score
+            if problem_type == "classification"
+            else mean_absolute_percentage_error
+        ),
+    )
+
+    # # Calculate the mean and standard deviation of the cross-validation scores
+    mean_score = np.mean(scores)
+    std_score = np.std(scores)
+
+    print(f"Mean score: {mean_score:.2f}")
+    print(f"Std score: {std_score:.2f}")
+
+    return mean_score, std_score
+
+
+def calculate_percentage_change(mean_score1, mean_score2, std_score1, std_score2):
+    score_change_percentage = ((mean_score2 - mean_score1) / mean_score1) * 100
+    std_change_percentage = ((std_score2 - std_score1) / std_score1) * 100
+    print(f"Mean score change: {score_change_percentage:.2f}%")
+    print(f"Std score change: {std_change_percentage:.2f}%")
+    return score_change_percentage, std_change_percentage
+
+
+def remove_duplicate_columns(df):
+    df = df.loc[:, ~df.T.duplicated(keep="first")]
+    return df
+
+
+def drop_correlated_columns(df, target, threshold_target=0.1, threshold_features=0.9):
+    columns_before = df.columns
+    # Calculate the correlation matrix
+    corr_matrix = df.corr().abs()
+
+    # Create a mask for correlations that are below the threshold with the target variable
+    low_corr_with_target = corr_matrix[target] < threshold_target
+
+    # Drop the columns that have low correlation with the target variable
+    df = df.drop(df.columns[low_corr_with_target], axis=1)
+
+    # Recalculate the correlation matrix
+    corr_matrix = df.corr().abs()
+
+    # Create a mask for correlations that are above the threshold with any other variable
+    high_corr_with_others = np.triu(np.ones(corr_matrix.shape), k=1).astype(np.bool)
+    high_corr_matrix = corr_matrix.where(high_corr_with_others)
+
+    # Find the first column that has high correlation with any other variable
+    to_drop = []
+    for column in high_corr_matrix.columns:
+        high_corr = high_corr_matrix[column] > threshold_features
+        if any(high_corr):
+            # Get the name of the first highly correlated column
+            correlated_column = high_corr.idxmax()
+            to_drop.append(correlated_column)
+
+    # Drop the first column that has high correlation with any other variable
+    df = df.drop(df[to_drop], axis=1)
+    columns_after = df.columns
+    print(f"Removed columns: {set(columns_before) - set(columns_after)}")
+    return df

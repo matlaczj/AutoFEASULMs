@@ -16,56 +16,9 @@ from sklearn.preprocessing import (
 )
 from src.utils import check_if_dtype
 
-# NOTE: Every variable ending with '_accepted' is a special variable that is extracted by another script to create prompt. Function headers are also extracted by that script.
-# NOTE: After adding a new function, remember to manually update response_schemas file.
-
-complex_tools = {
-    "quantile_transformer": {
-        "arguments": {
-            "n_quantiles": {"type": "number", "minimum": 2, "maximum": 100},
-            "output_distribution": {"type": "string", "enum": ["uniform", "normal"]},
-        }
-    },
-    "power_transformer": {
-        "arguments": {"method": {"type": "string", "enum": ["yeo-johnson", "box-cox"]}}
-    },
-    "apply_math_function": {
-        "arguments": {
-            "function": {
-                "type": "string",
-                "enum": [
-                    "log",
-                    "sqrt",
-                    "exp",
-                    "square",
-                    "cube",
-                    "inverse",
-                    "log2",
-                    "log10",
-                    "abs",
-                    "ceil",
-                    "floor",
-                    "round",
-                ],
-            }
-        }
-    },
-    "normalizer": {
-        "arguments": {"norm": {"type": "string", "enum": ["l1", "l2", "max"]}}
-    },
-    "binarizer": {"arguments": {"threshold": {"type": "number"}}},
-    "polynomial_features": {"arguments": {"degree": {"type": "number", "minimum": 2}}},
-    "k_bins_discretizer": {
-        "arguments": {
-            "n_bins": {"type": "number", "minimum": 2, "maximum": 100},
-            "encode": {"type": "string", "enum": ["onehot", "onehot-dense", "ordinal"]},
-            "strategy": {"type": "string", "enum": ["uniform", "quantile", "kmeans"]},
-        }
-    },
-    "linear_combination": {
-        "arguments": {"weight_1": {"type": "number"}, "weight_2": {"type": "number"}}
-    },
-}
+# NOTE:
+# 1. Every variable ending with '_accepted' is a special variable that is extracted by another script to create prompt. Function headers are also extracted by that script.
+# 2. After adding a new function, remember to manually update `response_schemas.py` file and `tool_handlers.py` file.
 
 
 def standard_scaler(df, column_name, drop_old=False):
@@ -172,7 +125,7 @@ def apply_math_function(df, column_name, function, drop_old=False):
         "round": np.round,
     }
     transformer = FunctionTransformer(func=function_dict[function])
-    df[f"{column_name}_{function}"] = transformer.transform(df[[column_name]])
+    df[f"{column_name}_{function}"] = transformer.transform(df[[column_name]]).fillna(0)
     if drop_old:
         df.drop(column_name, axis=1, inplace=True)
     return df
@@ -221,15 +174,15 @@ def polynomial_features(df, column_name, degree=2, drop_old=False):
 
 
 def k_bins_discretizer(
-    df, column_name, n_bins=5, encode="onehot", strategy="quantile", drop_old=False
+    df, column_name, n_bins=5, encode="ordinal", strategy="quantile", drop_old=False
 ):
     if not check_if_dtype(df, column_name, "Numeric"):
         return df
     n_bins_accepted = np.arange(2, 101)
-    encode_accepted = ["onehot", "onehot-dense", "ordinal"]
+    encode_accepted = ["ordinal"]
     strategy_accepted = ["uniform", "quantile", "kmeans"]
     if encode not in encode_accepted:
-        raise ValueError("encode must be either 'onehot', 'onehot-dense', or 'ordinal'")
+        raise ValueError("encode must be 'ordinal'")
     if strategy not in strategy_accepted:
         raise ValueError("strategy must be either 'uniform', 'quantile', or 'kmeans'")
     if n_bins not in n_bins_accepted:
@@ -285,8 +238,9 @@ def remove_column(df, column_name):
 def linear_combination(
     df, column_name_1, column_name_2, weight_1=1, weight_2=1, drop_old=False
 ):
-    if check_if_dtype(df, column_name_1, "Numeric") or check_if_dtype(
-        df, column_name_2, "Numeric"
+    if not (
+        check_if_dtype(df, column_name_1, "Numeric")
+        and check_if_dtype(df, column_name_2, "Numeric")
     ):
         return df
     df[f"{column_name_1}_{column_name_2}_linear_combination"] = (
@@ -298,8 +252,9 @@ def linear_combination(
 
 
 def create_interaction(df, column_name_1, column_name_2, drop_old=False):
-    if check_if_dtype(df, column_name_1, "Numeric") or check_if_dtype(
-        df, column_name_2, "Numeric"
+    if not (
+        check_if_dtype(df, column_name_1, "Numeric")
+        and check_if_dtype(df, column_name_2, "Numeric")
     ):
         return df
     df[f"{column_name_1}_{column_name_2}_interaction"] = (
@@ -311,8 +266,9 @@ def create_interaction(df, column_name_1, column_name_2, drop_old=False):
 
 
 def subtract_columns(df, column_name_1, column_name_2, drop_old=False):
-    if check_if_dtype(df, column_name_1, "Numeric") or check_if_dtype(
-        df, column_name_2, "Numeric"
+    if not (
+        check_if_dtype(df, column_name_1, "Numeric")
+        and check_if_dtype(df, column_name_2, "Numeric")
     ):
         return df
     df[f"{column_name_1}_{column_name_2}_subtraction"] = (

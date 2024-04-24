@@ -112,9 +112,9 @@ def test_polynomial_features(degree, column):
 @pytest.mark.parametrize(
     "n_bins,encode,strategy,column",
     [
-        (5, "onehot", "quantile", "sepal length (cm)"),
+        (5, "ordinal", "quantile", "sepal length (cm)"),
         (3, "ordinal", "uniform", "sepal width (cm)"),
-        (4, "onehot", "quantile", "petal length (cm)"),
+        (4, "ordinal", "quantile", "petal length (cm)"),
         (2, "ordinal", "uniform", "petal width (cm)"),
     ],
 )

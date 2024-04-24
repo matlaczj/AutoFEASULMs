@@ -1,8 +1,7 @@
-import pytest
 import pandas as pd
-import numpy as np
-import os
 from src.utils import *
+import pandas as pd
+from src.utils import drop_correlated_columns
 
 
 def test_extract_functions_with_args_and_values():
@@ -60,3 +59,49 @@ def test_check_if_dtype():
     assert check_if_dtype(df, "A", "Numeric") == True
     assert check_if_dtype(df, "B", "Non-numeric") == True
     assert check_if_dtype(df, "A", "Non-numeric") == False
+
+
+def test_drop_correlated_columns():
+    # Create a DataFrame for testing
+    df = pd.DataFrame(
+        {
+            "target": [1, 2, 3, 4, 5],
+            "low_corr": [
+                1,
+                1,
+                1,
+                1,
+                1,
+            ],  # This column has low correlation with the target
+            "high_corr1": [
+                1,
+                2,
+                3,
+                4,
+                5,
+            ],  # These two columns have high correlation with each other
+            "high_corr2": [1, 2, 3, 4, 5],
+            "unrelated": [
+                5,
+                4,
+                3,
+                2,
+                1,
+            ],  # This column is not correlated with the target or any other column
+        }
+    )
+
+    # Apply the function
+    result = drop_correlated_columns(df, "target")
+
+    # Check that the low_corr column was dropped
+    assert "low_corr" not in result.columns
+
+    # Check that only one of the high_corr columns was dropped
+    assert ("high_corr1" in result.columns) != ("high_corr2" in result.columns)
+
+    # Check that the unrelated column was not dropped
+    assert "unrelated" in result.columns
+
+    # Check that the target column was not dropped
+    assert "target" in result.columns
