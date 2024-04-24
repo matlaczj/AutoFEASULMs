@@ -12,6 +12,7 @@ from sklearn.metrics import (
     f1_score,
     explained_variance_score,
     mean_absolute_percentage_error,
+    accuracy_score,
 )
 
 
@@ -374,25 +375,27 @@ def cross_validate_model(
         X = df
     y = target
 
+    scorer = (
+        accuracy_score
+        if problem_type == "classification"
+        else mean_absolute_percentage_error
+    )
+
     # Perform cross-validation on the model
     scores = cross_val_score(
         model,
         X,
         y,
         cv=cross_val,
-        scoring=make_scorer(
-            f1_score
-            if problem_type == "classification"
-            else mean_absolute_percentage_error
-        ),
+        scoring=make_scorer(scorer),
     )
 
     # # Calculate the mean and standard deviation of the cross-validation scores
     mean_score = np.mean(scores)
     std_score = np.std(scores)
 
-    print(f"Mean score: {mean_score:.2f}")
-    print(f"Std score: {std_score:.2f}")
+    print(f"Mean of {scorer.__name__} scores: {mean_score:.2f}")
+    print(f"Std of {scorer.__name__} scores: {std_score:.2f}")
 
     return mean_score, std_score
 
@@ -410,7 +413,7 @@ def remove_duplicate_columns(df):
     return df
 
 
-def drop_correlated_columns(df, target, threshold_target=0.1, threshold_features=0.9):
+def drop_correlated_columns(df, target, threshold_target=0.1, threshold_features=0.95):
     columns_before = df.columns
     # Calculate the correlation matrix
     corr_matrix = df.corr().abs()
@@ -422,10 +425,10 @@ def drop_correlated_columns(df, target, threshold_target=0.1, threshold_features
     df = df.drop(df.columns[low_corr_with_target], axis=1)
 
     # Recalculate the correlation matrix
-    corr_matrix = df.corr().abs()
+    corr_matrix = df.drop(columns=[target]).corr().abs()
 
     # Create a mask for correlations that are above the threshold with any other variable
-    high_corr_with_others = np.triu(np.ones(corr_matrix.shape), k=1).astype(np.bool)
+    high_corr_with_others = np.triu(np.ones(corr_matrix.shape), k=1).astype(bool)
     high_corr_matrix = corr_matrix.where(high_corr_with_others)
 
     # Find the first column that has high correlation with any other variable
@@ -436,9 +439,22 @@ def drop_correlated_columns(df, target, threshold_target=0.1, threshold_features
             # Get the name of the first highly correlated column
             correlated_column = high_corr.idxmax()
             to_drop.append(correlated_column)
+            print(
+                f"Dropping column '{correlated_column}' because of high correlation with '{column}'"
+            )
 
     # Drop the first column that has high correlation with any other variable
     df = df.drop(df[to_drop], axis=1)
     columns_after = df.columns
     print(f"Removed columns: {set(columns_before) - set(columns_after)}")
+    return df
+
+
+def handle_invalid_data(df):
+    # Replace infinities with np.nan
+    df.replace([np.inf, -np.inf], np.nan, inplace=True)
+
+    # Fill np.nan with mean of the column
+    df.fillna(df.mean(), inplace=True)
+
     return df

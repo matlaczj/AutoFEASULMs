@@ -66,7 +66,11 @@ def power_transformer_handler(
     if len(transformation["columns"]) < 1:
         return df
     column_name = transformation["columns"][0]
-    method = transformation["categorical_arguments"][0]
+    method = (
+        transformation["categorical_arguments"][0]
+        if len(transformation["categorical_arguments"]) > 0
+        else "yeo-johnson"
+    )
     return power_transformer(df, column_name, method, drop_old)
 
 
@@ -243,4 +247,6 @@ def remove_column_handler(
     if len(transformation["columns"]) < 1:
         return df
     column_name = transformation["columns"][0]
+    if column_name == "target":
+        return df
     return remove_column(df, column_name)
