@@ -20,14 +20,12 @@ import json
 from experiments import prepare_experiments, datasets, classical_models, experiment_base
 from func_timeout import FunctionTimedOut
 
-# TODO Dropping columns.
 # TODO More column analysis in prompt.
-# TODO Play with other models from `sklearn.datasets`.
-# TODO: Select N most correlated features with target.
 # TODO: Check for memory leakage of context.
 # TODO: Do hyperparameter tuning to show real value of feature engineering.
 # TODO: Reverse FE if score decreases.
-# TODO: Save ALL details to logs.
+# TODO: Add more functions and remove some of them.
+# TODO: Lock columns in 1st iteration.
 
 global df, llm, scores
 experiments = prepare_experiments(datasets, classical_models, experiment_base)
@@ -110,24 +108,27 @@ for experiment in experiments:
             transformations=json_content,
             drop_old=False,
         )
-        handle_invalid_data(df)
+        df = handle_invalid_data(df)
         df = remove_duplicate_columns(df)
 
-        if experiment["problem"]["type"] == "regression":
-            df = select_most_correlated(
-                df=df,
-                target=experiment["dataset"]["target_variable"],
-                n=experiment["feature_engineering"]["n_most_correlated"],
-            )
-        else:
-            df = drop_correlated_columns(
-                df=df,
-                target=experiment["dataset"]["target_variable"],
-                threshold_features=experiment["feature_engineering"][
-                    "threshold_features"
-                ],
-                threshold_target=experiment["feature_engineering"]["threshold_target"],
-            )
+        if iteration > experiment["feature_engineering"]["delayed_deletion"]:
+            if experiment["problem"]["type"] == "regression":
+                df = select_most_correlated(
+                    df=df,
+                    target=experiment["dataset"]["target_variable"],
+                    n=experiment["feature_engineering"]["n_most_correlated"],
+                )
+            else:
+                df = drop_correlated_columns(
+                    df=df,
+                    target=experiment["dataset"]["target_variable"],
+                    threshold_features=experiment["feature_engineering"][
+                        "threshold_features"
+                    ],
+                    threshold_target=experiment["feature_engineering"][
+                        "threshold_target"
+                    ],
+                )
 
         # Prevent leakage of target variable
         df = df.drop(
@@ -163,16 +164,31 @@ for experiment in experiments:
 
         plot_scores(
             scores,
-            big_title=f"Results of {experiment["ID"]}",
+            big_title=f"""Experiment ID: {experiment["ID"]}""",
             score_axis_title=(
-                f"{experiment["validation"]["kfold"]}-Fold Cross-Val Accuracy Score [%] With Std Dev"
+                f"""{experiment["validation"]["kfold"]}-Fold Cross-Val Accuracy Score [%] With Std Dev"""
                 if experiment["problem"]["type"] == "classification"
-                else f"{experiment["validation"]["kfold"]}-Fold Cross-Val R2 Score With Std Dev"
+                else f"""{experiment["validation"]["kfold"]}-Fold Cross-Val R2 Score With Std Dev"""
             ),
             path=iter_base + "scores.pdf",
         )
+
+        # Early stopping mechanism
+        k = experiment["feature_engineering"]["early_stopping"]
+        if iteration >= k:
+            last_k_scores = [score["mean_score"] for score in scores[-k:]]
+            if all(
+                [
+                    (last_k_scores[i] > last_k_scores[i + 1])
+                    for i in range(len(last_k_scores) - 1)
+                ]
+            ):
+                print("Early stopping mechanism triggered.")
+                break
 
     del llm
     del df
     del scores
     print(f"Experiment {experiment['ID']} completed.")
+
+# %%

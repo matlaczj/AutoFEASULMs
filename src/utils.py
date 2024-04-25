@@ -407,8 +407,8 @@ def cross_validate_model(
 
 
 def calculate_percentage_change(mean_score1, mean_score2, std_score1, std_score2):
-    score_change_percentage = ((mean_score2 - mean_score1) / mean_score1) * 100
-    std_change_percentage = ((std_score2 - std_score1) / std_score1) * 100
+    score_change_percentage = ((mean_score2 - mean_score1) / abs(mean_score1)) * 100
+    std_change_percentage = ((std_score2 - std_score1) / abs(std_score1)) * 100
     print(f"Mean score change: {score_change_percentage:.2f}%")
     print(f"Std score change: {std_change_percentage:.2f}%")
     return score_change_percentage, std_change_percentage
@@ -474,10 +474,13 @@ def select_most_correlated(df, target, n):
 
 def handle_invalid_data(df):
     # Replace infinities with np.nan
-    df.replace([np.inf, -np.inf], np.nan, inplace=True)
+    df = df.replace(
+        [np.inf, -np.inf],
+        np.nan,
+    )
 
-    # Fill np.nan with mean of the column
-    df.fillna(df.mean(), inplace=True)
+    # Fill np.nan with most common value in each column
+    df = df.fillna(df.mode().iloc[0])
 
     return df
 

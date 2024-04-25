@@ -164,6 +164,8 @@ experiment_base = {
         "n_most_correlated": 20,
         "threshold_features": 0.8,
         "threshold_target": 0.1,
+        "early_stopping": 3,
+        "delayed_deletion": 2,
     },
     "validation": {
         "kfold": 10,
@@ -178,6 +180,7 @@ experiment_base = {
 
 def prepare_experiments(datasets, classical_models, experiment_base):
     experiments = []
+    i = 0
     for dataset in datasets:
         for model in classical_models:
             if dataset["type"] == model["type"]:
@@ -192,7 +195,8 @@ def prepare_experiments(datasets, classical_models, experiment_base):
                 ]
                 experiment["problem"]["model"] = model["model"]
                 experiment["ID"] = (
-                    f'MISTRAL-{dataset["name"].upper()}-{model["machine_learning_model"].upper()}'
-                )
+                    f'{i}-MISTRAL-{dataset["name"].upper()}-{model["machine_learning_model"].upper()}'
+                ).replace(" ", "_")
                 experiments.append(experiment)
+                i += 1
     return experiments
