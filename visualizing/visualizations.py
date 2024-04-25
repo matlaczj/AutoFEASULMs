@@ -364,6 +364,7 @@ def plot_scores(
     data: List[Dict],
     score_axis_title: str = "10-Fold Cross-Val Accuracy Score [%] With Std Dev",
     path: str = "scores.pdf",
+    big_title: str = "",
 ) -> None:
     """
     Function to plot mean_score, mean_std, and num_columns.
@@ -440,6 +441,7 @@ def plot_scores(
     ax2.set_ylabel("Total Number of Columns", color="tab:gray")
     ax2.plot(df.index, df["num_columns"], color="tab:gray", alpha=0.5)
     ax2.tick_params(axis="y", labelcolor="tab:gray")
+    plt.title(big_title)
 
     fig.tight_layout()
     # Save the plot as pdf file

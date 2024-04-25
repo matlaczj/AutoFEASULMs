@@ -8,6 +8,8 @@ from utils import (
 )
 import pandas as pd
 import json
+from func_timeout import func_set_timeout
+from func_timeout import FunctionTimedOut
 
 
 def initialize_llm(
@@ -39,6 +41,7 @@ def initialize_llm(
     )
 
 
+@func_set_timeout(120)  # Timeout of 2 minutes
 def create_chat_completion(
     llm: Llama,
     messages: List[Dict[str, str]],
