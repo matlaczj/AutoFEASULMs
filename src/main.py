@@ -10,6 +10,7 @@ from utils import (
     remove_duplicate_columns,
     handle_invalid_data,
     select_most_correlated,
+    default_func,
 )
 from response_schemas import schema
 from src.tool_handlers import *
@@ -21,6 +22,10 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, mean_absolute_percentage_error
+from visualizing.visualizations import plot_scores
+from src.config import config
+import os
+import json
 
 # TODO Dropping columns.
 # TODO More column analysis in prompt.
@@ -29,9 +34,11 @@ from sklearn.metrics import accuracy_score, mean_absolute_percentage_error
 # TODO: Check for memory leakage of context.
 # TODO: Do hyperparameter tuning to show real value of feature engineering.
 # TODO: Reverse FE if score decreases.
+# TODO: Save ALL details to logs.
 
 # Define the experiment
 experiment = {
+    "ID": "MIST-WINE-CLAS-SVC-1",
     "model": {
         "name": "MISTRAL-7B-INSTRUCT-V0.2.Q6_K",  # "MISTRAL-7B-INSTRUCT-V0.2.Q6_K"
         "chat_format": "mistral-instruct",  # "mistral-instruct"
@@ -68,11 +75,11 @@ experiment = {
     },
     "feature_engineering": {
         "iterations": 20,
-        "n_new_features": 10,
+        "n_new_features": 5,
         "n_unique_values": 10,
         "perc_digits_after_decimal": 20,
         "correlations_threshold": 0.3,
-        "temperature": 2,
+        "temperature": 1.5,
         "n_most_correlated": 20,
         "threshold_features": 0.8,
         "threshold_target": 0.1,
@@ -87,6 +94,14 @@ experiment = {
     "schema": schema,
 }
 
+
+# Create the directory if it doesn't exist
+exp_base = config["project_base_dir"] + f"\\src\\logs\\{experiment['ID']}\\"
+os.makedirs(exp_base, exist_ok=True)
+
+with open(exp_base + "experiment.json", "w") as f:
+    f.write(json.dumps(experiment, default=default_func))
+
 # Load the dataset
 global df
 df, target = load_dataset_by_name(experiment["dataset"]["name"])
@@ -94,7 +109,7 @@ handle_invalid_data(df)
 
 # %%
 scores = []
-mean_score1, std_score1 = cross_validate_model(
+mean_score1, mean_std1 = cross_validate_model(
     df=df,
     target=target,
     target_variable=experiment["dataset"]["target_variable"],
@@ -104,10 +119,10 @@ mean_score1, std_score1 = cross_validate_model(
     scorers=experiment["validation"]["scorers"],
 )
 scores.append(
-    {"mean_score": mean_score1, "std_score": std_score1, "columns": list(df.columns)}
+    {"mean_score": mean_score1, "mean_std": mean_std1, "columns": list(df.columns)}
 )
 
-mean_score2, std_score2 = None, None
+mean_score2, mean_std2 = None, None
 model_path = get_model_dict(use_cache=False)[experiment["model"]["name"]]
 
 llm = initialize_llm(
@@ -122,6 +137,8 @@ llm = initialize_llm(
 for iteration in range(1, experiment["feature_engineering"]["iterations"] + 1):
     # Run the inference iteration
     print(f"ITERATION: {iteration}")
+    iter_base = exp_base + f"{iteration}\\"
+    os.makedirs(iter_base, exist_ok=True)
 
     # Adding target to allow correlation analysis
     df["target"] = target
@@ -135,6 +152,7 @@ for iteration in range(1, experiment["feature_engineering"]["iterations"] + 1):
             machine_learning_model=experiment["problem"]["machine_learning_model"],
             n_new_features=experiment["feature_engineering"]["n_new_features"],
             schema=experiment["schema"],
+            exp_base=iter_base,
             n_unique_values=experiment["feature_engineering"]["n_unique_values"],
             perc_digits_after_decimal=experiment["feature_engineering"][
                 "perc_digits_after_decimal"
@@ -177,7 +195,7 @@ for iteration in range(1, experiment["feature_engineering"]["iterations"] + 1):
         ]
     )
 
-    mean_score2, std_score2 = cross_validate_model(
+    mean_score2, mean_std2 = cross_validate_model(
         df=df,
         target=target,
         target_variable=experiment["dataset"]["target_variable"],
@@ -187,14 +205,25 @@ for iteration in range(1, experiment["feature_engineering"]["iterations"] + 1):
         scorers=experiment["validation"]["scorers"],
     )
 
-    calculate_percentage_change(mean_score1, mean_score2, std_score1, std_score2)
+    calculate_percentage_change(mean_score1, mean_score2, mean_std1, mean_std2)
     print(f"Iteraion {iteration} completed.")
     scores.append(
         {
-            "mean_score": mean_score1,
-            "std_score": std_score1,
+            "mean_score": mean_score2,
+            "mean_std": mean_std2,
             "columns": list(df.columns),
         }
     )
 
-print(scores)
+    with open(iter_base + "scores.json", "w") as f:
+        f.write(json.dumps(scores))
+
+    plot_scores(
+        scores,
+        score_axis_title=(
+            "10-Fold Cross-Val Accuracy Score [%] With Std Dev"
+            if experiment["problem"]["type"] == "classification"
+            else "10-Fold Cross-Val Mean Abs Perc Error [%] With Std Dev"
+        ),
+        path=iter_base + "scores.pdf",
+    )

@@ -16,6 +16,7 @@ from sklearn.metrics import (
 )
 from sklearn.preprocessing import LabelEncoder
 import pandas as pd
+import json
 
 
 def extract_functions_with_args_and_values(filename: str) -> Dict[str, Dict[str, Any]]:
@@ -479,3 +480,12 @@ def handle_invalid_data(df):
     df.fillna(df.mean(), inplace=True)
 
     return df
+
+
+def default_func(obj):
+    """Usage: json_str = json.dumps(data, default=default_func)"""
+    # If the object has a __str__ method, use it
+    if hasattr(obj, "__str__"):
+        return str(obj)
+    # Otherwise, use the default behavior
+    return json.JSONEncoder.default(obj)

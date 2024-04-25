@@ -97,6 +97,7 @@ def run_inference_iteration(
     machine_learning_model: str,
     n_new_features: int,
     schema: dict,
+    exp_base: str,
     n_unique_values: int = 10,
     perc_digits_after_decimal: int = 25,
     correlations_threshold: float = 0.3,
@@ -114,6 +115,7 @@ def run_inference_iteration(
         machine_learning_model (str): Name of the machine learning model to optimize features for.
         n_new_features (int): Number of new features to suggest in each iteration.
         schema (dict): Schema to use for final json output.
+        exp_base (str): Base directory for the experiment.
         n_unique_values (int, optional): Number of unique values to describe each column in `df`. Defaults to 10.
         perc_digits_after_decimal (int, optional): Percentage of digits after decimal to describe each column in `df`. Defaults to 25.
         correlations_threshold (float, optional): Threshold for interesting correlations. Defaults to 0.3.
@@ -123,9 +125,6 @@ def run_inference_iteration(
         Dict[str, Union[str, List[Union[str, float]]]]: Description of the new features to create by using the tools and their arguments.
     """
     from src.config import config
-
-    with open(config["project_base_dir"] + r"\src\logs\schema.json", "w") as f:
-        f.write(json.dumps(schema))
 
     unqiue_values = describe_unique_values(
         df=df, n=n_unique_values, perc_digits_after_decimal=perc_digits_after_decimal
@@ -141,7 +140,7 @@ def run_inference_iteration(
 
     prompt1 = f"{short_description}**COLUMNS:**\n- *UNIQUE VALUES:*\n{unqiue_values}- *CORRELATIONS:*\n{correlations}\n\n**TOOLS:**\n{function_headers}\n\n**RULES:**\n- You are a feature engineering and selection program that works in iterations and one iteration at a time.\n- You create new features from existing columns to make ML {machine_learning_model} model better at predicting target variable '{target_variable}' in {problem_type} problem.\n- Target column should remain unchanged as it would be considered cheating.\n- Every iteration you suggest {n_new_features} new column-tool combinations.\n- You don't write code. Instead you suggest tools and their arguments.\n- You create columns that are highly correlated with target feature.\n\n**CURRENT ITERATION:**"
 
-    with open(config["project_base_dir"] + r"\src\logs\prompt1.md", "w") as f:
+    with open(exp_base + "prompt1.md", "w") as f:
         f.write(prompt1)
 
     completion1 = create_chat_completion(
@@ -153,7 +152,7 @@ def run_inference_iteration(
     )
     message_content = get_message_content(completion1)
 
-    with open(config["project_base_dir"] + r"\src\logs\output1.md", "w") as f:
+    with open(exp_base + "output1.md", "w") as f:
         f.write(message_content)
 
     prompt2 = f"**TASK:**\nTurn the content into valid json like on the schema.\nRemember to put values of arguments in correct lists.\n**TOOLS:**\n{function_headers}\n**SCHEMA:**\n{schema}\n**CONTENT**:\n{message_content}\n**JSON:**\n"
@@ -162,7 +161,10 @@ def run_inference_iteration(
         "enum"
     ] = [col for col in df.columns]
 
-    with open(config["project_base_dir"] + r"\src\logs\prompt2.md", "w") as f:
+    with open(exp_base + "schema.json", "w") as f:
+        f.write(json.dumps(schema))
+
+    with open(exp_base + "prompt2.md", "w") as f:
         f.write(prompt2)
 
     completion2 = create_chat_completion(
@@ -181,7 +183,7 @@ def run_inference_iteration(
     )
 
     json_content = json.loads(get_message_content(completion2))
-    with open(config["project_base_dir"] + r"\src\logs\output2.json", "w") as f:
+    with open(exp_base + "output2.json", "w") as f:
         json.dump(json_content, f)
 
     return json_content
