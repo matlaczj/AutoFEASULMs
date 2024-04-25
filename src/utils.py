@@ -14,6 +14,8 @@ from sklearn.metrics import (
     mean_absolute_percentage_error,
     accuracy_score,
 )
+from sklearn.preprocessing import LabelEncoder
+import pandas as pd
 
 
 def extract_functions_with_args_and_values(filename: str) -> Dict[str, Dict[str, Any]]:
@@ -301,6 +303,9 @@ def load_dataset_by_name(name: str) -> Tuple[DataFrame, Series]:
     try:
         load_func = getattr(datasets, f"load_{name}")
         X, y = load_func(return_X_y=True, as_frame=True)
+        # Convert the target to numeric if it is non-numeric
+        if check_if_dtype(pd.DataFrame(y, columns=["y"]), "y", "Non-numeric"):
+            y = LabelEncoder().fit_transform(y)
         X["target"] = y
         return X, y
     except AttributeError:
@@ -367,6 +372,10 @@ def cross_validate_model(
     model,
     problem_type,
     cross_val=5,
+    scorers: Dict = {
+        "classification": accuracy_score,
+        "regression": mean_absolute_percentage_error,
+    },
 ):
     # Split the dataset into features (X) and target variable (y)
     try:
@@ -375,11 +384,7 @@ def cross_validate_model(
         X = df
     y = target
 
-    scorer = (
-        accuracy_score
-        if problem_type == "classification"
-        else mean_absolute_percentage_error
-    )
+    scorer = scorers[problem_type]
 
     # Perform cross-validation on the model
     scores = cross_val_score(
@@ -448,6 +453,22 @@ def drop_correlated_columns(df, target, threshold_target=0.1, threshold_features
     columns_after = df.columns
     print(f"Removed columns: {set(columns_before) - set(columns_after)}")
     return df
+
+
+def select_most_correlated(df, target, n):
+    # Calculate the absolute correlation of each column with the target
+    corr_with_target = df.corr()[target].abs()
+
+    # Sort the correlations in descending order
+    sorted_corr_with_target = corr_with_target.sort_values(ascending=False)
+
+    # Select the top N columns
+    top_n_columns = sorted_corr_with_target.index[
+        1 : n + 1
+    ]  # We start from 1 to exclude the target itself
+
+    # Return a dataframe with only the selected columns
+    return df[top_n_columns]
 
 
 def handle_invalid_data(df):

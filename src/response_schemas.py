@@ -30,7 +30,6 @@ schema = {
                             "k_bins_discretizer",
                             "ordinal_encoder",
                             "one_hot_encoder",
-                            "remove_column",
                             "linear_combination",
                             "create_interaction",
                             "subtract_columns",

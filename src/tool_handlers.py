@@ -239,14 +239,14 @@ def subtract_columns_handler(
     return subtract_columns(df, column_name_1, column_name_2, drop_old)
 
 
-def remove_column_handler(
-    df,
-    transformation: Dict[str, Union[str, List[Union[str, int, float]]]],
-    drop_old=False,
-):
-    if len(transformation["columns"]) < 1:
-        return df
-    column_name = transformation["columns"][0]
-    if column_name == "target":
-        return df
-    return remove_column(df, column_name)
+# def remove_column_handler(
+#     df,
+#     transformation: Dict[str, Union[str, List[Union[str, int, float]]]],
+#     drop_old=False,
+# ):
+#     if len(transformation["columns"]) < 1:
+#         return df
+#     column_name = transformation["columns"][0]
+#     if column_name == "target":
+#         return df
+#     return remove_column(df, column_name)

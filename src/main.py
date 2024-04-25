@@ -9,6 +9,7 @@ from utils import (
     drop_correlated_columns,
     remove_duplicate_columns,
     handle_invalid_data,
+    select_most_correlated,
 )
 from response_schemas import schema
 from src.tool_handlers import *
@@ -19,17 +20,21 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, mean_absolute_percentage_error
 
 # TODO Dropping columns.
 # TODO More column analysis in prompt.
 # TODO Play with other models from `sklearn.datasets`.
 # TODO: Select N most correlated features with target.
+# TODO: Check for memory leakage of context.
+# TODO: Do hyperparameter tuning to show real value of feature engineering.
+# TODO: Reverse FE if score decreases.
 
 # Define the experiment
 experiment = {
     "model": {
-        "name": "MISTRAL-7B-INSTRUCT-V0.2.Q6_K",
-        "chat_format": "mistral-instruct",
+        "name": "MISTRAL-7B-INSTRUCT-V0.2.Q6_K",  # "MISTRAL-7B-INSTRUCT-V0.2.Q6_K"
+        "chat_format": "mistral-instruct",  # "mistral-instruct"
         "n_gpu_layers": -1,
         "n_ctx": 512 * 16,
         "n_batch": 512 * 8,
@@ -62,16 +67,22 @@ experiment = {
         "model": SVC(),
     },
     "feature_engineering": {
+        "iterations": 20,
         "n_new_features": 10,
         "n_unique_values": 10,
-        "perc_digits_after_decimal": 25,
+        "perc_digits_after_decimal": 20,
         "correlations_threshold": 0.3,
-        "threshold_features": 0.9,
-        "threshold_target": 0.05,
-        "iterations": 10,
+        "temperature": 2,
+        "n_most_correlated": 20,
+        "threshold_features": 0.8,
+        "threshold_target": 0.1,
     },
     "validation": {
         "kfold": 10,
+        "scorers": {
+            "classification": accuracy_score,
+            "regression": mean_absolute_percentage_error,
+        },
     },
     "schema": schema,
 }
@@ -90,13 +101,15 @@ mean_score1, std_score1 = cross_validate_model(
     model=experiment["problem"]["model"],
     problem_type=experiment["problem"]["type"],
     cross_val=experiment["validation"]["kfold"],
+    scorers=experiment["validation"]["scorers"],
 )
-scores.append({"mean_score": mean_score1, "std_score": std_score1})
-# %%
-mean_score2, std_score2 = None, None
+scores.append(
+    {"mean_score": mean_score1, "std_score": std_score1, "columns": list(df.columns)}
+)
 
-# Initialize the model
+mean_score2, std_score2 = None, None
 model_path = get_model_dict(use_cache=False)[experiment["model"]["name"]]
+
 llm = initialize_llm(
     model_path=model_path,
     chat_format=experiment["model"]["chat_format"],
@@ -104,29 +117,36 @@ llm = initialize_llm(
     n_ctx=experiment["model"]["n_ctx"],
     n_batch=experiment["model"]["n_batch"],
 )
+# %%
 
 for iteration in range(1, experiment["feature_engineering"]["iterations"] + 1):
-    print(f"ITERATION: {iteration}")
     # Run the inference iteration
+    print(f"ITERATION: {iteration}")
+
     # Adding target to allow correlation analysis
     df["target"] = target
-    json_content = run_inference_iteration(
-        llm=llm,
-        df=df,
-        short_description=experiment["dataset"]["short_description"],
-        problem_type=experiment["problem"]["type"],
-        target_variable=experiment["dataset"]["target_variable"],
-        machine_learning_model=experiment["problem"]["machine_learning_model"],
-        n_new_features=experiment["feature_engineering"]["n_new_features"],
-        schema=experiment["schema"],
-        n_unique_values=experiment["feature_engineering"]["n_unique_values"],
-        perc_digits_after_decimal=experiment["feature_engineering"][
-            "perc_digits_after_decimal"
-        ],
-        correlations_threshold=experiment["feature_engineering"][
-            "correlations_threshold"
-        ],
-    )
+    try:
+        json_content = run_inference_iteration(
+            llm=llm,
+            df=df,
+            short_description=experiment["dataset"]["short_description"],
+            problem_type=experiment["problem"]["type"],
+            target_variable=experiment["dataset"]["target_variable"],
+            machine_learning_model=experiment["problem"]["machine_learning_model"],
+            n_new_features=experiment["feature_engineering"]["n_new_features"],
+            schema=experiment["schema"],
+            n_unique_values=experiment["feature_engineering"]["n_unique_values"],
+            perc_digits_after_decimal=experiment["feature_engineering"][
+                "perc_digits_after_decimal"
+            ],
+            correlations_threshold=experiment["feature_engineering"][
+                "correlations_threshold"
+            ],
+            temperature=experiment["feature_engineering"]["temperature"],
+        )
+    except ValueError as e:
+        print(f"ValueError: {e}")
+        break
 
     df = execute_transformations(
         df=df,
@@ -136,12 +156,19 @@ for iteration in range(1, experiment["feature_engineering"]["iterations"] + 1):
     handle_invalid_data(df)
     df = remove_duplicate_columns(df)
 
-    df = drop_correlated_columns(
-        df=df,
-        target=experiment["dataset"]["target_variable"],
-        threshold_features=experiment["feature_engineering"]["threshold_features"],
-        threshold_target=experiment["feature_engineering"]["threshold_target"],
-    )
+    if experiment["problem"]["type"] == "regression":
+        df = select_most_correlated(
+            df=df,
+            target=experiment["dataset"]["target_variable"],
+            n=experiment["feature_engineering"]["n_most_correlated"],
+        )
+    else:
+        df = drop_correlated_columns(
+            df=df,
+            target=experiment["dataset"]["target_variable"],
+            threshold_features=experiment["feature_engineering"]["threshold_features"],
+            threshold_target=experiment["feature_engineering"]["threshold_target"],
+        )
 
     # Prevent leakage of target variable
     df = df.drop(
@@ -157,8 +184,17 @@ for iteration in range(1, experiment["feature_engineering"]["iterations"] + 1):
         model=experiment["problem"]["model"],
         problem_type=experiment["problem"]["type"],
         cross_val=experiment["validation"]["kfold"],
+        scorers=experiment["validation"]["scorers"],
     )
-    scores.append({"mean_score": mean_score2, "std_score": std_score2})
+
     calculate_percentage_change(mean_score1, mean_score2, std_score1, std_score2)
+    print(f"Iteraion {iteration} completed.")
+    scores.append(
+        {
+            "mean_score": mean_score1,
+            "std_score": std_score1,
+            "columns": list(df.columns),
+        }
+    )
 
 print(scores)

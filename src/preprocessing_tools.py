@@ -230,9 +230,9 @@ def one_hot_encoder(df, column_name, drop_old=False):
     return new_df
 
 
-def remove_column(df, column_name):
-    df.drop(column_name, axis=1, inplace=True)
-    return df
+# def remove_column(df, column_name):
+#     df.drop(column_name, axis=1, inplace=True)
+#     return df
 
 
 def linear_combination(

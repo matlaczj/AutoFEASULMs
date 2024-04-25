@@ -100,6 +100,7 @@ def run_inference_iteration(
     n_unique_values: int = 10,
     perc_digits_after_decimal: int = 25,
     correlations_threshold: float = 0.3,
+    temperature: float = 0.7,
 ) -> Dict[str, Union[str, List[Union[str, float]]]]:
     """Runs an inference iteration. Writes the prompt and completion to log files.
     Does not write code. Instead suggests tools and their arguments.
@@ -116,6 +117,7 @@ def run_inference_iteration(
         n_unique_values (int, optional): Number of unique values to describe each column in `df`. Defaults to 10.
         perc_digits_after_decimal (int, optional): Percentage of digits after decimal to describe each column in `df`. Defaults to 25.
         correlations_threshold (float, optional): Threshold for interesting correlations. Defaults to 0.3.
+        temperature (float, optional): The randomness of the output. Lower values make the output more deterministic. Defaults to 0.7.
 
     Returns:
         Dict[str, Union[str, List[Union[str, float]]]]: Description of the new features to create by using the tools and their arguments.
@@ -137,7 +139,7 @@ def run_inference_iteration(
         if_backtick=True,
     )
 
-    prompt1 = f"{short_description}**COLUMNS:**\n- *UNIQUE VALUES:*\n{unqiue_values}- *CORRELATIONS:*\n{correlations}\n\n**TOOLS:**\n{function_headers}\n\n**RULES:**\n- You are a feature engineering and selection program that works in iterations.\n- You create new features from existing columns to make ML {machine_learning_model} model better at predicting target variable '{target_variable}' in {problem_type} problem.\n- Target column should remain unchanged as it would be considered cheating.\n- Every iteration you suggest {n_new_features} new column-tool combinations.\n- You don't write code. Instead you suggest tools and their arguments.\n- You create columns that are highly correlated with target feature.\n**CURRENT ITERATION:**"
+    prompt1 = f"{short_description}**COLUMNS:**\n- *UNIQUE VALUES:*\n{unqiue_values}- *CORRELATIONS:*\n{correlations}\n\n**TOOLS:**\n{function_headers}\n\n**RULES:**\n- You are a feature engineering and selection program that works in iterations and one iteration at a time.\n- You create new features from existing columns to make ML {machine_learning_model} model better at predicting target variable '{target_variable}' in {problem_type} problem.\n- Target column should remain unchanged as it would be considered cheating.\n- Every iteration you suggest {n_new_features} new column-tool combinations.\n- You don't write code. Instead you suggest tools and their arguments.\n- You create columns that are highly correlated with target feature.\n\n**CURRENT ITERATION:**"
 
     with open(config["project_base_dir"] + r"\src\logs\prompt1.md", "w") as f:
         f.write(prompt1)
@@ -147,6 +149,7 @@ def run_inference_iteration(
         messages=[
             {"role": "user", "content": prompt1},
         ],
+        temperature=temperature,
     )
     message_content = get_message_content(completion1)
 
@@ -174,12 +177,11 @@ def run_inference_iteration(
             "type": "json_object",
             "schema": schema,
         },
+        temperature=0.8,
     )
 
     json_content = json.loads(get_message_content(completion2))
     with open(config["project_base_dir"] + r"\src\logs\output2.json", "w") as f:
         json.dump(json_content, f)
-
-    llm.reset()
 
     return json_content
