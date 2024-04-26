@@ -155,20 +155,20 @@ experiment_base = {
         "model": "PLACEHOLDER",
     },
     "feature_engineering": {
-        "iterations": 10,
+        "iterations": 100,
         "n_new_features": 5,
         "n_unique_values": 10,
         "perc_digits_after_decimal": 20,
-        "correlations_threshold": 0.3,
+        "correlations_threshold": 0.5,
         "temperature": 1.5,
         "n_most_correlated": 20,
         "threshold_features": 0.8,
-        "threshold_target": 0.1,
-        "early_stopping": 3,
+        "early_stopping": 4,
         "delayed_deletion": 2,
+        "n_sampled_corr": 100,
     },
     "validation": {
-        "kfold": 10,
+        "kfold": 5,
         "scorers": {
             "classification": accuracy_score,
             "regression": r2_score,  # mean_absolute_percentage_error

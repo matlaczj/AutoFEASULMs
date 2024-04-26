@@ -197,13 +197,16 @@ def describe_unique_values(
     return result
 
 
-def describe_strong_correlations(df: DataFrame, threshold: float) -> str:
+def describe_strong_correlations(
+    df: DataFrame, threshold: float, n_samples: int = 100
+) -> str:
     """
     Get a list of pairs of columns in a DataFrame that have a correlation above a certain threshold.
 
     Parameters:
     df (DataFrame): The DataFrame to calculate correlations on.
     threshold (float): The correlation threshold. Pairs of columns with a correlation above this threshold will be returned.
+    n_samples (int): The number of samples to return. Defaults to 100.
 
     Returns:
     str: A string containing the pairs of columns and their correlations.
@@ -218,8 +221,8 @@ def describe_strong_correlations(df: DataFrame, threshold: float) -> str:
     # Apply the mask to the correlation matrix
     filtered_corr = correlations.mask(mask)
 
-    # Find where correlation is above the threshold
-    strong_correlations = filtered_corr[filtered_corr > threshold]
+    # Find where absolute correlation is above the threshold
+    strong_correlations = filtered_corr[filtered_corr.abs() > threshold]
 
     # Drop rows and columns with all NaN values (these are the ones below the threshold)
     strong_correlations.dropna(axis=0, how="all", inplace=True)
@@ -234,13 +237,20 @@ def describe_strong_correlations(df: DataFrame, threshold: float) -> str:
         for index, corr in stacked_correlations.items()
     ]
 
-    # Sort the list of correlations in descending order
-    sorted_correlations = sorted(correlation_list, key=lambda x: x[2], reverse=True)
+    # Sort the list of correlations in descending order by absolute value
+    sorted_correlations = sorted(
+        correlation_list, key=lambda x: abs(x[2]), reverse=True
+    )
+
+    # Sample N correlations
+    sampled_correlations = random.sample(
+        sorted_correlations, min(n_samples, len(sorted_correlations))
+    )
 
     return "\n".join(
         [
             "correlation between '{}' and '{}': {}".format(*corr)
-            for corr in sorted_correlations
+            for corr in sampled_correlations
         ]
     )
 
@@ -419,19 +429,11 @@ def remove_duplicate_columns(df):
     return df
 
 
-def drop_correlated_columns(df, target, threshold_target=0.1, threshold_features=0.95):
+def drop_correlated_columns(df, threshold_features=0.95):
     columns_before = df.columns
-    # Calculate the correlation matrix
-    corr_matrix = df.corr().abs()
-
-    # Create a mask for correlations that are below the threshold with the target variable
-    low_corr_with_target = corr_matrix[target] < threshold_target
-
-    # Drop the columns that have low correlation with the target variable
-    df = df.drop(df.columns[low_corr_with_target], axis=1)
 
     # Recalculate the correlation matrix
-    corr_matrix = df.drop(columns=[target]).corr().abs()
+    corr_matrix = df.corr().abs()
 
     # Create a mask for correlations that are above the threshold with any other variable
     high_corr_with_others = np.triu(np.ones(corr_matrix.shape), k=1).astype(bool)

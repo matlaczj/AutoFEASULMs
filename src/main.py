@@ -25,13 +25,22 @@ from func_timeout import FunctionTimedOut
 # TODO: Do hyperparameter tuning to show real value of feature engineering.
 # TODO: Reverse FE if score decreases.
 # TODO: Add more functions and remove some of them.
-# TODO: Lock columns in 1st iteration.
+# TODO: Speed up inference by using a single prompt for all columns.
+# TODO: Explain bad regression results with diabetes dataset.
+# TODO: Reduce context size by reducing number of correlations mentioned.
 
 global df, llm, scores
 experiments = prepare_experiments(datasets, classical_models, experiment_base)
 
+print(f"Number of experiments: {len(experiments)}")
+for experiment in experiments:
+    print(experiment["ID"])
+
 # %%
 for experiment in experiments:
+    # NOTE: Temporary for debugging
+    if int(experiment["ID"].split("-")[0]) not in [4, 5, 6, 9, 10]:
+        continue
 
     # Create the directory if it doesn't exist
     exp_base = config["project_base_dir"] + f"\\src\\logs\\{experiment['ID']}\\"
@@ -95,6 +104,7 @@ for experiment in experiments:
                     "correlations_threshold"
                 ],
                 temperature=experiment["feature_engineering"]["temperature"],
+                n_sampled_corr=experiment["feature_engineering"]["n_sampled_corr"],
             )
         except ValueError as e:
             print(f"ValueError: {e}")
@@ -118,17 +128,12 @@ for experiment in experiments:
                     target=experiment["dataset"]["target_variable"],
                     n=experiment["feature_engineering"]["n_most_correlated"],
                 )
-            else:
-                df = drop_correlated_columns(
-                    df=df,
-                    target=experiment["dataset"]["target_variable"],
-                    threshold_features=experiment["feature_engineering"][
-                        "threshold_features"
-                    ],
-                    threshold_target=experiment["feature_engineering"][
-                        "threshold_target"
-                    ],
-                )
+            df = drop_correlated_columns(
+                df=df,
+                threshold_features=experiment["feature_engineering"][
+                    "threshold_features"
+                ],
+            )
 
         # Prevent leakage of target variable
         df = df.drop(

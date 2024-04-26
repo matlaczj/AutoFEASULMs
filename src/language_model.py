@@ -41,7 +41,7 @@ def initialize_llm(
     )
 
 
-@func_set_timeout(120)  # Timeout of 2 minutes
+@func_set_timeout(60)  # Timeout of 1 minute
 def create_chat_completion(
     llm: Llama,
     messages: List[Dict[str, str]],
@@ -105,6 +105,7 @@ def run_inference_iteration(
     perc_digits_after_decimal: int = 25,
     correlations_threshold: float = 0.3,
     temperature: float = 0.7,
+    n_sampled_corr: int = 100,
 ) -> Dict[str, Union[str, List[Union[str, float]]]]:
     """Runs an inference iteration. Writes the prompt and completion to log files.
     Does not write code. Instead suggests tools and their arguments.
@@ -123,6 +124,7 @@ def run_inference_iteration(
         perc_digits_after_decimal (int, optional): Percentage of digits after decimal to describe each column in `df`. Defaults to 25.
         correlations_threshold (float, optional): Threshold for interesting correlations. Defaults to 0.3.
         temperature (float, optional): The randomness of the output. Lower values make the output more deterministic. Defaults to 0.7.
+        n_sampled_corr (int, optional): Number of samples to use for correlation analysis. Defaults to 100.
 
     Returns:
         Dict[str, Union[str, List[Union[str, float]]]]: Description of the new features to create by using the tools and their arguments.
@@ -132,7 +134,9 @@ def run_inference_iteration(
     unqiue_values = describe_unique_values(
         df=df, n=n_unique_values, perc_digits_after_decimal=perc_digits_after_decimal
     )
-    correlations = describe_strong_correlations(df=df, threshold=correlations_threshold)
+    correlations = describe_strong_correlations(
+        df=df, threshold=correlations_threshold, n_samples=n_sampled_corr
+    )
 
     function_headers = describe_transformations(
         filename=r"C:\Users\matlaczj\Documents\Repozytoria\AutoFEASULMs\src\preprocessing_tools.py",
