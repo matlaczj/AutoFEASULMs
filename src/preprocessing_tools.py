@@ -111,14 +111,14 @@ def apply_math_function(df, column_name, function, drop_old=False):
     if function not in function_accepted:
         raise ValueError(f"Unknown function: {function}")
     function_dict = {
-        "log": np.log,
-        "sqrt": np.sqrt,
+        "log": lambda x: np.log(np.abs(x) + 1e-9),
+        "sqrt": lambda x: np.sqrt(np.abs(x)),
         "exp": np.exp,
         "square": np.square,
         "cube": lambda x: np.power(x, 3),
-        "inverse": np.reciprocal,
-        "log2": np.log2,
-        "log10": np.log10,
+        "inverse": lambda x: np.reciprocal(x + 1e-9),
+        "log2": lambda x: np.log2(np.abs(x) + 1e-9),
+        "log10": lambda x: np.log10(np.abs(x) + 1e-9),
         "abs": np.abs,
         "ceil": np.ceil,
         "floor": np.floor,

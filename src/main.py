@@ -39,11 +39,17 @@ for experiment in experiments:
 # %%
 for experiment in experiments:
     # NOTE: Temporary for debugging
-    if int(experiment["ID"].split("-")[0]) not in [4, 5, 6, 9, 10]:
+    if int(experiment["ID"].split("-")[0]) < 4:
         continue
 
     # Create the directory if it doesn't exist
     exp_base = config["project_base_dir"] + f"\\src\\logs\\{experiment['ID']}\\"
+    counter = 1
+    while os.path.exists(exp_base):
+        exp_base = (
+            config["project_base_dir"] + f"\\src\\logs\\{experiment['ID']}-{counter}\\"
+        )
+        counter += 1
     os.makedirs(exp_base, exist_ok=True)
 
     with open(exp_base + "experiment.json", "w") as f:

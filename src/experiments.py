@@ -1,4 +1,9 @@
-from sklearn.metrics import accuracy_score, mean_absolute_percentage_error, r2_score
+from sklearn.metrics import (
+    accuracy_score,
+    mean_absolute_percentage_error,
+    r2_score,
+    f1_score,
+)
 from response_schemas import schema
 import copy
 
@@ -165,13 +170,13 @@ experiment_base = {
         "threshold_features": 0.8,
         "early_stopping": 4,
         "delayed_deletion": 2,
-        "n_sampled_corr": 100,
+        "n_sampled_corr": 40,
     },
     "validation": {
-        "kfold": 5,
+        "kfold": 10,
         "scorers": {
             "classification": accuracy_score,
-            "regression": r2_score,  # mean_absolute_percentage_error
+            "regression": r2_score,
         },
     },
     "schema": schema,

@@ -237,20 +237,20 @@ def describe_strong_correlations(
         for index, corr in stacked_correlations.items()
     ]
 
-    # Sort the list of correlations in descending order by absolute value
-    sorted_correlations = sorted(
-        correlation_list, key=lambda x: abs(x[2]), reverse=True
-    )
-
     # Sample N correlations
     sampled_correlations = random.sample(
-        sorted_correlations, min(n_samples, len(sorted_correlations))
+        correlation_list, min(n_samples, len(correlation_list))
+    )
+
+    # Sort the list of correlations in descending order by absolute value
+    sorted_correlations = sorted(
+        sampled_correlations, key=lambda x: abs(x[2]), reverse=True
     )
 
     return "\n".join(
         [
             "correlation between '{}' and '{}': {}".format(*corr)
-            for corr in sampled_correlations
+            for corr in sorted_correlations
         ]
     )
 
