@@ -1,357 +1,10 @@
 # %%
-data1 = [
-    {
-        "mean_score": 0.8761437908496731,
-        "mean_std": 0.07926369368650263,
-        "columns": [
-            "alcohol",
-            "malic_acid",
-            "ash",
-            "alcalinity_of_ash",
-            "magnesium",
-            "total_phenols",
-            "flavanoids",
-            "nonflavanoid_phenols",
-            "proanthocyanins",
-            "color_intensity",
-            "hue",
-            "od280/od315_of_diluted_wines",
-            "proline",
-            "target",
-        ],
-    },
-    {
-        "mean_score": 0.8931372549019606,
-        "mean_std": 0.08947387763437538,
-        "columns": [
-            "alcohol",
-            "malic_acid",
-            "magnesium",
-            "flavanoids",
-            "nonflavanoid_phenols",
-            "proanthocyanins",
-            "hue",
-            "od280/od315_of_diluted_wines",
-            "proline",
-            "alcohol_color_intensity_interaction",
-            "alcalinity_of_ash_log",
-            "alcalinity_of_ash_binarized_20",
-            "flavanoids_nonflavanoid_phenols_linear_combination",
-        ],
-    },
-    {
-        "mean_score": 0.9552287581699346,
-        "mean_std": 0.041672753624335215,
-        "columns": [
-            "alcohol",
-            "malic_acid",
-            "magnesium",
-            "nonflavanoid_phenols",
-            "proanthocyanins",
-            "od280/od315_of_diluted_wines",
-            "alcalinity_of_ash_log",
-            "alcalinity_of_ash_binarized_20",
-            "flavanoids_nonflavanoid_phenols_linear_combination",
-            "alcohol_color_intensity_interaction_poly_2",
-            "alcohol_color_intensity_interaction_poly_3",
-            "alcalinity_of_ash_binarized_20_binarized_1.0",
-            "proline_bin_5_ordinal_quantile",
-            "od280/od315_of_diluted_wines_hue_interaction",
-        ],
-    },
-    {
-        "mean_score": 0.9493464052287581,
-        "mean_std": 0.039004058604679016,
-        "columns": [
-            "malic_acid",
-            "magnesium",
-            "nonflavanoid_phenols",
-            "proanthocyanins",
-            "flavanoids_nonflavanoid_phenols_linear_combination",
-            "alcohol_color_intensity_interaction_poly_3",
-            "alcalinity_of_ash_binarized_20_binarized_1.0",
-            "proline_bin_5_ordinal_quantile",
-            "od280/od315_of_diluted_wines_hue_interaction",
-            "alcohol_poly_2",
-            "alcohol_poly_3",
-            "alcalinity_of_ash_log_quantile_transformed_5_normal",
-            "flavanoids_nonflavanoid_phenols_linear_combination_alcalinity_of_ash_binarized_20_interaction",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction",
-        ],
-    },
-    {
-        "mean_score": 0.9166666666666666,
-        "mean_std": 0.08695819912499181,
-        "columns": [
-            "malic_acid",
-            "magnesium",
-            "nonflavanoid_phenols",
-            "proanthocyanins",
-            "alcalinity_of_ash_binarized_20_binarized_1.0",
-            "alcohol_poly_3",
-            "alcalinity_of_ash_log_quantile_transformed_5_normal",
-            "flavanoids_nonflavanoid_phenols_linear_combination_alcalinity_of_ash_binarized_20_interaction",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction",
-            "alcohol_poly_2_flavanoids_nonflavanoid_phenols_linear_combination_interaction",
-            "nonflavanoid_phenols_proline_bin_5_ordinal_quantile_linear_combination",
-            "alcohol_poly_2_poly_2",
-            "alcohol_poly_2_poly_3",
-            "alcohol_poly_2_normalized_l2",
-            "od280/od315_of_diluted_wines_hue_interaction_log",
-        ],
-    },
-    {
-        "mean_score": 0.9107843137254902,
-        "mean_std": 0.08302261693851917,
-        "columns": [
-            "malic_acid",
-            "magnesium",
-            "nonflavanoid_phenols",
-            "proanthocyanins",
-            "alcalinity_of_ash_binarized_20_binarized_1.0",
-            "alcalinity_of_ash_log_quantile_transformed_5_normal",
-            "flavanoids_nonflavanoid_phenols_linear_combination_alcalinity_of_ash_binarized_20_interaction",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction",
-            "alcohol_poly_2_flavanoids_nonflavanoid_phenols_linear_combination_interaction",
-            "nonflavanoid_phenols_proline_bin_5_ordinal_quantile_linear_combination",
-            "alcohol_poly_2_poly_2",
-            "alcohol_poly_2_poly_3",
-            "alcohol_poly_2_normalized_l2",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2",
-            "alcohol_poly_3_magnesium_subtraction",
-        ],
-    },
-    {
-        "mean_score": 0.9107843137254902,
-        "mean_std": 0.08302261693851917,
-        "columns": [
-            "malic_acid",
-            "nonflavanoid_phenols",
-            "proanthocyanins",
-            "alcalinity_of_ash_binarized_20_binarized_1.0",
-            "alcalinity_of_ash_log_quantile_transformed_5_normal",
-            "flavanoids_nonflavanoid_phenols_linear_combination_alcalinity_of_ash_binarized_20_interaction",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction",
-            "alcohol_poly_2_flavanoids_nonflavanoid_phenols_linear_combination_interaction",
-            "nonflavanoid_phenols_proline_bin_5_ordinal_quantile_linear_combination",
-            "alcohol_poly_2_poly_3",
-            "alcohol_poly_2_normalized_l2",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2",
-            "alcohol_poly_3_magnesium_subtraction",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_bin_10_ordinal_quantile",
-            "magnesium_nonflavanoid_phenols_linear_combination",
-        ],
-    },
-    {
-        "mean_score": 0.9052287581699346,
-        "mean_std": 0.05561319578086965,
-        "columns": [
-            "malic_acid",
-            "nonflavanoid_phenols",
-            "proanthocyanins",
-            "alcalinity_of_ash_binarized_20_binarized_1.0",
-            "flavanoids_nonflavanoid_phenols_linear_combination_alcalinity_of_ash_binarized_20_interaction",
-            "nonflavanoid_phenols_proline_bin_5_ordinal_quantile_linear_combination",
-            "alcohol_poly_2_normalized_l2",
-            "alcohol_poly_3_magnesium_subtraction",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_bin_10_ordinal_quantile",
-            "flavanoids_nonflavanoid_phenols_linear_combination_alcalinity_of_ash_binarized_20_interaction_alcalinity_of_ash_log_quantile_transformed_5_normal_linear_combination",
-            "alcohol_poly_2_flavanoids_nonflavanoid_phenols_linear_combination_interaction_magnesium_nonflavanoid_phenols_linear_combination_interaction",
-            "magnesium_nonflavanoid_phenols_linear_combination_binarized_65",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_magnesium_nonflavanoid_phenols_linear_combination_interaction",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_magnesium_nonflavanoid_phenols_linear_combination_subtraction",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_interaction",
-        ],
-    },
-    {
-        "mean_score": 0.9107843137254902,
-        "mean_std": 0.05071259477683134,
-        "columns": [
-            "malic_acid",
-            "nonflavanoid_phenols",
-            "proanthocyanins",
-            "alcalinity_of_ash_binarized_20_binarized_1.0",
-            "nonflavanoid_phenols_proline_bin_5_ordinal_quantile_linear_combination",
-            "alcohol_poly_2_normalized_l2",
-            "flavanoids_nonflavanoid_phenols_linear_combination_alcalinity_of_ash_binarized_20_interaction_alcalinity_of_ash_log_quantile_transformed_5_normal_linear_combination",
-            "alcohol_poly_2_flavanoids_nonflavanoid_phenols_linear_combination_interaction_magnesium_nonflavanoid_phenols_linear_combination_interaction",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_magnesium_nonflavanoid_phenols_linear_combination_interaction",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_magnesium_nonflavanoid_phenols_linear_combination_subtraction",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_interaction",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_bin_10_ordinal_quantile_quantile_transformed_100_normal",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_magnesium_nonflavanoid_phenols_linear_combination_subtraction_bin_5_ordinal_quantile",
-            "alcohol_poly_3_magnesium_subtraction_log",
-        ],
-    },
-    {
-        "mean_score": 0.9104575163398693,
-        "mean_std": 0.0669129118785682,
-        "columns": [
-            "malic_acid",
-            "nonflavanoid_phenols",
-            "alcalinity_of_ash_binarized_20_binarized_1.0",
-            "nonflavanoid_phenols_proline_bin_5_ordinal_quantile_linear_combination",
-            "alcohol_poly_2_normalized_l2",
-            "flavanoids_nonflavanoid_phenols_linear_combination_alcalinity_of_ash_binarized_20_interaction_alcalinity_of_ash_log_quantile_transformed_5_normal_linear_combination",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_magnesium_nonflavanoid_phenols_linear_combination_interaction",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_interaction",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_bin_10_ordinal_quantile_quantile_transformed_100_normal",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_magnesium_nonflavanoid_phenols_linear_combination_subtraction_bin_5_ordinal_quantile",
-            "alcohol_poly_3_magnesium_subtraction_log",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_malic_acid_linear_combination",
-            "proanthocyanins_log",
-            "alcohol_poly_2_flavanoids_nonflavanoid_phenols_linear_combination_interaction_magnesium_nonflavanoid_phenols_linear_combination_interaction_bin_5_ordinal_quantile",
-        ],
-    },
-    {
-        "mean_score": 0.8761437908496731,
-        "mean_std": 0.07105044148767231,
-        "columns": [
-            "nonflavanoid_phenols",
-            "alcalinity_of_ash_binarized_20_binarized_1.0",
-            "nonflavanoid_phenols_proline_bin_5_ordinal_quantile_linear_combination",
-            "alcohol_poly_2_normalized_l2",
-            "flavanoids_nonflavanoid_phenols_linear_combination_alcalinity_of_ash_binarized_20_interaction_alcalinity_of_ash_log_quantile_transformed_5_normal_linear_combination",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_magnesium_nonflavanoid_phenols_linear_combination_interaction",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_interaction",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_magnesium_nonflavanoid_phenols_linear_combination_subtraction_bin_5_ordinal_quantile",
-            "alcohol_poly_3_magnesium_subtraction_log",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_malic_acid_linear_combination",
-            "proanthocyanins_log",
-            "alcohol_poly_2_flavanoids_nonflavanoid_phenols_linear_combination_interaction_magnesium_nonflavanoid_phenols_linear_combination_interaction_bin_5_ordinal_quantile_proanthocyanins_log_linear_combination",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_bin_5_ordinal_quantile",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_bin_10_ordinal_quantile_quantile_transformed_100_normal_od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_interaction",
-            "malic_acid_power_transformed_box-cox",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_bin_10_ordinal_quantile_quantile_transformed_100_normal_od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_subtraction",
-        ],
-    },
-    {
-        "mean_score": 0.8931372549019608,
-        "mean_std": 0.05882443717527601,
-        "columns": [
-            "nonflavanoid_phenols",
-            "alcalinity_of_ash_binarized_20_binarized_1.0",
-            "nonflavanoid_phenols_proline_bin_5_ordinal_quantile_linear_combination",
-            "alcohol_poly_2_normalized_l2",
-            "flavanoids_nonflavanoid_phenols_linear_combination_alcalinity_of_ash_binarized_20_interaction_alcalinity_of_ash_log_quantile_transformed_5_normal_linear_combination",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_magnesium_nonflavanoid_phenols_linear_combination_interaction",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_interaction",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_magnesium_nonflavanoid_phenols_linear_combination_subtraction_bin_5_ordinal_quantile",
-            "alcohol_poly_3_magnesium_subtraction_log",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_malic_acid_linear_combination",
-            "proanthocyanins_log",
-            "alcohol_poly_2_flavanoids_nonflavanoid_phenols_linear_combination_interaction_magnesium_nonflavanoid_phenols_linear_combination_interaction_bin_5_ordinal_quantile_proanthocyanins_log_linear_combination",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_bin_5_ordinal_quantile",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_bin_10_ordinal_quantile_quantile_transformed_100_normal_od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_interaction",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_bin_10_ordinal_quantile_quantile_transformed_100_normal_od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_subtraction",
-            "proanthocyanins_log_log",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_magnesium_nonflavanoid_phenols_linear_combination_subtraction_bin_5_ordinal_quantile_malic_acid_power_transformed_box-cox_interaction",
-        ],
-    },
-    {
-        "mean_score": 0.8941176470588236,
-        "mean_std": 0.07200229727540083,
-        "columns": [
-            "nonflavanoid_phenols",
-            "alcalinity_of_ash_binarized_20_binarized_1.0",
-            "nonflavanoid_phenols_proline_bin_5_ordinal_quantile_linear_combination",
-            "alcohol_poly_2_normalized_l2",
-            "flavanoids_nonflavanoid_phenols_linear_combination_alcalinity_of_ash_binarized_20_interaction_alcalinity_of_ash_log_quantile_transformed_5_normal_linear_combination",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_interaction",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_magnesium_nonflavanoid_phenols_linear_combination_subtraction_bin_5_ordinal_quantile",
-            "alcohol_poly_3_magnesium_subtraction_log",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_malic_acid_linear_combination",
-            "alcohol_poly_2_flavanoids_nonflavanoid_phenols_linear_combination_interaction_magnesium_nonflavanoid_phenols_linear_combination_interaction_bin_5_ordinal_quantile_proanthocyanins_log_linear_combination",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_bin_5_ordinal_quantile",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_bin_10_ordinal_quantile_quantile_transformed_100_normal_od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_subtraction",
-            "proanthocyanins_log_log",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_magnesium_nonflavanoid_phenols_linear_combination_subtraction_bin_5_ordinal_quantile_malic_acid_power_transformed_box-cox_interaction",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_magnesium_nonflavanoid_phenols_linear_combination_interaction_poly_2",
-            "proanthocyanins_log_bin_5_ordinal_quantile",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_bin_10_ordinal_quantile_quantile_transformed_100_normal_od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_interaction_od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_malic_acid_linear_combination_linear_combination",
-            "alcohol_poly_2_normalized_l2_proanthocyanins_log_subtraction",
-        ],
-    },
-    {
-        "mean_score": 0.9107843137254902,
-        "mean_std": 0.061695503646811,
-        "columns": [
-            "nonflavanoid_phenols",
-            "alcalinity_of_ash_binarized_20_binarized_1.0",
-            "nonflavanoid_phenols_proline_bin_5_ordinal_quantile_linear_combination",
-            "alcohol_poly_2_normalized_l2",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_interaction",
-            "alcohol_poly_3_magnesium_subtraction_log",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_malic_acid_linear_combination",
-            "alcohol_poly_2_flavanoids_nonflavanoid_phenols_linear_combination_interaction_magnesium_nonflavanoid_phenols_linear_combination_interaction_bin_5_ordinal_quantile_proanthocyanins_log_linear_combination",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_bin_5_ordinal_quantile",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_bin_10_ordinal_quantile_quantile_transformed_100_normal_od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_subtraction",
-            "proanthocyanins_log_log",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_magnesium_nonflavanoid_phenols_linear_combination_subtraction_bin_5_ordinal_quantile_malic_acid_power_transformed_box-cox_interaction",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_magnesium_nonflavanoid_phenols_linear_combination_interaction_poly_2",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_bin_10_ordinal_quantile_quantile_transformed_100_normal_od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_interaction_od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_malic_acid_linear_combination_linear_combination",
-            "alcohol_poly_2_normalized_l2_proanthocyanins_log_subtraction",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_magnesium_nonflavanoid_phenols_linear_combination_subtraction_bin_5_ordinal_quantile_poly_2",
-            "flavanoids_nonflavanoid_phenols_linear_combination_alcalinity_of_ash_binarized_20_interaction_alcalinity_of_ash_log_quantile_transformed_5_normal_linear_combination_od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_malic_acid_linear_combination_linear_combination",
-        ],
-    },
-    {
-        "mean_score": 0.9055555555555556,
-        "mean_std": 0.07049209744694176,
-        "columns": [
-            "nonflavanoid_phenols",
-            "alcalinity_of_ash_binarized_20_binarized_1.0",
-            "nonflavanoid_phenols_proline_bin_5_ordinal_quantile_linear_combination",
-            "alcohol_poly_2_normalized_l2",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_malic_acid_linear_combination",
-            "alcohol_poly_2_flavanoids_nonflavanoid_phenols_linear_combination_interaction_magnesium_nonflavanoid_phenols_linear_combination_interaction_bin_5_ordinal_quantile_proanthocyanins_log_linear_combination",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_bin_5_ordinal_quantile",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_bin_10_ordinal_quantile_quantile_transformed_100_normal_od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_subtraction",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_magnesium_nonflavanoid_phenols_linear_combination_subtraction_bin_5_ordinal_quantile_malic_acid_power_transformed_box-cox_interaction",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_magnesium_nonflavanoid_phenols_linear_combination_interaction_poly_2",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_bin_10_ordinal_quantile_quantile_transformed_100_normal_od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_interaction_od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_malic_acid_linear_combination_linear_combination",
-            "alcohol_poly_2_normalized_l2_proanthocyanins_log_subtraction",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_magnesium_nonflavanoid_phenols_linear_combination_subtraction_bin_5_ordinal_quantile_poly_2",
-            "flavanoids_nonflavanoid_phenols_linear_combination_alcalinity_of_ash_binarized_20_interaction_alcalinity_of_ash_log_quantile_transformed_5_normal_linear_combination_od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_malic_acid_linear_combination_linear_combination",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_interaction_power_transformed_box-cox",
-            "alcohol_poly_3_magnesium_subtraction_log_quantile_transformed_100_normal",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_interaction_nonflavanoid_phenols_proline_bin_5_ordinal_quantile_linear_combination_linear_combination",
-            "proanthocyanins_log_log_poly_2",
-            "proanthocyanins_log_log_poly_3",
-            "proanthocyanins_log_log_normalized_l2",
-        ],
-    },
-    {
-        "mean_score": 0.8820261437908498,
-        "mean_std": 0.05857700702910962,
-        "columns": [
-            "nonflavanoid_phenols",
-            "alcalinity_of_ash_binarized_20_binarized_1.0",
-            "alcohol_poly_2_normalized_l2",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_bin_5_ordinal_quantile",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_bin_10_ordinal_quantile_quantile_transformed_100_normal_od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_subtraction",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_magnesium_nonflavanoid_phenols_linear_combination_subtraction_bin_5_ordinal_quantile_malic_acid_power_transformed_box-cox_interaction",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_magnesium_nonflavanoid_phenols_linear_combination_interaction_poly_2",
-            "alcohol_poly_2_normalized_l2_proanthocyanins_log_subtraction",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_magnesium_nonflavanoid_phenols_linear_combination_subtraction_bin_5_ordinal_quantile_poly_2",
-            "flavanoids_nonflavanoid_phenols_linear_combination_alcalinity_of_ash_binarized_20_interaction_alcalinity_of_ash_log_quantile_transformed_5_normal_linear_combination_od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_malic_acid_linear_combination_linear_combination",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_interaction_power_transformed_box-cox",
-            "alcohol_poly_3_magnesium_subtraction_log_quantile_transformed_100_normal",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_interaction_nonflavanoid_phenols_proline_bin_5_ordinal_quantile_linear_combination_linear_combination",
-            "proanthocyanins_log_log_poly_3",
-            "proanthocyanins_log_log_normalized_l2",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_malic_acid_linear_combination_poly_2",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_malic_acid_linear_combination_poly_3",
-            "nonflavanoid_phenols_proline_bin_5_ordinal_quantile_linear_combination_power_transformed_box-cox",
-            "alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_bin_10_ordinal_quantile_quantile_transformed_100_normal_od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_interaction_od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_malic_acid_linear_combination_linear_combination_alcohol_color_intensity_interaction_poly_3_magnesium_subtraction_bin_10_ordinal_quantile_quantile_transformed_100_normal_od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_interaction_od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_malic_acid_linear_combination_linear_combination_interaction",
-            "od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_malic_acid_linear_combination_quantile_transformed_100_normal",
-            "alcohol_poly_2_flavanoids_nonflavanoid_phenols_linear_combination_interaction_magnesium_nonflavanoid_phenols_linear_combination_interaction_bin_5_ordinal_quantile_proanthocyanins_log_linear_combination_od280/od315_of_diluted_wines_hue_interaction_log_poly_2_power_transformed_box-cox_malic_acid_linear_combination_linear_combination",
-        ],
-    },
-]
+import json
+
+with open(
+    r"C:\Users\matlaczj\Documents\Repozytoria\AutoFEASULMs\archive\logs-1\14-MISTRAL-DIABETES-K-NEAREST_NEIGHBORS_REGRESSOR\12\scores.json"
+) as f:
+    data = json.load(f)
 
 # %%
 
@@ -495,12 +148,118 @@ def plot_scores(
 
 
 # %%
-# plot_scores(
-#     data1[1:-1] * 1,
-#     if_score=False,
-#     score_axis_title="placeholder",
-#     big_title="Placeholder",
-# )
+plot_scores(
+    data,
+    if_score=False,
+    score_axis_title="placeholder",
+    big_title="Placeholder",
+    path=r"C:\Users\matlaczj\Documents\Repozytoria\AutoFEASULMs\visualizing\scores.pdf",
+)
 # %%
+
+# %%
+import json
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+import numpy as np
+
+
+def plot_columns(
+    data: list,
+    title: str = "Columns Across Iterations",
+    fig_size: tuple = None,
+    font_size: int = 12,
+    cmap: str = "inferno_r",
+    save_path: str = "columns.pdf",
+    column_threshold: int = 10,
+) -> Dict[int, str]:
+    """
+    Function to plot columns based on their presence across iterations.
+
+    Parameters:
+    data (list): The data to be plotted.
+    title (str): The title of the plot. Default is "Columns Across Iterations".
+    fig_size (tuple): The size of the figure. If None, the size will be calculated based on the number of columns. Default is None.
+    font_size (int): The font size to be used in the plot. Default is 12.
+    cmap (str): The colormap to be used in the plot. Default is "inferno_r".
+    save_path (str): The path where the plot will be saved as a pdf. Default is "columns.pdf".
+    column_threshold (int): The maximum number of columns to display before switching to alternate mode. Default is 50.
+
+    Returns:
+    Dict[int, str]: A dictionary mapping the column index to the column name.
+    """
+
+    # Get the unique columns across all iterations and their first appearance
+    columns = {}
+    for i, d in enumerate(data):
+        for col in d["columns"]:
+            if col == "target":
+                continue
+            if col not in columns:
+                columns[col] = i
+
+    # Sort the columns by their first appearance
+    columns = sorted(columns, key=columns.get)
+
+    # Create a binary matrix indicating the presence of each column in each iteration
+    matrix = [[col in d["columns"] for col in columns] for d in data]
+
+    # Transpose the matrix
+    matrix = np.transpose(matrix)
+
+    # Calculate the figure size based on the number of iterations and columns if not provided
+    if fig_size is None:
+        fig_size = (max(10, len(data) // 2), max(10, len(columns) // 2))
+
+    # Increase the figure size
+    fig, ax = plt.subplots(figsize=fig_size)
+
+    # Increase the font size
+    mpl.rcParams["font.size"] = font_size
+
+    # Use a different colormap for better contrast
+    ax.matshow(matrix, cmap=cmap)
+
+    # Add a title to the plot
+    plt.title(title, pad=20)
+
+    # Add labels to the x and y axes
+    plt.xlabel("Method's Iteration")
+    plt.ylabel("Column ID")
+
+    # Now the x-axis labels should be the iteration number
+    plt.xticks(range(len(data)), range(0, len(data)))
+
+    yticks_content = (
+        columns if len(columns) <= column_threshold else range(len(columns))
+    )
+
+    # Create a dictionary to map the column index to the column name
+    column_mapping = {i: col for i, col in enumerate(columns)}
+
+    # And the y-axis labels should be the unique columns, rotated
+    plt.yticks(range(len(columns)), yticks_content, rotation="horizontal")
+
+    # Adjust the spacing between the labels and the plot
+    plt.subplots_adjust(bottom=0.15)
+
+    # Add padding between y-axis labels and the axis
+    ax.tick_params(axis="y", which="major", pad=10)
+
+    # Save as pdf
+    plt.savefig(save_path, bbox_inches="tight")
+
+    # Show the plot
+    plt.show()
+
+    return column_mapping
+
+
+# %%
+column_mapping = plot_columns(
+    data,
+    save_path=r"C:\Users\matlaczj\Documents\Repozytoria\AutoFEASULMs\visualizing\columns.pdf",
+    cmap="binary",
+)
 
 # %%

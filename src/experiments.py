@@ -14,6 +14,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.linear_model import LogisticRegression
 
 # Regression Models
 from sklearn.svm import SVR
@@ -24,7 +25,7 @@ from sklearn.linear_model import LinearRegression
 
 # https://huggingface.co/datasets?task_categories=task_categories:tabular-regression&sort=likes
 
-datasets = [
+datasets1 = [
     {
         "origin": "sklearn",
         "predicted_variable": "",
@@ -174,27 +175,36 @@ default.payment.next.month: Default payment (1=yes, 0=no)
     },
 ]
 
+datasets = [
+    {
+        "origin": "",
+        "predicted_variable": "",
+        "type": "",
+        "name": "",
+        "short_description": """""",
+    },
+    {
+        "origin": "",
+        "predicted_variable": "",
+        "type": "",
+        "name": "",
+        "short_description": """""",
+    },
+]
+
 classical_models = [
+    # Linear Models - They often require feature scaling and normalization for optimal performance. They also benefit from creating polynomial and interaction features.
     {
         "type": "classification",
-        "machine_learning_model": "Support Vector Machine Classifier",
-        "model": SVC(),
+        "machine_learning_model": "Logistic Regression",
+        "model": LogisticRegression(),
     },
     {
-        "type": "classification",
-        "machine_learning_model": "Random Forest Classifier",
-        "model": RandomForestClassifier(),
+        "type": "regression",
+        "machine_learning_model": "Linear Regression",
+        "model": LinearRegression(),
     },
-    {
-        "type": "classification",
-        "machine_learning_model": "K-Nearest Neighbors Classifier",
-        "model": KNeighborsClassifier(),
-    },
-    {
-        "type": "classification",
-        "machine_learning_model": "Gaussian Naive Bayes Classifier",
-        "model": GaussianNB(),
-    },
+    # Tree-based Models - They are less sensitive to the scale of the features and can handle a mix of binary and continuous features.
     {
         "type": "classification",
         "machine_learning_model": "Decision Tree Classifier",
@@ -202,28 +212,25 @@ classical_models = [
     },
     {
         "type": "regression",
-        "machine_learning_model": "Support Vector Machine Regressor",
-        "model": SVR(),
+        "machine_learning_model": "Decision Tree Regressor",
+        "model": DecisionTreeRegressor(),
     },
+    # Distance-based Models - They require feature scaling because they rely on calculating the distance between instances.
     {
-        "type": "regression",
-        "machine_learning_model": "Random Forest Regressor",
-        "model": RandomForestRegressor(),
+        "type": "classification",
+        "machine_learning_model": "K-Nearest Neighbors Classifier",
+        "model": KNeighborsClassifier(),
     },
     {
         "type": "regression",
         "machine_learning_model": "K-Nearest Neighbors Regressor",
         "model": KNeighborsRegressor(),
     },
+    # Probabilistic Models - They often require data to be in a specific format or distribution.
     {
-        "type": "regression",
-        "machine_learning_model": "Decision Tree Regressor",
-        "model": DecisionTreeRegressor(),
-    },
-    {
-        "type": "regression",
-        "machine_learning_model": "Linear Regression",
-        "model": LinearRegression(),
+        "type": "classification",
+        "machine_learning_model": "Gaussian Naive Bayes Classifier",
+        "model": GaussianNB(),
     },
 ]
 
@@ -255,8 +262,8 @@ experiment_base = {
         "correlations_threshold": 0.5,
         "temperature": 1.5,
         "n_most_correlated": 20,
-        "threshold_features": 0.8,
-        "early_stopping": 4,
+        "threshold_features": 0.9,
+        "early_stopping": 3,
         "delayed_deletion": 2,
         "n_sampled_corr": 40,
         "percentage_change_threshold": 0.05,

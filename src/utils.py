@@ -1,23 +1,33 @@
-import ast, os, random
-from functools import lru_cache
-from pandas import DataFrame, Series
-import numpy as np
-from typing import Dict, List, Any, Tuple
-from sklearn import datasets
-from src import tool_handlers
-from sklearn.model_selection import cross_val_score
-from sklearn.metrics import (
-    make_scorer,
-    r2_score,
-    f1_score,
-    explained_variance_score,
-    mean_absolute_percentage_error,
-    accuracy_score,
-)
-from sklearn.preprocessing import LabelEncoder
-import pandas as pd
+# %%
+# Standard library imports
+import ast
+import inspect
 import json
-from datasets import load_dataset, concatenate_datasets
+import os
+import random
+from functools import lru_cache, wraps
+from typing import Any, Dict, List, Tuple
+
+# Related third party imports
+import numpy as np
+import pandas as pd
+from pandas import DataFrame, Series
+from scipy.io import arff
+from sklearn import datasets
+from sklearn.metrics import (
+    accuracy_score,
+    explained_variance_score,
+    f1_score,
+    make_scorer,
+    mean_absolute_percentage_error,
+    r2_score,
+)
+from sklearn.model_selection import cross_val_score
+from sklearn.preprocessing import LabelEncoder
+
+# Local application/library specific imports
+from datasets import concatenate_datasets, load_dataset
+from src import tool_handlers
 
 
 def extract_functions_with_args_and_values(filename: str) -> Dict[str, Dict[str, Any]]:
@@ -266,49 +276,6 @@ def describe_strong_correlations(
     )
 
 
-def check_dtype(df, column_name):
-    numeric_types = [
-        "int8",
-        "int16",
-        "int32",
-        "int64",
-        "uint8",
-        "uint16",
-        "uint32",
-        "uint64",
-        "float16",
-        "float32",
-        "float64",
-        "complex64",
-        "complex128",
-    ]
-    non_numeric_types = [
-        "object",
-        "bool",
-        "datetime64[ns]",
-        "timedelta[ns]",
-        "category",
-        "period",
-        "sparse",
-        "interval",
-    ]
-
-    if df[column_name].dtypes in numeric_types:
-        return "Numeric"
-    elif df[column_name].dtypes in non_numeric_types:
-        return "Non-numeric"
-    else:
-        return "Unknown"
-
-
-def check_if_dtype(df, column_name, dtype):
-    if check_dtype(df, column_name) == dtype:
-        return True
-    else:
-        print(f"Column '{column_name}' should be of type '{dtype}'")
-        return False
-
-
 def load_dataset_from_sklearn(name: str) -> Tuple[DataFrame, Series]:
     """Load a dataset by name from the `sklearn.datasets` module.
 
@@ -362,6 +329,24 @@ def load_dataset_from_huggingface(dataset_name, target_name):
     target = df["target"].copy()
 
     return df, target
+
+
+def load_all_arff_files(directory):
+    datasets = {}
+    for filename in os.listdir(directory):
+        if filename.endswith(".arff"):
+            file_path = os.path.join(directory, filename)
+            data, meta = arff.loadarff(file_path)
+            df = pd.DataFrame(data)
+            dataset_name = os.path.splitext(filename)[0]  # Remove the .arff extension
+            datasets[dataset_name] = df
+    return datasets
+
+
+# Use the function
+datasets = load_all_arff_files(
+    r"C:\Users\matlaczj\Documents\Repozytoria\AutoFEASULMs\src\datasets"
+)
 
 
 def encode_non_numeric(df):
@@ -568,3 +553,49 @@ def transform_date_columns(df):
             print(f"Error processing column {col}: {e}")
             continue
     return df
+
+
+def check_if_dtype(df, column_name, dtype):
+    if check_dtype(df, column_name) == dtype:
+        return True
+    else:
+        print(f"Column '{column_name}' should be of type '{dtype}'")
+        return False
+
+
+def check_dtype(df, column_name):
+    numeric_types = [
+        "int8",
+        "int16",
+        "int32",
+        "int64",
+        "uint8",
+        "uint16",
+        "uint32",
+        "uint64",
+        "float16",
+        "float32",
+        "float64",
+        "complex64",
+        "complex128",
+    ]
+    non_numeric_types = [
+        "object",
+        "bool",
+        "datetime64[ns]",
+        "timedelta[ns]",
+        "category",
+        "period",
+        "sparse",
+        "interval",
+    ]
+
+    if df[column_name].dtypes in numeric_types:
+        return "Numeric"
+    elif df[column_name].dtypes in non_numeric_types:
+        return "Non-numeric"
+    else:
+        return "Unknown"
+
+
+# %%

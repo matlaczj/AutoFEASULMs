@@ -1,4 +1,14 @@
 # %%
+# Standard library imports
+import os
+import json
+from func_timeout import FunctionTimedOut
+
+# Third party imports
+from sklearn.utils import all_estimators
+from sklearn.base import ClassifierMixin, RegressorMixin
+
+# Local application/library specific imports
 from language_model import initialize_llm, run_inference_iteration
 from utils import (
     get_model_dict,
@@ -18,10 +28,7 @@ from utils import (
 from src.tool_handlers import *
 from visualizing.visualizations import plot_scores
 from src.config import config
-import os
-import json
 from experiments import prepare_experiments, datasets, classical_models, experiment_base
-from func_timeout import FunctionTimedOut
 
 # TODO More column analysis in prompt.
 # TODO: Check for memory leakage of context.
@@ -33,6 +40,7 @@ from func_timeout import FunctionTimedOut
 # TODO: Reduce context size by reducing number of correlations mentioned.
 # TODO: Change what lines are printed on the visualization.
 # TODO: Handle only tabular numeric datasets.
+# TODO: Improve column names.
 
 global df, llm, scores
 experiments = prepare_experiments(datasets, classical_models, experiment_base)
@@ -190,7 +198,7 @@ for experiment in experiments:
 
         plot_scores(
             scores,
-            big_title=f"""Experiment ID: {experiment["ID"]}""",
+            big_title=f"""{experiment["dataset"]["name"]} - {experiment["model"]["name"]}""",
             score_axis_title=(
                 f"""{experiment["validation"]["kfold"]}-Fold Cross-Val Accuracy Score With Std Dev"""
                 if experiment["problem"]["type"] == "classification"
