@@ -2,7 +2,7 @@
 from language_model import initialize_llm, run_inference_iteration
 from utils import (
     get_model_dict,
-    load_dataset_by_name,
+    load_dataset_from_sklearn,
     execute_transformations,
     cross_validate_model,
     calculate_percentage_change,
@@ -11,6 +11,9 @@ from utils import (
     handle_invalid_data,
     select_most_correlated,
     default_func,
+    load_dataset_from_huggingface,
+    one_hot_encode,
+    transform_date_columns,
 )
 from src.tool_handlers import *
 from visualizing.visualizations import plot_scores
@@ -28,6 +31,8 @@ from func_timeout import FunctionTimedOut
 # TODO: Speed up inference by using a single prompt for all columns.
 # TODO: Explain bad regression results with diabetes dataset.
 # TODO: Reduce context size by reducing number of correlations mentioned.
+# TODO: Change what lines are printed on the visualization.
+# TODO: Handle only tabular numeric datasets.
 
 global df, llm, scores
 experiments = prepare_experiments(datasets, classical_models, experiment_base)
@@ -39,7 +44,7 @@ for experiment in experiments:
 # %%
 for experiment in experiments:
     # NOTE: Temporary for debugging
-    if int(experiment["ID"].split("-")[0]) < 4:
+    if int(experiment["ID"].split("-")[0]) != 36:
         continue
 
     # Create the directory if it doesn't exist
@@ -56,8 +61,18 @@ for experiment in experiments:
         f.write(json.dumps(experiment, default=default_func))
 
     # Load the dataset
-    df, target = load_dataset_by_name(experiment["dataset"]["name"])
-    handle_invalid_data(df)
+    if experiment["dataset"]["origin"] == "sklearn":
+        df, target = load_dataset_from_sklearn(experiment["dataset"]["name"])
+    elif experiment["dataset"]["origin"] == "huggingface":
+        df, target = load_dataset_from_huggingface(
+            experiment["dataset"]["name"], experiment["dataset"]["predicted_variable"]
+        )
+    else:
+        raise ValueError("Dataset origin not recognized.")
+
+    df = handle_invalid_data(df)
+    df = transform_date_columns(df)
+    df = one_hot_encode(df)
 
     scores = []
     mean_score1, mean_std1 = cross_validate_model(
@@ -114,10 +129,10 @@ for experiment in experiments:
             )
         except ValueError as e:
             print(f"ValueError: {e}")
-            break
+            continue
         except FunctionTimedOut as e:
             print(f"FunctionTimedOut: {e}")
-            break
+            continue
 
         df = execute_transformations(
             df=df,
@@ -177,23 +192,26 @@ for experiment in experiments:
             scores,
             big_title=f"""Experiment ID: {experiment["ID"]}""",
             score_axis_title=(
-                f"""{experiment["validation"]["kfold"]}-Fold Cross-Val Accuracy Score [%] With Std Dev"""
+                f"""{experiment["validation"]["kfold"]}-Fold Cross-Val Accuracy Score With Std Dev"""
                 if experiment["problem"]["type"] == "classification"
-                else f"""{experiment["validation"]["kfold"]}-Fold Cross-Val R2 Score With Std Dev"""
+                else f"""{experiment["validation"]["kfold"]}-Fold Cross-Val MAPE With Std Dev"""
             ),
             path=iter_base + "scores.pdf",
+            if_score=(
+                True if experiment["problem"]["type"] == "classification" else False
+            ),
         )
 
         # Early stopping mechanism
         k = experiment["feature_engineering"]["early_stopping"]
+        threshold = experiment["feature_engineering"]["percentage_change_threshold"]
         if iteration >= k:
             last_k_scores = [score["mean_score"] for score in scores[-k:]]
-            if all(
-                [
-                    (last_k_scores[i] > last_k_scores[i + 1])
-                    for i in range(len(last_k_scores) - 1)
-                ]
-            ):
+            percentage_changes = [
+                (last_k_scores[i] - last_k_scores[i + 1]) / last_k_scores[i + 1] * 100
+                for i in range(len(last_k_scores) - 1)
+            ]
+            if all(change < threshold for change in percentage_changes):
                 print("Early stopping mechanism triggered.")
                 break
 

@@ -1,5 +1,5 @@
 # %%
-data = [
+data1 = [
     {
         "mean_score": 0.8761437908496731,
         "mean_std": 0.07926369368650263,
@@ -354,10 +354,13 @@ data = [
 ]
 
 # %%
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 from typing import List, Dict
+from matplotlib.ticker import MaxNLocator
+import numpy as np
 
 
 def plot_scores(
@@ -365,6 +368,7 @@ def plot_scores(
     score_axis_title: str = "10-Fold Cross-Val Accuracy Score [%] With Std Dev",
     path: str = "scores.pdf",
     big_title: str = "",
+    if_score: bool = True,
 ) -> None:
     """
     Function to plot mean_score, mean_std, and num_columns.
@@ -393,40 +397,81 @@ def plot_scores(
         df["mean_score"] - df["mean_std"],
         df["mean_score"] + df["mean_std"],
         color=color,
-        alpha=0.2,
+        alpha=0.1,
     )
     ax1.tick_params(axis="y", labelcolor=color)
+    ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
 
     # Add lines for min, max and average of mean_score
-    min_score = df["mean_score"].min()
-    max_score = df["mean_score"].max()
+    starting_score = df["mean_score"].iloc[0]
+    best_score = df["mean_score"].max() if if_score else df["mean_score"].min()
     avg_score = df["mean_score"].mean()
 
-    min_line = ax1.axhline(min_score, color="red", linestyle="--")
-    max_line = ax1.axhline(max_score, color="green", linestyle="--")
+    min_line = ax1.axhline(starting_score, color="red", linestyle="--")
+    max_line = ax1.axhline(best_score, color="green", linestyle="--")
     avg_line = ax1.axhline(avg_score, color="purple", linestyle="--")
 
+    # Define an offset for the x-coordinate of the text annotation
+    offset = 0.02 * len(df.index) * 4
+
     # Add text for min, max and average of mean_score
-    ax1.text(0, min_score, f"{round(min_score,2)}", color="red", va="bottom", ha="left")
     ax1.text(
-        0, max_score, f"{round(max_score,2)}", color="green", va="bottom", ha="left"
+        0,
+        starting_score,
+        f"{round(starting_score,2)}",
+        color="red",
+        va="bottom",
+        ha="left",
     )
     ax1.text(
-        0, avg_score, f"{round(avg_score,2)}", color="purple", va="bottom", ha="left"
+        offset,  # Add the offset to the x-coordinate
+        best_score,
+        f"{round(best_score,2)}",
+        color="green",
+        va="bottom",
+        ha="left",
+    )
+    ax1.text(
+        2 * offset,  # Add twice the offset to the x-coordinate
+        avg_score,
+        f"{round(avg_score,2)}",
+        color="purple",
+        va="bottom",
+        ha="left",
     )
 
+    # ...
+
     # Create custom legend handles
-    min_handle = mlines.Line2D([], [], color="red", linestyle="--", label="Min Score")
-    max_handle = mlines.Line2D([], [], color="green", linestyle="--", label="Max Score")
+    min_handle = mlines.Line2D(
+        [],
+        [],
+        color="red",
+        linestyle="--",
+        label=f"""No FE {"Score" if if_score else "Error"}""",
+    )
+    max_handle = mlines.Line2D(
+        [],
+        [],
+        color="green",
+        linestyle="--",
+        label=f"""{"Highest Score" if if_score else "Smallest Error"}""",
+    )
     avg_handle = mlines.Line2D(
-        [], [], color="purple", linestyle="--", label="Avg Score"
+        [],
+        [],
+        color="purple",
+        linestyle="--",
+        label=f"""Avg {"Score" if if_score else "Error"}""",
     )
 
     # Find the index of the max mean_score
-    max_score_index = df["mean_score"].idxmax()
+    best_score_index = (
+        df["mean_score"].idxmax() if if_score else df["mean_score"].idxmin()
+    )
 
     # Add a vertical line at the position of the max mean_score
-    ax1.axvline(max_score_index, color="orange", linestyle="--")
+    ax1.axvline(best_score_index, color="orange", linestyle="--")
 
     # Create a custom legend handle for the max value line
     max_value_handle = mlines.Line2D(
@@ -439,7 +484,7 @@ def plot_scores(
     # Create a secondary y-axis for num_columns
     ax2 = ax1.twinx()
     ax2.set_ylabel("Total Number of Columns", color="tab:gray")
-    ax2.plot(df.index, df["num_columns"], color="tab:gray", alpha=0.5)
+    ax2.plot(df.index, df["num_columns"], color="tab:gray", alpha=0.6)
     ax2.tick_params(axis="y", labelcolor="tab:gray")
     plt.title(big_title)
 
@@ -450,5 +495,12 @@ def plot_scores(
 
 
 # %%
-# plot_scores(data)
+# plot_scores(
+#     data1[1:-1] * 1,
+#     if_score=False,
+#     score_axis_title="placeholder",
+#     big_title="Placeholder",
+# )
+# %%
+
 # %%

@@ -3,6 +3,7 @@ from sklearn.metrics import (
     mean_absolute_percentage_error,
     r2_score,
     f1_score,
+    mean_absolute_error,
 )
 from response_schemas import schema
 import copy
@@ -12,16 +13,21 @@ from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
+from sklearn.tree import DecisionTreeClassifier
 
 # Regression Models
 from sklearn.svm import SVR
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.tree import DecisionTreeRegressor
+from sklearn.linear_model import LinearRegression
 
+# https://huggingface.co/datasets?task_categories=task_categories:tabular-regression&sort=likes
 
 datasets = [
     {
+        "origin": "sklearn",
+        "predicted_variable": "",
         "type": "classification",
         "name": "wine",
         "short_description": """
@@ -44,6 +50,8 @@ Target: class_0, class_1, class_2: Labels indicating the class or category of th
 """,
     },
     {
+        "origin": "sklearn",
+        "predicted_variable": "",
         "type": "classification",
         "name": "iris",
         "short_description": """
@@ -57,6 +65,8 @@ Target: class_0, class_1, class_2 - Labels indicating the class or category.
 """,
     },
     {
+        "origin": "sklearn",
+        "predicted_variable": "",
         "type": "classification",
         "name": "breast_cancer",
         "short_description": """
@@ -76,6 +86,8 @@ Target: Type of tumor, either malignant (WDBC-Malignant) or benign (WDBC-Benign)
 """,
     },
     {
+        "origin": "sklearn",
+        "predicted_variable": "",
         "type": "regression",
         "name": "diabetes",
         "short_description": """
@@ -92,6 +104,72 @@ S5 ltg: Possibly the logarithm of serum triglycerides level, a measure of fat fo
 S6 glu: Blood sugar level, the concentration of glucose in the blood.
 Target: A quantitative measure of disease progression one year after baseline, likely the outcome variable of interest in the dataset.
 
+""",
+    },
+    {
+        "origin": "huggingface",
+        "predicted_variable": "body_mass_g",
+        "type": "regression",
+        "name": "SIH/palmer-penguins",
+        "short_description": """""",
+    },
+    {
+        "origin": "huggingface",
+        "predicted_variable": "Price",
+        "type": "regression",
+        "name": "Ammok/laptop_price_prediction",
+        "short_description": """""",
+    },
+    {
+        "origin": "huggingface",
+        "predicted_variable": "symbol",
+        "type": "classification",
+        "name": "edarchimbaud/earnings-forecast-stocks",
+        "short_description": """**Data Fields**
+symbol (string): A string representing the ticker symbol or abbreviation used to identify the company.
+date (string): A string indicating the date of the forecast.
+id (int64): An integer representing the unique identifier for the forecast.
+fiscal_end (string): A string indicating the fiscal end date for the forecast.
+consensus_eps_forecast (float64): A floating-point number representing the consensus earnings per share forecast.
+high_eps_forecast (float64): A floating-point number representing the highest earnings per share forecast.
+low_eps_forecast (float64): A floating-point number representing the lowest earnings per share forecast.
+no_of_estimates (int64): An integer representing the number of estimates contributing to the consensus forecast.
+up (int64): An integer representing the number of upward revisions to the forecast.
+down (int64): An integer representing the number of downward revisions to the forecast.
+""",
+    },
+    {
+        "origin": "huggingface",
+        "predicted_variable": "age",
+        "type": "regression",
+        "name": "imodels/credit-card",
+        "short_description": """There are 25 variables:
+
+ID: ID of each client
+LIMIT_BAL: Amount of given credit in NT dollars (includes individual and family/supplementary credit
+SEX: Gender (1=male, 2=female)
+EDUCATION: (1=graduate school, 2=university, 3=high school, 4=others, 5=unknown, 6=unknown)
+MARRIAGE: Marital status (1=married, 2=single, 3=others)
+AGE: Age in years
+PAY_0: Repayment status in September, 2005 (-1=pay duly, 1=payment delay for one month, 2=payment delay for two months, … 8=payment delay for eight months, 9=payment delay for nine months and above)
+PAY_2: Repayment status in August, 2005 (scale same as above)
+PAY_3: Repayment status in July, 2005 (scale same as above)
+PAY_4: Repayment status in June, 2005 (scale same as above)
+PAY_5: Repayment status in May, 2005 (scale same as above)
+PAY_6: Repayment status in April, 2005 (scale same as above)
+BILL_AMT1: Amount of bill statement in September, 2005 (NT dollar)
+BILL_AMT2: Amount of bill statement in August, 2005 (NT dollar)
+BILL_AMT3: Amount of bill statement in July, 2005 (NT dollar)
+BILL_AMT4: Amount of bill statement in June, 2005 (NT dollar)
+BILL_AMT5: Amount of bill statement in May, 2005 (NT dollar)
+BILL_AMT6: Amount of bill statement in April, 2005 (NT dollar)
+PAY_AMT1: Amount of previous payment in September, 2005 (NT dollar)
+PAY_AMT2: Amount of previous payment in August, 2005 (NT dollar)
+PAY_AMT3: Amount of previous payment in July, 2005 (NT dollar)
+PAY_AMT4: Amount of previous payment in June, 2005 (NT dollar)
+PAY_AMT5: Amount of previous payment in May, 2005 (NT dollar)
+PAY_AMT6: Amount of previous payment in April, 2005 (NT dollar)
+default.payment.next.month: Default payment (1=yes, 0=no)
 """,
     },
 ]
@@ -118,6 +196,11 @@ classical_models = [
         "model": GaussianNB(),
     },
     {
+        "type": "classification",
+        "machine_learning_model": "Decision Tree Classifier",
+        "model": DecisionTreeClassifier(),
+    },
+    {
         "type": "regression",
         "machine_learning_model": "Support Vector Machine Regressor",
         "model": SVR(),
@@ -136,6 +219,11 @@ classical_models = [
         "type": "regression",
         "machine_learning_model": "Decision Tree Regressor",
         "model": DecisionTreeRegressor(),
+    },
+    {
+        "type": "regression",
+        "machine_learning_model": "Linear Regression",
+        "model": LinearRegression(),
     },
 ]
 
@@ -171,12 +259,13 @@ experiment_base = {
         "early_stopping": 4,
         "delayed_deletion": 2,
         "n_sampled_corr": 40,
+        "percentage_change_threshold": 0.05,
     },
     "validation": {
         "kfold": 10,
         "scorers": {
             "classification": accuracy_score,
-            "regression": r2_score,
+            "regression": mean_absolute_percentage_error,
         },
     },
     "schema": schema,
@@ -191,16 +280,20 @@ def prepare_experiments(datasets, classical_models, experiment_base):
             if dataset["type"] == model["type"]:
                 experiment = copy.deepcopy(experiment_base)
                 experiment["dataset"]["name"] = dataset["name"]
+                experiment["dataset"]["predicted_variable"] = dataset[
+                    "predicted_variable"
+                ]
                 experiment["dataset"]["short_description"] = dataset[
                     "short_description"
                 ]
+                experiment["dataset"]["origin"] = dataset["origin"]
                 experiment["problem"]["type"] = model["type"]
                 experiment["problem"]["machine_learning_model"] = model[
                     "machine_learning_model"
                 ]
                 experiment["problem"]["model"] = model["model"]
                 experiment["ID"] = (
-                    f'{i}-MISTRAL-{dataset["name"].upper()}-{model["machine_learning_model"].upper()}'
+                    f'{i}-MISTRAL-{dataset["name"].replace("/","-").upper()}-{model["machine_learning_model"].upper()}'
                 ).replace(" ", "_")
                 experiments.append(experiment)
                 i += 1

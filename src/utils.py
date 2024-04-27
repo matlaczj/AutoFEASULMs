@@ -17,6 +17,7 @@ from sklearn.metrics import (
 from sklearn.preprocessing import LabelEncoder
 import pandas as pd
 import json
+from datasets import load_dataset, concatenate_datasets
 
 
 def extract_functions_with_args_and_values(filename: str) -> Dict[str, Dict[str, Any]]:
@@ -197,6 +198,16 @@ def describe_unique_values(
     return result
 
 
+def one_hot_encode(df, max_columns=10):
+    for col in df.columns:
+        if df[col].dtype == "object":
+            dummies = pd.get_dummies(df[col], prefix=col)
+            if len(dummies.columns) <= max_columns:
+                df = pd.concat([df, dummies], axis=1)
+            df.drop(col, axis=1, inplace=True)
+    return df
+
+
 def describe_strong_correlations(
     df: DataFrame, threshold: float, n_samples: int = 100
 ) -> str:
@@ -298,7 +309,7 @@ def check_if_dtype(df, column_name, dtype):
         return False
 
 
-def load_dataset_by_name(name: str) -> Tuple[DataFrame, Series]:
+def load_dataset_from_sklearn(name: str) -> Tuple[DataFrame, Series]:
     """Load a dataset by name from the `sklearn.datasets` module.
 
     Args:
@@ -322,6 +333,42 @@ def load_dataset_by_name(name: str) -> Tuple[DataFrame, Series]:
     except AttributeError:
         print(f"No dataset found with name: {name}")
         return None, None
+
+
+def load_dataset_from_huggingface(dataset_name, target_name):
+    # Load the dataset
+    dataset = load_dataset(dataset_name)
+
+    # Concatenate all splits into a single dataset
+    combined_dataset = concatenate_datasets(
+        [dataset[split] for split in dataset.keys()]
+    )
+
+    # Convert to pandas DataFrame
+    df = combined_dataset.to_pandas()
+
+    # Encode target column if it is non-numeric
+    if check_if_dtype(df, target_name, "Non-numeric"):
+        df[target_name] = LabelEncoder().fit_transform(df[target_name])
+
+    # Handle invalid data
+    df = handle_invalid_data(df)
+
+    # Rename the target column to 'target'
+    if target_name in df.columns:
+        df.rename(columns={target_name: "target"}, inplace=True)
+
+    # Create a separate Series for the target column
+    target = df["target"].copy()
+
+    return df, target
+
+
+def encode_non_numeric(df):
+    for col in df.columns:
+        if df[col].dtype not in ["int64", "float64"]:
+            df[col] = pd.factorize(df[col])[0]
+    return df
 
 
 def run_function_by_name(module, function_name: str, *args, **kwargs):
@@ -394,6 +441,9 @@ def cross_validate_model(
     except KeyError:
         X = df
     y = target
+
+    # Select only numeric columns from X
+    X = X.select_dtypes(include=["number", "bool"])
 
     scorer = scorers[problem_type]
 
@@ -494,3 +544,27 @@ def default_func(obj):
         return str(obj)
     # Otherwise, use the default behavior
     return json.JSONEncoder.default(obj)
+
+
+def transform_date_columns(df):
+    for col in df.columns:
+        try:
+            # Try to convert the column to datetime
+            df[col] = pd.to_datetime(
+                df[col], errors="raise", infer_datetime_format=True
+            )
+
+            # If the conversion is successful, extract date components
+            if np.issubdtype(df[col].dtype, np.datetime64):
+                df[col + "_year"] = df[col].dt.year
+                df[col + "_month"] = df[col].dt.month
+                df[col + "_day"] = df[col].dt.day
+                df[col + "_dayofweek"] = df[col].dt.dayofweek
+                df[col + "_dayofyear"] = df[col].dt.dayofyear
+
+                # Drop the original date column
+                df.drop(col, axis=1, inplace=True)
+        except Exception as e:
+            print(f"Error processing column {col}: {e}")
+            continue
+    return df
