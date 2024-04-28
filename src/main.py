@@ -1,11 +1,12 @@
 # %%
 import os
 import json
+import time
 from func_timeout import FunctionTimedOut
 from src.config import config
 from language_model import initialize_llm, run_inference_iteration
 from experiments import prepare_experiments, datasets, classical_models, experiment_base
-from visualizing.visualizations import plot_scores, plot_columns
+from vis.vis import plot_scores, plot_columns
 from utils.data_operations_utils import (
     handle_invalid_data,
     transform_date_columns,
@@ -84,7 +85,12 @@ for experiment in experiments:
         scorers=experiment["validation"]["scorers"],
     )
     scores.append(
-        {"mean_score": mean_score1, "mean_std": mean_std1, "columns": list(df.columns)}
+        {
+            "mean_score": mean_score1,
+            "mean_std": mean_std1,
+            "columns": list(df.columns),
+            "time": 0,
+        }
     )
 
     # INITIALIZE THE LANGUAGE MODEL
@@ -104,6 +110,9 @@ for experiment in experiments:
         # CREATE THE ITERATION DIRECTORY
         iter_base = exp_base + f"{iteration}\\"
         os.makedirs(iter_base, exist_ok=True)
+
+        # START THE TIMER
+        start_time = time.time()
 
         # TRY TO RUN THE INFERENCE ITERATION
         df["target"] = target
@@ -167,6 +176,9 @@ for experiment in experiments:
             ]
         )
 
+        # STOP THE TIMER
+        end_time = time.time()
+
         # CALCULATE THE SCORES AFTER THE FEATURE ENGINEERING
         mean_score2, mean_std2 = cross_validate_model(
             df=df,
@@ -182,6 +194,7 @@ for experiment in experiments:
                 "mean_score": mean_score2,
                 "mean_std": mean_std2,
                 "columns": list(df.columns),
+                "time": end_time - start_time,
             }
         )
 

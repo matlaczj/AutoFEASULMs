@@ -1,11 +1,11 @@
-# NOTE: Keep this up to date with `src\preprocessing_tools.py` file.
+# NOTE: Keep this up to date with `preprocessing_tools.py` file.
 # NOTE: Fill columns' enum with the column names from analysed dataset.
 # NOTE: These are only schemas. Example of full response format:
 # response_format = {
 #     "type": "json_object",
 #     "schema": schema,
 # }
-# TODO: Auto-generate this from `src\preprocessing_tools.py` file.
+# TODO: Auto-generate this from `preprocessing_tools.py` file.
 
 schema = {
     "type": "object",

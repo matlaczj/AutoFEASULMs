@@ -233,11 +233,6 @@ def one_hot_encoder(df, column_name, drop_old=False):
     return new_df
 
 
-# def remove_column(df, column_name):
-#     df.drop(column_name, axis=1, inplace=True)
-#     return df
-
-
 def linear_combination(
     df, column_name_1, column_name_2, weight_1=1, weight_2=1, drop_old=False
 ):

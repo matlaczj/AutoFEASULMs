@@ -1,18 +1,9 @@
-# %%
-import json
-
-# with open(
-#     r"C:\Users\matlaczj\Documents\Repozytoria\AutoFEASULMs\archive\logs-1\14-MISTRAL-DIABETES-K-NEAREST_NEIGHBORS_REGRESSOR\12\scores.json"
-# ) as f:
-#     data = json.load(f)
-
-# %%
-
-import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
-from typing import List, Dict
 from matplotlib.ticker import MaxNLocator
+import matplotlib as mpl
+from typing import List, Dict
+import pandas as pd
 import numpy as np
 
 
@@ -93,8 +84,6 @@ def plot_scores(
         ha="left",
     )
 
-    # ...
-
     # Create custom legend handles
     min_handle = mlines.Line2D(
         [],
@@ -142,120 +131,9 @@ def plot_scores(
     plt.title(big_title)
 
     fig.tight_layout()
+
     # Save the plot as pdf file
     plt.savefig(path)
-    # plt.show()
-
-
-# %%
-# plot_scores(
-#     data,
-#     if_score=False,
-#     score_axis_title="placeholder",
-#     big_title="Placeholder",
-#     path=r"C:\Users\matlaczj\Documents\Repozytoria\AutoFEASULMs\visualizing\scores.pdf",
-# )
-# %%
-
-# %%
-import json
-import matplotlib.pyplot as plt
-import matplotlib as mpl
-import numpy as np
-
-
-# def plot_columns(
-#     data: list,
-#     title: str = "Columns Across Iterations",
-#     fig_size: tuple = None,
-#     font_size: int = 16,
-#     cmap: str = "inferno_r",
-#     save_path: str = "columns.pdf",
-#     column_threshold: int = 10,
-# ) -> Dict[int, str]:
-#     """
-#     Function to plot columns based on their presence across iterations.
-
-#     Parameters:
-#     data (list): The data to be plotted.
-#     title (str): The title of the plot. Default is "Columns Across Iterations".
-#     fig_size (tuple): The size of the figure. If None, the size will be calculated based on the number of columns. Default is None.
-#     font_size (int): The font size to be used in the plot. Default is 12.
-#     cmap (str): The colormap to be used in the plot. Default is "inferno_r".
-#     save_path (str): The path where the plot will be saved as a pdf. Default is "columns.pdf".
-#     column_threshold (int): The maximum number of columns to display before switching to alternate mode. Default is 50.
-
-#     Returns:
-#     Dict[int, str]: A dictionary mapping the column index to the column name.
-#     """
-
-#     # Get the unique columns across all iterations and their first appearance
-#     columns = {}
-#     for i, d in enumerate(data):
-#         for col in d["columns"]:
-#             if col == "target":
-#                 continue
-#             if col not in columns:
-#                 columns[col] = i
-
-#     # Sort the columns by their first appearance
-#     columns = sorted(columns, key=columns.get)
-
-#     # Create a binary matrix indicating the presence of each column in each iteration
-#     matrix = [[col in d["columns"] for col in columns] for d in data]
-
-#     # Transpose the matrix
-#     matrix = np.transpose(matrix)
-
-#     # Calculate the figure size based on the number of iterations and columns if not provided
-#     if fig_size is None:
-#         fig_size = (max(10, len(data) // 2), max(10, len(columns) // 2))
-
-#     # Increase the figure size
-#     fig, ax = plt.subplots(figsize=fig_size)
-
-#     # Increase the font size
-#     mpl.rcParams["font.size"] = font_size
-
-#     # Use a different colormap for better contrast
-#     ax.matshow(matrix, cmap=cmap)
-
-#     # Add a title to the plot
-#     plt.title(title, pad=20)
-
-#     # Add labels to the x and y axes
-#     plt.xlabel("Method's Iteration")
-#     plt.ylabel("Column ID")
-
-#     # Now the x-axis labels should be the iteration number
-#     plt.xticks(range(len(data)), range(0, len(data)))
-
-#     yticks_content = (
-#         columns if len(columns) <= column_threshold else range(len(columns))
-#     )
-
-#     # Create a dictionary to map the column index to the column name
-#     column_mapping = {i: col for i, col in enumerate(columns)}
-
-#     # And the y-axis labels should be the unique columns, rotated
-#     plt.yticks(range(len(columns)), yticks_content, rotation="horizontal")
-
-#     # Adjust the spacing between the labels and the plot
-#     plt.subplots_adjust(bottom=0.15)
-
-#     # Add padding between y-axis labels and the axis
-#     ax.tick_params(axis="y", which="major", pad=10)
-
-#     # Save as pdf
-#     plt.savefig(save_path, bbox_inches="tight")
-
-#     # Show the plot
-#     # plt.show()
-
-#     return column_mapping
-
-
-# %%
 
 
 def plot_columns(
@@ -349,18 +227,4 @@ def plot_columns(
     # Save as pdf
     plt.savefig(save_path, bbox_inches="tight")
 
-    # Show the plot
-    # plt.show()
-
     return column_mapping
-
-
-# %%
-# column_mapping = plot_columns(
-#     data,
-#     save_path=r"C:\Users\matlaczj\Documents\Repozytoria\AutoFEASULMs\visualizing\columns.pdf",
-#     problem_type="reg",
-# )
-
-
-# %%
