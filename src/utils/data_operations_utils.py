@@ -164,7 +164,7 @@ def select_most_correlated(df, target, n):
 
     # Select the top N columns
     top_n_columns = sorted_corr_with_target.index[
-        1 : n + 1
+        0:n
     ]  # We start from 1 to exclude the target itself
 
     # Return a dataframe with only the selected columns

@@ -26,10 +26,10 @@ def check_dtype(df, column_name):
         "float64",
         "complex64",
         "complex128",
+        "bool",
     ]
     non_numeric_types = [
         "object",
-        "bool",
         "datetime64[ns]",
         "timedelta[ns]",
         "category",

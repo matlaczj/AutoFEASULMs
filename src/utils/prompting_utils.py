@@ -41,6 +41,8 @@ def describe_unique_values(
     Returns:
         str: A string containing descriptions of the unique values in each column.
     """
+    random.seed(777)
+
     result = ""
 
     for column in df.columns:
@@ -70,6 +72,7 @@ def describe_strong_correlations(
     Returns:
     str: A string containing the pairs of columns and their correlations.
     """
+    random.seed(777)
 
     # Get the correlation matrix
     correlations = df.corr()
@@ -98,7 +101,8 @@ def describe_strong_correlations(
 
     # Sample N correlations
     sampled_correlations = random.sample(
-        correlation_list, min(n_samples, len(correlation_list))
+        correlation_list,
+        min(n_samples, len(correlation_list)),
     )
 
     # Sort the list of correlations in descending order by absolute value
