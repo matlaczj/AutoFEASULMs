@@ -1,34 +1,22 @@
 # %%
-# Standard library imports
 import ast
-import inspect
 import json
 import os
 import random
-from functools import lru_cache, wraps
-from typing import Any, Dict, List, Tuple
-
-# Related third party imports
 import numpy as np
 import pandas as pd
-from pandas import DataFrame, Series
-from scipy.io import arff
-from sklearn import datasets as sklearn_datasets
-from sklearn.metrics import (
-    accuracy_score,
-    explained_variance_score,
-    f1_score,
-    make_scorer,
-    mean_absolute_percentage_error,
-    r2_score,
-)
 from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import LabelEncoder
-
-# Local application/library specific imports
-from datasets import concatenate_datasets, load_dataset
+from sklearn.datasets import fetch_openml
+from typing import Any, Dict, List, Tuple
+from pandas import DataFrame, Series
+from functools import lru_cache
 from src import tool_handlers
-from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import (
+    accuracy_score,
+    make_scorer,
+    mean_absolute_percentage_error,
+)
 
 
 def extract_functions_with_args_and_values(filename: str) -> Dict[str, Dict[str, Any]]:
@@ -211,7 +199,7 @@ def describe_unique_values(
 
 def one_hot_encode(df, max_columns=10):
     for col in df.columns:
-        if df[col].dtype == "object":
+        if df[col].dtype in ["object", "category"]:
             dummies = pd.get_dummies(df[col], prefix=col)
             if len(dummies.columns) <= max_columns:
                 df = pd.concat([df, dummies], axis=1)
@@ -277,59 +265,27 @@ def describe_strong_correlations(
     )
 
 
-def load_dataset_from_sklearn(name: str) -> Tuple[DataFrame, Series]:
-    """Load a dataset by name from the `sklearn.datasets` module.
+def load_openml_dataset(name: str):
+    """Load a dataset from OpenML by name.
+    https://www.openml.org/search?type=data&status=active
 
     Args:
-        name (str): The name of the dataset to load. Possible values are: "breast_cancer", "diabetes", "digits", "files", "iris", "linnerud", "sample_image", "sample_images", "wine".
+        name (str): The name of the dataset to load.
 
     Returns:
-        Tuple[DataFrame, Series]: A tuple containing the features DataFrame and the target Series.
-
-    Example:
-        >>> df = load_dataset_by_name("diabetes")
+        X (pd.DataFrame): The features DataFrame, including the target column.
+        y (pd.Series): The target Series.
     """
-
-    try:
-        load_func = getattr(sklearn_datasets, f"load_{name}")
-        X, y = load_func(return_X_y=True, as_frame=True)
-        # Convert the target to numeric if it is non-numeric
-        if check_if_dtype(pd.DataFrame(y, columns=["y"]), "y", "Non-numeric"):
-            y = LabelEncoder().fit_transform(y)
-        X["target"] = y
-        return X, y
-    except AttributeError:
-        print(f"No dataset found with name: {name}")
-        return None, None
-
-
-def load_dataset_from_huggingface(dataset_name, target_name):
-    # Load the dataset
-    dataset = load_dataset(dataset_name)
-
-    # Concatenate all splits into a single dataset
-    combined_dataset = concatenate_datasets(
-        [dataset[split] for split in dataset.keys()]
-    )
-
-    # Convert to pandas DataFrame
-    df = combined_dataset.to_pandas()
-
-    df, target = preprocess_loaded_dataset(df, target_name)
-
-    return df, target
-
-
-def load_arff_dataset(name: str, target_name: str) -> DataFrame:
-    file_path = rf"C:\Users\matlaczj\Documents\Repozytoria\AutoFEASULMs\src\datasets\{name}.arff"
-    data, meta = arff.loadarff(file_path)
-    # Assuming 'data' is the structured array returned by loadarff
-    for col in data.dtype.names:
-        if isinstance(data[col][0], bytes):
-            data[col] = np.array([x.decode("utf-8") for x in data[col]])
-    df = pd.DataFrame(data)
-    df, target = preprocess_loaded_dataset(df, target_name)
-    return df, target
+    data = fetch_openml(name, as_frame=True)
+    X = data["data"]
+    X["target"] = data["target"]
+    # Convert the target to numeric if it is non-numeric
+    if check_if_dtype(
+        pd.DataFrame(X["target"], columns=["target"]), "target", "Non-numeric"
+    ):
+        X["target"] = LabelEncoder().fit_transform(X["target"])
+    y = X["target"]
+    return X, y
 
 
 def preprocess_loaded_dataset(
@@ -358,31 +314,6 @@ def preprocess_loaded_dataset(
     target = df["target"].copy()
 
     return df, target
-
-
-def load_all_arff_files(directory):
-    datasets = {}
-    for filename in os.listdir(directory):
-        if filename.endswith(".arff"):
-            file_path = os.path.join(directory, filename)
-            data, meta = arff.loadarff(file_path)
-            df = pd.DataFrame(data)
-            dataset_name = os.path.splitext(filename)[0]  # Remove the .arff extension
-            datasets[dataset_name] = df
-    return datasets
-
-
-# Use the function
-datasets = load_all_arff_files(
-    r"C:\Users\matlaczj\Documents\Repozytoria\AutoFEASULMs\src\datasets"
-)
-
-
-def encode_non_numeric(df):
-    for col in df.columns:
-        if df[col].dtype not in ["int64", "float64"]:
-            df[col] = pd.factorize(df[col])[0]
-    return df
 
 
 def run_function_by_name(module, function_name: str, *args, **kwargs):
@@ -483,14 +414,6 @@ def cross_validate_model(
     return mean_score, std_score
 
 
-def calculate_percentage_change(mean_score1, mean_score2, std_score1, std_score2):
-    score_change_percentage = ((mean_score2 - mean_score1) / abs(mean_score1)) * 100
-    std_change_percentage = ((std_score2 - std_score1) / abs(std_score1)) * 100
-    print(f"Mean score change: {score_change_percentage:.2f}%")
-    print(f"Std score change: {std_change_percentage:.2f}%")
-    return score_change_percentage, std_change_percentage
-
-
 def remove_duplicate_columns(df):
     df = df.loc[:, ~df.T.duplicated(keep="first")]
     return df
@@ -519,7 +442,7 @@ def drop_correlated_columns(df, threshold_features=0.95):
             )
 
     # Drop the first column that has high correlation with any other variable
-    df = df.drop(df[to_drop], axis=1)
+    df = df.drop(to_drop, axis=1)
     columns_after = df.columns
     print(f"Removed columns: {set(columns_before) - set(columns_after)}")
     return df

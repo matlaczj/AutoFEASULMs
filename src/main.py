@@ -1,34 +1,27 @@
 # %%
-# Standard library imports
 import os
 import json
 from func_timeout import FunctionTimedOut
-
-# Local application/library specific imports
 from language_model import initialize_llm, run_inference_iteration
 from utils import (
     get_model_dict,
-    load_dataset_from_sklearn,
     execute_transformations,
     cross_validate_model,
-    calculate_percentage_change,
     drop_correlated_columns,
     remove_duplicate_columns,
     handle_invalid_data,
     select_most_correlated,
     default_func,
-    load_dataset_from_huggingface,
     one_hot_encode,
     transform_date_columns,
-    load_arff_dataset,
+    load_openml_dataset,
 )
 from src.tool_handlers import *
 from visualizing.visualizations import plot_scores, plot_columns
 from src.config import config
 from experiments import prepare_experiments, datasets, classical_models, experiment_base
-from sklearn.preprocessing import StandardScaler
-import pandas as pd
 
+# SECTION OF THINGS THAT NEED TO BE DONE:
 # TODO More column analysis in prompt.
 # TODO: Check for memory leakage of context.
 # TODO: Add more functions and remove some of them.
@@ -44,20 +37,22 @@ import pandas as pd
 # TODO: Compare with SOTA Classical Methods
 # TODO: Use reduce_dimentionality function to reduce the number of columns.
 
+# DEFINE GLOBAL VARIABLES AND LOAD THE EXPERIMENTS
 global df, llm, scores
 experiments = prepare_experiments(datasets, classical_models, experiment_base)
 
+# PRINT THE NUMBER OF EXPERIMENTS AND THEIR IDS FOR CONVENIENCE
 print(f"Number of experiments: {len(experiments)}")
 for experiment in experiments:
     print(experiment["ID"])
 
 # %%
 for experiment in experiments:
-    # NOTE: Temporary for debugging
-    if int(experiment["ID"].split("-")[0]) not in [18, 19, 20, 21, 22, 23]:
+    # NOTE: TEMPORARY FOR DEBUGGING
+    if int(experiment["ID"].split("-")[0]) not in [6, 7, 8]:
         continue
 
-    # Create the directory if it doesn't exist
+    # CREATE THE DIRECTORY IF IT DOESN'T EXIST
     exp_base = config["project_base_dir"] + f"\\src\\logs\\{experiment['ID']}\\"
     counter = 1
     while os.path.exists(exp_base):
@@ -67,29 +62,18 @@ for experiment in experiments:
         counter += 1
     os.makedirs(exp_base, exist_ok=True)
 
+    # SAVE THE EXPERIMENT JSON
     with open(exp_base + "experiment.json", "w") as f:
         f.write(json.dumps(experiment, default=default_func))
 
-    # Load the dataset
-    if experiment["dataset"]["origin"] == "sklearn":
-        df, target = load_dataset_from_sklearn(experiment["dataset"]["name"])
-    elif experiment["dataset"]["origin"] == "huggingface":
-        df, target = load_dataset_from_huggingface(
-            experiment["dataset"]["name"], experiment["dataset"]["predicted_variable"]
-        )
-    elif experiment["dataset"]["origin"] == "arff":
-        df, target = load_arff_dataset(
-            experiment["dataset"]["name"], experiment["dataset"]["predicted_variable"]
-        )
-    else:
-        raise ValueError("Dataset origin not recognized.")
-
+    # LOAD THE DATASET AND PREPROCESS IT
+    df, target = load_openml_dataset(experiment["dataset"]["name"])
     df.columns = [col.lower().replace(" ", "_") for col in df.columns]
-    # df = pd.DataFrame(StandardScaler().fit_transform(df), columns=df.columns)
     df = handle_invalid_data(df)
     df = transform_date_columns(df)
     df = one_hot_encode(df)
 
+    # RUN THE BASELINE MODEL
     scores = []
     mean_score1, mean_std1 = cross_validate_model(
         df=df,
@@ -104,8 +88,8 @@ for experiment in experiments:
         {"mean_score": mean_score1, "mean_std": mean_std1, "columns": list(df.columns)}
     )
 
+    # INITIALIZE THE LANGUAGE MODEL
     model_path = get_model_dict(use_cache=False)[experiment["model"]["name"]]
-
     llm = initialize_llm(
         model_path=model_path,
         chat_format=experiment["model"]["chat_format"],
@@ -114,13 +98,15 @@ for experiment in experiments:
         n_batch=experiment["model"]["n_batch"],
     )
 
+    # RUN THE FEATURE ENGINEERING ITERATIONS
     for iteration in range(1, experiment["feature_engineering"]["iterations"] + 1):
-        # Run the inference iteration
         print(f"ITERATION: {iteration}")
+
+        # CREATE THE ITERATION DIRECTORY
         iter_base = exp_base + f"{iteration}\\"
         os.makedirs(iter_base, exist_ok=True)
 
-        # Adding target to allow correlation analysis
+        # TRY TO RUN THE INFERENCE ITERATION
         df["target"] = target
         try:
             json_content = run_inference_iteration(
@@ -143,21 +129,22 @@ for experiment in experiments:
                 temperature=experiment["feature_engineering"]["temperature"],
                 n_sampled_corr=experiment["feature_engineering"]["n_sampled_corr"],
             )
-        except ValueError as e:
-            print(f"ValueError: {e}")
-            continue
         except FunctionTimedOut as e:
             print(f"FunctionTimedOut: {e}")
             continue
 
+        # EXECUTE THE TRANSFORMATIONS RETURNED BY LANGUAGE MODEL
         df = execute_transformations(
             df=df,
             transformations=json_content,
             drop_old=False,
         )
+
+        # POSTPROCESS AFTERMATH OF EXECUTED TRANSFORMATIONS
         df = handle_invalid_data(df)
         df = remove_duplicate_columns(df)
 
+        # AUTOMATIC FEATURE SELECTION
         if iteration > experiment["feature_engineering"]["delayed_deletion"]:
             if experiment["problem"]["type"] == "regression":
                 df = select_most_correlated(
@@ -172,7 +159,7 @@ for experiment in experiments:
                 ],
             )
 
-        # Prevent leakage of target variable
+        # PREVENT THE TARGET VARIABLE LEAKAGE
         df = df.drop(
             columns=[
                 col
@@ -181,6 +168,7 @@ for experiment in experiments:
             ]
         )
 
+        # CALCULATE THE SCORES AFTER THE FEATURE ENGINEERING
         mean_score2, mean_std2 = cross_validate_model(
             df=df,
             target=target,
@@ -190,9 +178,6 @@ for experiment in experiments:
             cross_val=experiment["validation"]["kfold"],
             scorers=experiment["validation"]["scorers"],
         )
-
-        calculate_percentage_change(mean_score1, mean_score2, mean_std1, mean_std2)
-        print(f"Iteraion {iteration} completed.")
         scores.append(
             {
                 "mean_score": mean_score2,
@@ -201,6 +186,9 @@ for experiment in experiments:
             }
         )
 
+        print(f"Iteraion {iteration} completed.")
+
+        # SAVE THE SCORES AND VISUALIZATIONS
         with open(iter_base + "scores.json", "w") as f:
             f.write(json.dumps(scores))
 
@@ -225,7 +213,7 @@ for experiment in experiments:
             problem_type=experiment["problem"]["type"],
         )
 
-        # Early stopping mechanism
+        # EARLY STOPPING MECHANISM CHECK
         k = experiment["feature_engineering"]["early_stopping"]
         threshold = experiment["feature_engineering"]["percentage_change_threshold"]
         if iteration >= k:
@@ -238,6 +226,7 @@ for experiment in experiments:
                 print("Early stopping mechanism triggered.")
                 break
 
+    # AFTER THE EXPERIMENT IS DONE DELETE THE VARIABLES TO FREE UP MEMORY FOR THE NEXT EXPERIMENT
     del llm
     del df
     del scores

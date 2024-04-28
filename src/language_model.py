@@ -9,7 +9,6 @@ from utils import (
 import pandas as pd
 import json
 from func_timeout import func_set_timeout
-from func_timeout import FunctionTimedOut
 
 
 def initialize_llm(
