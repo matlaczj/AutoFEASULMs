@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 from pandas import DataFrame, Series
 from scipy.io import arff
-from sklearn import datasets
+from sklearn import datasets as sklearn_datasets
 from sklearn.metrics import (
     accuracy_score,
     explained_variance_score,
@@ -28,6 +28,7 @@ from sklearn.preprocessing import LabelEncoder
 # Local application/library specific imports
 from datasets import concatenate_datasets, load_dataset
 from src import tool_handlers
+from sklearn.preprocessing import StandardScaler
 
 
 def extract_functions_with_args_and_values(filename: str) -> Dict[str, Dict[str, Any]]:
@@ -290,7 +291,7 @@ def load_dataset_from_sklearn(name: str) -> Tuple[DataFrame, Series]:
     """
 
     try:
-        load_func = getattr(datasets, f"load_{name}")
+        load_func = getattr(sklearn_datasets, f"load_{name}")
         X, y = load_func(return_X_y=True, as_frame=True)
         # Convert the target to numeric if it is non-numeric
         if check_if_dtype(pd.DataFrame(y, columns=["y"]), "y", "Non-numeric"):
@@ -314,18 +315,46 @@ def load_dataset_from_huggingface(dataset_name, target_name):
     # Convert to pandas DataFrame
     df = combined_dataset.to_pandas()
 
-    # Encode target column if it is non-numeric
-    if check_if_dtype(df, target_name, "Non-numeric"):
-        df[target_name] = LabelEncoder().fit_transform(df[target_name])
+    df, target = preprocess_loaded_dataset(df, target_name)
 
+    return df, target
+
+
+def load_arff_dataset(name: str, target_name: str) -> DataFrame:
+    file_path = rf"C:\Users\matlaczj\Documents\Repozytoria\AutoFEASULMs\src\datasets\{name}.arff"
+    data, meta = arff.loadarff(file_path)
+    # Assuming 'data' is the structured array returned by loadarff
+    for col in data.dtype.names:
+        if isinstance(data[col][0], bytes):
+            data[col] = np.array([x.decode("utf-8") for x in data[col]])
+    df = pd.DataFrame(data)
+    df, target = preprocess_loaded_dataset(df, target_name)
+    return df, target
+
+
+def preprocess_loaded_dataset(
+    df: DataFrame, target_variable: str
+) -> Tuple[DataFrame, Series]:
     # Handle invalid data
     df = handle_invalid_data(df)
 
-    # Rename the target column to 'target'
-    if target_name in df.columns:
-        df.rename(columns={target_name: "target"}, inplace=True)
+    # Encode target variable if it is non-numeric
+    if check_if_dtype(df, target_variable, "Non-numeric"):
+        df[target_variable] = LabelEncoder().fit_transform(df[target_variable])
 
-    # Create a separate Series for the target column
+    # Transform date columns
+    df = transform_date_columns(df)
+
+    # One-hot encode non-numeric columns
+    df = one_hot_encode(df)
+
+    # Select only numeric columns
+    df = df.select_dtypes(include=["number", "bool"])
+
+    # Rename target variable to 'target'
+    df = df.rename(columns={target_variable: "target"})
+
+    # Create a separate Series for the target variable
     target = df["target"].copy()
 
     return df, target
@@ -432,6 +461,9 @@ def cross_validate_model(
 
     scorer = scorers[problem_type]
 
+    # Standardize the features before cross-validation
+    # X = pd.DataFrame(StandardScaler().fit_transform(X), columns=X.columns)
+
     # Perform cross-validation on the model
     scores = cross_val_score(
         model,
@@ -534,13 +566,12 @@ def default_func(obj):
 def transform_date_columns(df):
     for col in df.columns:
         try:
-            # Try to convert the column to datetime
-            df[col] = pd.to_datetime(
-                df[col], errors="raise", infer_datetime_format=True
-            )
-
-            # If the conversion is successful, extract date components
+            # If the column is of datetime type
             if np.issubdtype(df[col].dtype, np.datetime64):
+                # Try to convert the column to datetime
+                df[col] = pd.to_datetime(
+                    df[col], errors="raise", infer_datetime_format=True
+                )
                 df[col + "_year"] = df[col].dt.year
                 df[col + "_month"] = df[col].dt.month
                 df[col + "_day"] = df[col].dt.day
@@ -550,7 +581,7 @@ def transform_date_columns(df):
                 # Drop the original date column
                 df.drop(col, axis=1, inplace=True)
         except Exception as e:
-            print(f"Error processing column {col}: {e}")
+            print(f"Not Convertible To Datetime {col}: {e}")
             continue
     return df
 

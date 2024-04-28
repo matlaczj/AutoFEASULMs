@@ -51,63 +51,6 @@ Target: class_0, class_1, class_2: Labels indicating the class or category of th
 """,
     },
     {
-        "origin": "sklearn",
-        "predicted_variable": "",
-        "type": "classification",
-        "name": "iris",
-        "short_description": """
-**Attribute Information:**
-Sepal length: Length of the sepal in cm.
-Sepal width: Width of the sepal in cm.
-Petal length: Length of the petal in cm.
-Petal width: Width of the petal in cm.
-Target: class_0, class_1, class_2 - Labels indicating the class or category.
-
-""",
-    },
-    {
-        "origin": "sklearn",
-        "predicted_variable": "",
-        "type": "classification",
-        "name": "breast_cancer",
-        "short_description": """
-**Attribute Information:**
-Radius: Mean distance from the center to points on the perimeter of a tumor.
-Texture: Standard deviation of gray-scale values in the tumor area.
-Perimeter: Total length of the tumor perimeter.
-Area: Total area covered by the tumor.
-Smoothness: Local variation in the lengths of tumor radii.
-Compactness: Measure of how compact the shape of the tumor is (calculated as (perimeter^2 / area) - 1).
-Concavity: Severity of concave portions of the tumor contour.
-Concave points: Number of concave portions of the tumor contour.
-Symmetry: Symmetry of the tumor.
-Fractal dimension: Measure of the complexity of the tumor's contour ("coastline approximation" - 1).
-Target: Type of tumor, either malignant (WDBC-Malignant) or benign (WDBC-Benign).
-
-""",
-    },
-    {
-        "origin": "sklearn",
-        "predicted_variable": "",
-        "type": "regression",
-        "name": "diabetes",
-        "short_description": """
-**Attribute Information:**
-Age: Age of the individual in years.
-Sex: Gender of the individual.
-BMI: Body mass index, a measure of body fat based on height and weight.
-BP: Average blood pressure of the individual.
-S1 tc: Total serum cholesterol, the total amount of cholesterol in the blood.
-S2 ldl: Low-density lipoproteins, a type of cholesterol often referred to as "bad" cholesterol.
-S3 hdl: High-density lipoproteins, a type of cholesterol often referred to as "good" cholesterol.
-S4 tch: Total cholesterol / HDL ratio, a measure of the balance between total cholesterol and HDL cholesterol.
-S5 ltg: Possibly the logarithm of serum triglycerides level, a measure of fat found in the blood.
-S6 glu: Blood sugar level, the concentration of glucose in the blood.
-Target: A quantitative measure of disease progression one year after baseline, likely the outcome variable of interest in the dataset.
-
-""",
-    },
-    {
         "origin": "huggingface",
         "predicted_variable": "body_mass_g",
         "type": "regression",
@@ -140,11 +83,111 @@ down (int64): An integer representing the number of downward revisions to the fo
 """,
     },
     {
-        "origin": "huggingface",
-        "predicted_variable": "age",
+        "origin": "arff",
+        "predicted_variable": "class",
+        "type": "classification",
+        "name": "credit_data",
+        "short_description": """Attribute description
+Status of existing checking account, in Deutsche Mark.
+Duration in months
+Credit history (credits taken, paid back duly, delays, critical accounts)
+Purpose of the credit (car, television,...)
+Credit amount
+Status of savings account/bonds, in Deutsche Mark.
+Present employment, in number of years.
+Installment rate in percentage of disposable income
+Personal status (married, single,...) and sex
+Other debtors / guarantors
+Present residence since X years
+Property (e.g. real estate)
+Age in years
+Other installment plans (banks, stores)
+Housing (rent, own,...)
+Number of existing credits at this bank
+Job
+Number of people being liable to provide maintenance for
+Telephone (yes,no)
+Foreign worker (yes,no)
+""",
+    },
+    {
+        "origin": "sklearn",
+        "predicted_variable": "",
         "type": "regression",
-        "name": "imodels/credit-card",
-        "short_description": """There are 25 variables:
+        "name": "diabetes",
+        "short_description": """
+**Attribute Information:**
+Age: Age of the individual in years.
+Sex: Gender of the individual.
+BMI: Body mass index, a measure of body fat based on height and weight.
+BP: Average blood pressure of the individual.
+S1 tc: Total serum cholesterol, the total amount of cholesterol in the blood.
+S2 ldl: Low-density lipoproteins, a type of cholesterol often referred to as "bad" cholesterol.
+S3 hdl: High-density lipoproteins, a type of cholesterol often referred to as "good" cholesterol.
+S4 tch: Total cholesterol / HDL ratio, a measure of the balance between total cholesterol and HDL cholesterol.
+S5 ltg: Possibly the logarithm of serum triglycerides level, a measure of fat found in the blood.
+S6 glu: Blood sugar level, the concentration of glucose in the blood.
+Target: A quantitative measure of disease progression one year after baseline, likely the outcome variable of interest in the dataset.
+
+""",
+    },
+]
+
+datasets = (
+    [
+        {
+            "origin": "sklearn",
+            "predicted_variable": "",
+            "type": "classification",
+            "name": "breast_cancer",
+            "short_description": """
+**Attribute Information:**
+Radius: Mean distance from the center to points on the perimeter of a tumor.
+Texture: Standard deviation of gray-scale values in the tumor area.
+Perimeter: Total length of the tumor perimeter.
+Area: Total area covered by the tumor.
+Smoothness: Local variation in the lengths of tumor radii.
+Compactness: Measure of how compact the shape of the tumor is (calculated as (perimeter^2 / area) - 1).
+Concavity: Severity of concave portions of the tumor contour.
+Concave points: Number of concave portions of the tumor contour.
+Symmetry: Symmetry of the tumor.
+Fractal dimension: Measure of the complexity of the tumor's contour ("coastline approximation" - 1).
+Target: Type of tumor, either malignant (WDBC-Malignant) or benign (WDBC-Benign).
+
+""",
+        },
+        {
+            "origin": "sklearn",
+            "predicted_variable": "",
+            "type": "classification",
+            "name": "iris",
+            "short_description": """
+**Attribute Information:**
+Sepal length: Length of the sepal in cm.
+Sepal width: Width of the sepal in cm.
+Petal length: Length of the petal in cm.
+Petal width: Width of the petal in cm.
+Target: class_0, class_1, class_2 - Labels indicating the class or category.
+
+""",
+        },
+        {
+            "origin": "huggingface",
+            "predicted_variable": "price",
+            "type": "regression",
+            "name": "gauss314/bitcoin_daily",
+            "short_description": """Daily Bitcoin price data. The dataset contains the following columns:
+- date: The date of the data point.
+- price: The price of Bitcoin on that date.
+- market_caps: The market capitalization of Bitcoin on that date.
+- total_volumes: The total volume of Bitcoin traded on that date.""",
+        },
+        {
+            "origin": "huggingface",
+            "predicted_variable": "age",
+            "type": "regression",
+            "name": "imodels/credit-card",
+            "short_description": """There are 25 variables:
 
 ID: ID of each client
 LIMIT_BAL: Amount of given credit in NT dollars (includes individual and family/supplementary credit
@@ -172,32 +215,17 @@ PAY_AMT5: Amount of previous payment in May, 2005 (NT dollar)
 PAY_AMT6: Amount of previous payment in April, 2005 (NT dollar)
 default.payment.next.month: Default payment (1=yes, 0=no)
 """,
-    },
-]
-
-datasets = [
-    {
-        "origin": "",
-        "predicted_variable": "",
-        "type": "",
-        "name": "",
-        "short_description": """""",
-    },
-    {
-        "origin": "",
-        "predicted_variable": "",
-        "type": "",
-        "name": "",
-        "short_description": """""",
-    },
-]
+        },
+    ]
+    + datasets1
+)
 
 classical_models = [
     # Linear Models - They often require feature scaling and normalization for optimal performance. They also benefit from creating polynomial and interaction features.
     {
         "type": "classification",
         "machine_learning_model": "Logistic Regression",
-        "model": LogisticRegression(),
+        "model": LogisticRegression(max_iter=500),
     },
     {
         "type": "regression",
@@ -208,23 +236,23 @@ classical_models = [
     {
         "type": "classification",
         "machine_learning_model": "Decision Tree Classifier",
-        "model": DecisionTreeClassifier(),
+        "model": DecisionTreeClassifier(criterion="entropy", splitter="best"),
     },
     {
         "type": "regression",
         "machine_learning_model": "Decision Tree Regressor",
-        "model": DecisionTreeRegressor(),
+        "model": DecisionTreeRegressor(criterion="absolute_error", splitter="best"),
     },
     # Distance-based Models - They require feature scaling because they rely on calculating the distance between instances.
     {
         "type": "classification",
         "machine_learning_model": "K-Nearest Neighbors Classifier",
-        "model": KNeighborsClassifier(),
+        "model": KNeighborsClassifier(algorithm="ball_tree"),
     },
     {
         "type": "regression",
         "machine_learning_model": "K-Nearest Neighbors Regressor",
-        "model": KNeighborsRegressor(),
+        "model": KNeighborsRegressor(algorithm="ball_tree"),
     },
     # Probabilistic Models - They often require data to be in a specific format or distribution.
     {
@@ -240,9 +268,9 @@ experiment_base = {
     "model": {
         "name": "MISTRAL-7B-INSTRUCT-V0.2.Q6_K",
         "chat_format": "mistral-instruct",
-        "n_gpu_layers": -1,
-        "n_ctx": 512 * 16,
-        "n_batch": 512 * 8,
+        "n_gpu_layers": -1,  # Meaning: Use all available GPUs.
+        "n_ctx": 512 * 16,  # Meaning: Use a context window of X tokens.
+        "n_batch": 512 * 8,  # Meaning: Use a batch size of X tokens.
     },
     "dataset": {
         "target_variable": "target",
@@ -255,27 +283,27 @@ experiment_base = {
         "model": "PLACEHOLDER",
     },
     "feature_engineering": {
-        "iterations": 100,
-        "n_new_features": 5,
-        "n_unique_values": 10,
-        "perc_digits_after_decimal": 20,
-        "correlations_threshold": 0.5,
-        "temperature": 1.5,
-        "n_most_correlated": 20,
-        "threshold_features": 0.9,
-        "early_stopping": 3,
-        "delayed_deletion": 2,
-        "n_sampled_corr": 40,
-        "percentage_change_threshold": 0.05,
+        "iterations": 10,  # Meaning: Run the FE process for X iterations.
+        "n_new_features": 6,  # Meaning: Suggest X new features in each iteration.
+        "n_unique_values": 8,  # Meaning: Describe each column with X unique values.
+        "perc_digits_after_decimal": 20,  # Meaning: Describe each column with X% of the digits after the decimal.
+        "correlations_threshold": 0.4,  # Meaning: What is considered an interesting correlation to show on the prompt.
+        "temperature": 0.5,  # Meaning: The higher the temperature, the more creative the FE process.
+        "n_most_correlated": 30,  # Meaning: Select the X most correlated features with the target variable.
+        "threshold_features": 0.9,  # Meaning: Drop features that are more than X% correlated with another feature.
+        "early_stopping": 3,  # Meaning: Stop the FE process if the relative performance does not improve for X iterations.
+        "delayed_deletion": 1,  # Meaning: Start dropping features after the Xnd iteration.
+        "n_sampled_corr": 40,  # Meaning: Sample X correlations into prompt.
+        "percentage_change_threshold": 0.05,  # Meaning: Trigger early stopping counter if the relative performance does not improve by more than X%.
     },
     "validation": {
-        "kfold": 10,
+        "kfold": 10,  # Meaning: Use 10-fold cross-validation for model evaluation.
         "scorers": {
-            "classification": accuracy_score,
-            "regression": mean_absolute_percentage_error,
+            "classification": accuracy_score,  # Meaning: Use accuracy score for classification problems.
+            "regression": mean_absolute_percentage_error,  # Meaning: Use mean absolute percentage error for regression problems.
         },
     },
-    "schema": schema,
+    "schema": schema,  # Meaning: The schema to use for the final JSON output.
 }
 
 

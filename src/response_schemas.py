@@ -33,6 +33,7 @@ schema = {
                             "linear_combination",
                             "create_interaction",
                             "subtract_columns",
+                            "reduce_dimentionality",
                         ],
                     },
                     "columns": {
@@ -81,6 +82,10 @@ schema = {
                                 "ceil",
                                 "floor",
                                 "round",
+                                "PCA",
+                                "TruncatedSVD",
+                                "FastICA",
+                                "FactorAnalysis",
                             ],
                         },
                     },

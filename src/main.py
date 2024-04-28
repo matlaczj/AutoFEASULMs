@@ -4,10 +4,6 @@ import os
 import json
 from func_timeout import FunctionTimedOut
 
-# Third party imports
-from sklearn.utils import all_estimators
-from sklearn.base import ClassifierMixin, RegressorMixin
-
 # Local application/library specific imports
 from language_model import initialize_llm, run_inference_iteration
 from utils import (
@@ -24,16 +20,17 @@ from utils import (
     load_dataset_from_huggingface,
     one_hot_encode,
     transform_date_columns,
+    load_arff_dataset,
 )
 from src.tool_handlers import *
-from visualizing.visualizations import plot_scores
+from visualizing.visualizations import plot_scores, plot_columns
 from src.config import config
 from experiments import prepare_experiments, datasets, classical_models, experiment_base
+from sklearn.preprocessing import StandardScaler
+import pandas as pd
 
 # TODO More column analysis in prompt.
 # TODO: Check for memory leakage of context.
-# TODO: Do hyperparameter tuning to show real value of feature engineering.
-# TODO: Reverse FE if score decreases.
 # TODO: Add more functions and remove some of them.
 # TODO: Speed up inference by using a single prompt for all columns.
 # TODO: Explain bad regression results with diabetes dataset.
@@ -41,6 +38,11 @@ from experiments import prepare_experiments, datasets, classical_models, experim
 # TODO: Change what lines are printed on the visualization.
 # TODO: Handle only tabular numeric datasets.
 # TODO: Improve column names.
+# TODO: Reverse FE if score decreases. Like a tree search (add a parameter to the config).
+# TODO: Do hyperparameter tuning to show real value of FE. Or just set HP.
+# TODO: Seed and temperature to increase reproducibility and determinism.
+# TODO: Compare with SOTA Classical Methods
+# TODO: Use reduce_dimentionality function to reduce the number of columns.
 
 global df, llm, scores
 experiments = prepare_experiments(datasets, classical_models, experiment_base)
@@ -52,7 +54,7 @@ for experiment in experiments:
 # %%
 for experiment in experiments:
     # NOTE: Temporary for debugging
-    if int(experiment["ID"].split("-")[0]) != 36:
+    if int(experiment["ID"].split("-")[0]) not in [18, 19, 20, 21, 22, 23]:
         continue
 
     # Create the directory if it doesn't exist
@@ -75,9 +77,15 @@ for experiment in experiments:
         df, target = load_dataset_from_huggingface(
             experiment["dataset"]["name"], experiment["dataset"]["predicted_variable"]
         )
+    elif experiment["dataset"]["origin"] == "arff":
+        df, target = load_arff_dataset(
+            experiment["dataset"]["name"], experiment["dataset"]["predicted_variable"]
+        )
     else:
         raise ValueError("Dataset origin not recognized.")
 
+    df.columns = [col.lower().replace(" ", "_") for col in df.columns]
+    # df = pd.DataFrame(StandardScaler().fit_transform(df), columns=df.columns)
     df = handle_invalid_data(df)
     df = transform_date_columns(df)
     df = one_hot_encode(df)
@@ -198,7 +206,7 @@ for experiment in experiments:
 
         plot_scores(
             scores,
-            big_title=f"""{experiment["dataset"]["name"]} - {experiment["model"]["name"]}""",
+            big_title=f"""{experiment["dataset"]["name"]} - {experiment["problem"]["model"]}""",
             score_axis_title=(
                 f"""{experiment["validation"]["kfold"]}-Fold Cross-Val Accuracy Score With Std Dev"""
                 if experiment["problem"]["type"] == "classification"
@@ -208,6 +216,13 @@ for experiment in experiments:
             if_score=(
                 True if experiment["problem"]["type"] == "classification" else False
             ),
+        )
+
+        plot_columns(
+            data=scores,
+            title=f"""{experiment["dataset"]["name"]} - {experiment["problem"]["model"]}""",
+            save_path=iter_base + "columns.pdf",
+            problem_type=experiment["problem"]["type"],
         )
 
         # Early stopping mechanism

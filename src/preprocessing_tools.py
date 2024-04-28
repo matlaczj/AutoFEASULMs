@@ -15,6 +15,7 @@ from sklearn.preprocessing import (
     FunctionTransformer,
 )
 from src.utils import check_if_dtype
+from sklearn.decomposition import PCA, TruncatedSVD, FastICA, FactorAnalysis
 
 # NOTE:
 # 1. Every variable ending with '_accepted' is a special variable that is extracted by another script to create prompt. Function headers are also extracted by that script.
@@ -69,7 +70,7 @@ def quantile_transformer(
         n_quantiles=n_quantiles, output_distribution=output_distribution
     )
     new_column_name = (
-        f"{column_name}_quantile_transformed_{n_quantiles}_{output_distribution}"
+        f"{column_name}_quantiled_n={n_quantiles}_distr={output_distribution}"
     )
     df[new_column_name] = transformer.fit_transform(df[[column_name]])
     if drop_old:
@@ -149,7 +150,7 @@ def binarizer(df, column_name, threshold=0.0, drop_old=False):
     if not check_if_dtype(df, column_name, "Numeric"):
         return df
     transformer = Binarizer(threshold=threshold)
-    new_column_name = f"{column_name}_binarized_{threshold}"
+    new_column_name = f"{column_name}_binarized_th={threshold}"
     df[new_column_name] = transformer.transform(df[[column_name]].values)
     if drop_old:
         df.drop(column_name, axis=1, inplace=True)
@@ -189,7 +190,9 @@ def k_bins_discretizer(
         raise ValueError("n_bins must be between 2 and 20")
     discretizer = KBinsDiscretizer(n_bins=n_bins, encode=encode, strategy=strategy)
     transformed = discretizer.fit_transform(df[[column_name]])
-    new_column_name = f"{column_name}_bin_{n_bins}_{encode}_{strategy}"
+    new_column_name = (
+        f"{column_name}_binarized_n={n_bins}_enc={encode}_strat={strategy}"
+    )
     df = pd.concat([df, pd.DataFrame(transformed, columns=[new_column_name])], axis=1)
     if drop_old:
         df.drop(column_name, axis=1, inplace=True)
@@ -243,7 +246,7 @@ def linear_combination(
         and check_if_dtype(df, column_name_2, "Numeric")
     ):
         return df
-    df[f"{column_name_1}_{column_name_2}_linear_combination"] = (
+    df[f"{column_name_1}_{column_name_2}_combination"] = (
         df[column_name_1] * weight_1 + df[column_name_2] * weight_2
     )
     if drop_old:
@@ -257,9 +260,7 @@ def create_interaction(df, column_name_1, column_name_2, drop_old=False):
         and check_if_dtype(df, column_name_2, "Numeric")
     ):
         return df
-    df[f"{column_name_1}_{column_name_2}_interaction"] = (
-        df[column_name_1] * df[column_name_2]
-    )
+    df[f"{column_name_1}_{column_name_2}_inter"] = df[column_name_1] * df[column_name_2]
     if drop_old:
         df.drop([column_name_1, column_name_2], axis=1, inplace=True)
     return df
@@ -271,12 +272,43 @@ def subtract_columns(df, column_name_1, column_name_2, drop_old=False):
         and check_if_dtype(df, column_name_2, "Numeric")
     ):
         return df
-    df[f"{column_name_1}_{column_name_2}_subtraction"] = (
-        df[column_name_1] - df[column_name_2]
-    )
+    df[f"{column_name_1}_{column_name_2}_sub"] = df[column_name_1] - df[column_name_2]
     if drop_old:
         df.drop([column_name_1, column_name_2], axis=1, inplace=True)
     return df
 
 
-# %%
+def reduce_dimentionality(df, columns, method, drop_old=False):
+    method_accepted = ["PCA", "TruncatedSVD", "FastICA", "FactorAnalysis"]
+    if method not in method_accepted:
+        raise ValueError(
+            "method must be either 'PCA', 'TruncatedSVD', 'FastICA', or 'FactorAnalysis'"
+        )
+
+    if method == "PCA":
+        transformer = PCA(n_components=1)
+    elif method == "TruncatedSVD":
+        transformer = TruncatedSVD(n_components=1)
+    elif method == "FastICA":
+        transformer = FastICA(n_components=1)
+    elif method == "FactorAnalysis":
+        transformer = FactorAnalysis(n_components=1)
+
+    # Apply the transformation
+    transformed_data = transformer.fit_transform(df[columns])
+
+    # Create new column name that combines the original column names
+    new_column = "_".join(columns) + f"_{method}"
+
+    # Create a DataFrame for the transformed data
+    transformed_df = pd.DataFrame(
+        transformed_data, columns=[new_column], index=df.index
+    )
+
+    if drop_old:
+        df.drop(columns, axis=1, inplace=True)
+
+    # Concatenate the original df with the transformed df
+    df = pd.concat([df, transformed_df], axis=1)
+
+    return df

@@ -14,6 +14,7 @@ from src.preprocessing_tools import (
     linear_combination,
     create_interaction,
     subtract_columns,
+    reduce_dimentionality,
 )
 from typing import Dict, Union, List
 
@@ -253,3 +254,19 @@ def subtract_columns_handler(
     column_name_1 = transformation["columns"][0]
     column_name_2 = transformation["columns"][1]
     return subtract_columns(df, column_name_1, column_name_2, drop_old)
+
+
+def reduce_dimentionality_handler(
+    df,
+    transformation: Dict[str, Union[str, List[Union[str, int, float]]]],
+    drop_old=False,
+):
+    if len(transformation["columns"]) < 1:
+        return df
+    columns = transformation["columns"]
+    method = (
+        transformation["categorical_arguments"][0]
+        if len(transformation["categorical_arguments"]) > 0
+        else "PCA"
+    )
+    return reduce_dimentionality(df, columns, method, drop_old)

@@ -38,6 +38,7 @@ def initialize_llm(
         n_gpu_layers=n_gpu_layers,
         n_ctx=n_ctx,
         n_batch=n_batch,
+        seed=777,
     )
 
 
@@ -82,6 +83,7 @@ def create_chat_completion(
         min_p=min_p,
         max_tokens=max_tokens,
         repeat_penalty=repeat_penalty,
+        seed=777,
     )
 
 
