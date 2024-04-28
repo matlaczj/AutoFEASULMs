@@ -1,4 +1,5 @@
-from response_schemas import schema
+from src.tools.response_schemas import schema
+import numpy as np
 import copy
 from sklearn.metrics import (
     accuracy_score,
@@ -11,6 +12,11 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.linear_model import LinearRegression
+
+
+def median_absolute_percentage_error(y_true, y_pred):
+    y_true, y_pred = np.array(y_true), np.array(y_pred)
+    return np.median(np.abs((y_true - y_pred) / y_true))
 
 
 datasets = [

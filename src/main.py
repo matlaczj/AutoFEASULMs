@@ -2,24 +2,23 @@
 import os
 import json
 from func_timeout import FunctionTimedOut
-from language_model import initialize_llm, run_inference_iteration
-from utils import (
-    get_model_dict,
-    execute_transformations,
-    cross_validate_model,
-    drop_correlated_columns,
-    remove_duplicate_columns,
-    handle_invalid_data,
-    select_most_correlated,
-    default_func,
-    one_hot_encode,
-    transform_date_columns,
-    load_openml_dataset,
-)
-from src.tool_handlers import *
-from visualizing.visualizations import plot_scores, plot_columns
 from src.config import config
+from language_model import initialize_llm, run_inference_iteration
 from experiments import prepare_experiments, datasets, classical_models, experiment_base
+from visualizing.visualizations import plot_scores, plot_columns
+from utils.data_operations_utils import (
+    handle_invalid_data,
+    transform_date_columns,
+    remove_duplicate_columns,
+    drop_correlated_columns,
+    select_most_correlated,
+    one_hot_encode,
+    load_openml_dataset,
+    execute_transformations,
+    default_func,
+)
+from utils.validation_utils import cross_validate_model
+from utils.ast_utils import get_model_dict
 
 # SECTION OF THINGS THAT NEED TO BE DONE:
 # TODO More column analysis in prompt.
@@ -49,8 +48,8 @@ for experiment in experiments:
 # %%
 for experiment in experiments:
     # NOTE: TEMPORARY FOR DEBUGGING
-    if int(experiment["ID"].split("-")[0]) not in [6, 7, 8]:
-        continue
+    # if int(experiment["ID"].split("-")[0]) not in []:
+    #     continue
 
     # CREATE THE DIRECTORY IF IT DOESN'T EXIST
     exp_base = config["project_base_dir"] + f"\\src\\logs\\{experiment['ID']}\\"

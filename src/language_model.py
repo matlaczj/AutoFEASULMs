@@ -1,7 +1,7 @@
 # %%
 from llama_cpp import Llama
 from typing import List, Dict, Union, Optional
-from utils import (
+from src.utils.prompting_utils import (
     describe_unique_values,
     describe_strong_correlations,
     describe_transformations,
@@ -140,7 +140,7 @@ def run_inference_iteration(
     )
 
     function_headers = describe_transformations(
-        filename=r"C:\Users\matlaczj\Documents\Repozytoria\AutoFEASULMs\src\preprocessing_tools.py",
+        filename=config["function_header_file_path"],
         skip_args=["df", "drop_old"],
         if_def=False,
         if_backtick=True,

@@ -14,7 +14,7 @@ from sklearn.preprocessing import (
     KBinsDiscretizer,
     FunctionTransformer,
 )
-from src.utils import check_if_dtype
+from src.utils.validation_utils import check_if_dtype
 from sklearn.decomposition import PCA, TruncatedSVD, FastICA, FactorAnalysis
 
 # NOTE:
