@@ -44,7 +44,9 @@ def one_hot_encode(df, max_columns=10):
     return df
 
 
-def load_openml_dataset(name: str):
+def load_openml_dataset(
+    name: str, target_column: str = "target", problem_type: str = None
+):
     """Load a dataset from OpenML by name.
     https://www.openml.org/search?type=data&status=active
 
@@ -55,44 +57,24 @@ def load_openml_dataset(name: str):
         X (pd.DataFrame): The features DataFrame, including the target column.
         y (pd.Series): The target Series.
     """
+    print(
+        f"Loading dataset: {name}, target_column: {target_column}, problem_type: {problem_type}"
+    )
     data = fetch_openml(name, as_frame=True)
     X = data["data"]
-    X["target"] = data["target"]
+    X[target_column] = data["target"]
     # Convert the target to numeric if it is non-numeric
     if check_if_dtype(
-        pd.DataFrame(X["target"], columns=["target"]), "target", "Non-numeric"
+        pd.DataFrame(X[target_column], columns=[target_column]),
+        target_column,
+        "Non-numeric",
     ):
-        X["target"] = LabelEncoder().fit_transform(X["target"])
-    y = X["target"]
+        X[target_column] = LabelEncoder().fit_transform(X[target_column])
+    # Because we use MAPE for regression, we need to log-transform the target and add 1
+    if problem_type == "regression":
+        X[target_column] = np.log(X[target_column] + 1) + 1
+    y = X[target_column]
     return X, y
-
-
-def preprocess_loaded_dataset(
-    df: DataFrame, target_variable: str
-) -> Tuple[DataFrame, Series]:
-    # Handle invalid data
-    df = handle_invalid_data(df)
-
-    # Encode target variable if it is non-numeric
-    if check_if_dtype(df, target_variable, "Non-numeric"):
-        df[target_variable] = LabelEncoder().fit_transform(df[target_variable])
-
-    # Transform date columns
-    df = transform_date_columns(df)
-
-    # One-hot encode non-numeric columns
-    df = one_hot_encode(df)
-
-    # Select only numeric columns
-    df = df.select_dtypes(include=["number", "bool"])
-
-    # Rename target variable to 'target'
-    df = df.rename(columns={target_variable: "target"})
-
-    # Create a separate Series for the target variable
-    target = df["target"].copy()
-
-    return df, target
 
 
 def execute_transformations(
@@ -127,6 +109,7 @@ def remove_duplicate_columns(df):
 
 
 def drop_correlated_columns(df, threshold_features=0.95):
+
     columns_before = df.columns
 
     # Recalculate the correlation matrix

@@ -41,7 +41,7 @@ def initialize_llm(
     )
 
 
-@func_set_timeout(60)  # Timeout of 1 minute
+@func_set_timeout(120)  # Timeout of 2 minutes
 def create_chat_completion(
     llm: Llama,
     messages: List[Dict[str, str]],

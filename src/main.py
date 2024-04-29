@@ -6,17 +6,17 @@ from func_timeout import FunctionTimedOut
 from src.config import config
 from language_model import initialize_llm, run_inference_iteration
 from experiments import prepare_experiments, datasets, classical_models, experiment_base
-from vis.vis import plot_scores, plot_columns
+from vis.vis import plot_scores, plot_columns, plot_time
 from utils.data_operations_utils import (
     handle_invalid_data,
     transform_date_columns,
-    remove_duplicate_columns,
     drop_correlated_columns,
     select_most_correlated,
     one_hot_encode,
     load_openml_dataset,
     execute_transformations,
     default_func,
+    remove_duplicate_columns,
 )
 from utils.validation_utils import cross_validate_model
 from utils.ast_utils import get_model_dict
@@ -36,6 +36,8 @@ from utils.ast_utils import get_model_dict
 # TODO: Seed and temperature to increase reproducibility and determinism.
 # TODO: Compare with SOTA Classical Methods
 # TODO: Use reduce_dimentionality function to reduce the number of columns.
+# TODO: Experiment with smaller mistral versions.
+# TODO: Improve dataset descriptions.
 
 # DEFINE GLOBAL VARIABLES AND LOAD THE EXPERIMENTS
 global df, llm, scores
@@ -46,10 +48,16 @@ print(f"Number of experiments: {len(experiments)}")
 for experiment in experiments:
     print(experiment["ID"])
 
+# TEST IF ALL DATASETS CAN BE LOADED
+df_dict = {}
+for dataset in datasets:
+    name = dataset["name"]
+    df, target = load_openml_dataset(name)
+    df_dict[name] = df
 # %%
 for experiment in experiments:
     # NOTE: TEMPORARY FOR DEBUGGING
-    # if int(experiment["ID"].split("-")[0]) not in []:
+    # if int(experiment["ID"].split("-")[0]) < 27:
     #     continue
 
     # CREATE THE DIRECTORY IF IT DOESN'T EXIST
@@ -67,7 +75,11 @@ for experiment in experiments:
         f.write(json.dumps(experiment, default=default_func))
 
     # LOAD THE DATASET AND PREPROCESS IT
-    df, target = load_openml_dataset(experiment["dataset"]["name"])
+    df, target = load_openml_dataset(
+        experiment["dataset"]["name"],
+        experiment["dataset"]["target_variable"],
+        experiment["problem"]["type"],
+    )
     df.columns = [col.lower().replace(" ", "_") for col in df.columns]
     df = handle_invalid_data(df)
     df = transform_date_columns(df)
@@ -111,11 +123,11 @@ for experiment in experiments:
         iter_base = exp_base + f"{iteration}\\"
         os.makedirs(iter_base, exist_ok=True)
 
-        # START THE TIMER
+        # START THE TIMER AND BACKUP THE DATAFRAME
         start_time = time.time()
 
         # TRY TO RUN THE INFERENCE ITERATION
-        df["target"] = target
+        df[experiment["dataset"]["target_variable"]] = target
         try:
             json_content = run_inference_iteration(
                 llm=llm,
@@ -150,6 +162,7 @@ for experiment in experiments:
 
         # POSTPROCESS AFTERMATH OF EXECUTED TRANSFORMATIONS
         df = handle_invalid_data(df)
+        # NOTE: Apparently, the following line is necessary!
         df = remove_duplicate_columns(df)
 
         # AUTOMATIC FEATURE SELECTION
@@ -176,9 +189,6 @@ for experiment in experiments:
             ]
         )
 
-        # STOP THE TIMER
-        end_time = time.time()
-
         # CALCULATE THE SCORES AFTER THE FEATURE ENGINEERING
         mean_score2, mean_std2 = cross_validate_model(
             df=df,
@@ -189,6 +199,9 @@ for experiment in experiments:
             cross_val=experiment["validation"]["kfold"],
             scorers=experiment["validation"]["scorers"],
         )
+
+        # STOP THE TIMER
+        end_time = time.time()
         scores.append(
             {
                 "mean_score": mean_score2,
@@ -206,7 +219,7 @@ for experiment in experiments:
 
         plot_scores(
             scores,
-            big_title=f"""{experiment["dataset"]["name"]} - {experiment["problem"]["model"]}""",
+            big_title=f"""{experiment["dataset"]["name"]}\n{experiment["problem"]["model"]}""",
             score_axis_title=(
                 f"""{experiment["validation"]["kfold"]}-Fold Cross-Val Accuracy Score With Std Dev"""
                 if experiment["problem"]["type"] == "classification"
@@ -220,9 +233,15 @@ for experiment in experiments:
 
         plot_columns(
             data=scores,
-            title=f"""{experiment["dataset"]["name"]} - {experiment["problem"]["model"]}""",
+            title=f"""{experiment["dataset"]["name"]}\n{experiment["problem"]["model"]}""",
             save_path=iter_base + "columns.pdf",
             problem_type=experiment["problem"]["type"],
+        )
+
+        plot_time(
+            data=scores,
+            path=iter_base + "time.pdf",
+            title=f"""{experiment["dataset"]["name"]}\n{experiment["problem"]["model"]}""",
         )
 
         # EARLY STOPPING MECHANISM CHECK

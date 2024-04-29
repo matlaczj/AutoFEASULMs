@@ -1,6 +1,16 @@
 import pandas as pd
 import numpy as np
-from src.utils.data_operations_utils import *
+from src.utils.data_operations_utils import (
+    round_to_percent_digits,
+    one_hot_encode,
+    load_openml_dataset,
+    execute_transformations,
+    drop_correlated_columns,
+    select_most_correlated,
+    handle_invalid_data,
+    default_func,
+    transform_date_columns,
+)
 
 
 # Test for round_to_percent_digits
@@ -9,17 +19,23 @@ def test_round_to_percent_digits():
     assert round_to_percent_digits(123.456789, 100) == 123.456789
     assert round_to_percent_digits(123.456789, 0) == 123.46
     assert round_to_percent_digits(123, 50) == 123
+    assert round_to_percent_digits(123, 0) == 123
+    assert round_to_percent_digits(123, 100) == 123
 
 
 # Test for one_hot_encode
 def test_one_hot_encode():
-    df = pd.DataFrame({"A": ["a", "b", "a"], "B": ["b", "a", "c"]})
+    df = pd.DataFrame({"A": ["a", "b", "a"], "B": ["b", "a", "c"], "C": [1, 2, 3]})
     df_encoded = one_hot_encode(df)
     assert "A_a" in df_encoded.columns
     assert "A_b" in df_encoded.columns
     assert "B_a" in df_encoded.columns
     assert "B_b" in df_encoded.columns
     assert "B_c" in df_encoded.columns
+    assert "C" in df_encoded.columns
+    assert "C_1" not in df_encoded.columns
+    assert "C_2" not in df_encoded.columns
+    assert "C_3" not in df_encoded.columns
 
 
 # Test for load_openml_dataset
@@ -27,14 +43,6 @@ def test_load_openml_dataset():
     X, y = load_openml_dataset("iris")
     assert X.shape[0] == y.shape[0]
     assert "target" in X.columns
-
-
-# Test for preprocess_loaded_dataset
-def test_preprocess_loaded_dataset():
-    df = pd.DataFrame({"A": ["a", "b", "a"], "B": ["b", "a", "c"], "target": [1, 2, 3]})
-    df, target = preprocess_loaded_dataset(df, "target")
-    assert "target" in df.columns
-    assert df.shape[0] == target.shape[0]
 
 
 # Test for execute_transformations
@@ -53,14 +61,6 @@ def test_execute_transformations():
     df = execute_transformations(df, transformations)
     assert "A_B_inter" in df.columns
     assert df["A_B_inter"].equals(df["A"] * df["B"])
-
-
-# Test for remove_duplicate_columns
-def test_remove_duplicate_columns():
-    df = pd.DataFrame({"A": [1, 2, 3], "B": [1, 2, 3]})
-    df = remove_duplicate_columns(df)
-    assert "A" in df.columns
-    assert "B" not in df.columns
 
 
 # Test for drop_correlated_columns

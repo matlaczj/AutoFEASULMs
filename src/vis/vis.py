@@ -1,3 +1,4 @@
+# %%
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 from matplotlib.ticker import MaxNLocator
@@ -228,3 +229,84 @@ def plot_columns(
     plt.savefig(save_path, bbox_inches="tight")
 
     return column_mapping
+
+
+def plot_time(data: List[Dict], path: str = "time.pdf", title: str = "") -> None:
+    """
+    Function to plot the time taken for each iteration.
+
+    Parameters:
+    data (List[Dict]): A list of dictionaries containing 'time' for each iteration.
+
+    Returns:
+    None
+    """
+    # Convert the data into a DataFrame
+    df = pd.DataFrame(data)
+
+    # Calculate the cumulative sum of the time
+    df["cumulative_time"] = df["time"].cumsum()
+
+    # Shift the cumulative time so it starts from 0
+    df["cumulative_time"] = df["cumulative_time"] - df["cumulative_time"].iloc[0]
+
+    # Create a figure with two subplots
+    fig, ax1 = plt.subplots()
+
+    # Plot the time for each iteration as a bar plot on the first subplot
+    ax1.bar(df.index, df["time"], label="Time Per Iteration", color="royalblue")
+    ax1.set_xlabel(
+        "Method's Iteration",
+    )
+    ax1.set_ylabel(
+        "Time Taken [s]",
+        color="blue",
+    )
+    ax1.axhline(df["time"].mean(), color="blue", linestyle="--", label="Average Time")
+
+    # Set the start of y-axis to the average time
+    ax1.set_ylim(bottom=df["time"].mean() * 9 // 10)
+
+    # Replace 0 on x-axis with "No FE"
+    labels = [item.get_text() for item in ax1.get_xticklabels()]
+    labels[labels.index("0")] = "No Feature\nEngineering"
+    ax1.set_xticklabels(labels)
+
+    # Create a second subplot that shares the same x-axis
+    ax2 = ax1.twinx()
+
+    # Plot the cumulative time as a line plot on the second subplot
+    ax2.plot(
+        df.index,
+        df["cumulative_time"],
+        color="r",
+        label="Cumulative Time",
+        marker="o",
+        linestyle="-",
+    )
+    ax2.set_ylabel(
+        "Cumulative Time Taken [s]",
+        color="red",
+    )
+
+    # Set the start of y-axis to the average time
+    ax2.set_ylim(bottom=0)
+
+    # Add a legend to each subplot
+    ax1.legend(loc="upper left")
+    ax2.legend(loc="upper right")
+
+    # Change the color of the axes
+    ax1.spines["left"].set_color("blue")
+    ax2.spines["right"].set_color("red")
+
+    # Change the color of the ticks
+    ax1.tick_params(axis="y", colors="blue")
+    ax2.tick_params(axis="y", colors="red")
+
+    plt.title(title)
+
+    plt.tight_layout()
+
+    # Save the plot as a pdf file
+    plt.savefig(path)

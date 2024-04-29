@@ -177,7 +177,10 @@ def polynomial_features(df, column_name, degree=2, drop_old=False):
 def k_bins_discretizer(
     df, column_name, n_bins=5, encode="ordinal", strategy="quantile", drop_old=False
 ):
-    if not check_if_dtype(df, column_name, "Numeric"):
+    if (
+        not check_if_dtype(df, column_name, "Numeric")
+        or df[column_name].dtype == "bool"
+    ):
         return df
     n_bins_accepted = np.arange(2, 101)
     encode_accepted = ["ordinal"]
