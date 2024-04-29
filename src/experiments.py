@@ -336,8 +336,8 @@ classical_models = [
 experiment_base = {
     "ID": "PLACEHOLDER",
     "model": {
-        "name": "MISTRAL-7B-INSTRUCT-V0.2.Q6_K",
-        "chat_format": "mistral-instruct",
+        "name": "MISTRAL-7B-INSTRUCT-V0.2.Q6_K",  # Meaning: The model name.
+        "chat_format": "mistral-instruct",  # Meaning: The chat format to use. Improper chat formats can lead to unexpected results.
         "n_gpu_layers": -1,  # Meaning: Use all available GPUs.
         "n_ctx": 512 * 16,  # Meaning: Use a context window of X tokens.
         "n_batch": 512 * 8,  # Meaning: Use a batch size of X tokens.
