@@ -15,15 +15,6 @@ def plot_scores(
     big_title: str = "",
     if_score: bool = True,
 ) -> None:
-    """
-    Function to plot mean_score, mean_std, and num_columns.
-
-    Parameters:
-    data (List[Dict]): A list of dictionaries containing 'mean_score', 'mean_std', and 'columns'.
-
-    Returns:
-    None
-    """
     # Convert the data into a DataFrame
     df = pd.DataFrame(data)
 
@@ -33,10 +24,7 @@ def plot_scores(
     # Plot the mean_score, mean_std, and num_columns
     fig, ax1 = plt.subplots()
 
-    # Change figure size dynamically based on the number of iterations
-    fig.set_size_inches(8, 4 + 0.5 * len(df.index))
-
-    color = "royalblue"
+    color = "blue"
     ax1.set_xlabel("Method's Iteration", color="black")
     ax1.set_ylabel(score_axis_title, color=color)
     ax1.plot(df.index, df["mean_score"], color=color)
@@ -55,12 +43,12 @@ def plot_scores(
     best_score = df["mean_score"].max() if if_score else df["mean_score"].min()
     avg_score = df["mean_score"].mean()
 
-    min_line = ax1.axhline(starting_score, color="red", linestyle="--")
-    max_line = ax1.axhline(best_score, color="green", linestyle="--")
-    avg_line = ax1.axhline(avg_score, color="purple", linestyle="--")
+    ax1.axhline(starting_score, color="red", linestyle="--")
+    ax1.axhline(best_score, color="green", linestyle="--")
+    ax1.axhline(avg_score, color="purple", linestyle="--")
 
     # Define an offset for the x-coordinate of the text annotation
-    offset = 0.02 * len(df.index) * 4
+    offset = 0.02 * len(df.index) * 6
 
     # Add text for min, max and average of mean_score
     ax1.text(
@@ -155,8 +143,6 @@ def plot_columns(
     data: list,
     problem_type: str,
     title: str = "Columns Across Iterations",
-    fig_size: tuple = None,
-    font_size: int = 12,
     save_path: str = "columns.pdf",
     column_threshold: int = 10,
 ) -> Dict[int, str]:
@@ -179,15 +165,8 @@ def plot_columns(
     # Transpose the matrix
     matrix = np.transpose(matrix)
 
-    # Calculate the figure size based on the number of iterations and columns if not provided
-    if fig_size is None:
-        fig_size = (max(8, len(data) // 2), max(8, len(columns) // 2))
-
     # Increase the figure size
-    fig, ax = plt.subplots(figsize=fig_size)
-
-    # Increase the font size
-    mpl.rcParams["font.size"] = font_size
+    fig, ax = plt.subplots()
 
     # Extract the mean scores from the data
     scores = [d["mean_score"] for d in data]
@@ -208,7 +187,7 @@ def plot_columns(
             # If this is the best iteration, color the square red
             color = "red" if j == best_iter else "black"
             if val:
-                ax.scatter(j, i, color=color, s=200, marker="s")
+                ax.scatter(j, i, color=color, s=20, marker="s")
 
     # Add a title to the plot
     plt.title(title)
@@ -230,12 +209,6 @@ def plot_columns(
     # And the y-axis labels should be the unique columns, rotated
     plt.yticks(range(len(columns)), yticks_content, rotation="horizontal")
 
-    # Adjust the spacing between the labels and the plot
-    plt.subplots_adjust(bottom=0.15)
-
-    # Add padding between y-axis labels and the axis
-    ax.tick_params(axis="y", which="major", pad=10)
-
     # Force x axis to only show integer values
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
 
@@ -245,41 +218,35 @@ def plot_columns(
     ax.set_xticklabels(labels)
 
     # Add a grid to the plot
-    plt.grid(True, which="both", color="grey", linewidth=0.5, linestyle="--")
+    plt.grid(True, which="both", color="grey", linewidth=0.3, linestyle="--")
+
+    plt.tight_layout()
 
     # Save as pdf
-    plt.savefig(save_path, bbox_inches="tight")
+    plt.savefig(save_path)
 
     return column_mapping
 
 
 def plot_time(data: List[Dict], path: str = "time.pdf", title: str = "") -> None:
-    """
-    Function to plot the time taken for each iteration.
-
-    Parameters:
-    data (List[Dict]): A list of dictionaries containing 'time' for each iteration.
-
-    Returns:
-    None
-    """
-    # Convert the data into a DataFrame
-    df = pd.DataFrame(data)
+    # Convert the data into a DataFrame and skip the first row
+    df = pd.DataFrame(data)[1:]
 
     # Calculate the cumulative sum of the time
     df["cumulative_time"] = df["time"].cumsum()
 
-    # Shift the cumulative time so it starts from 0
-    df["cumulative_time"] = df["cumulative_time"] - df["cumulative_time"].iloc[0]
-
     # Create a figure with two subplots
     fig, ax1 = plt.subplots()
 
-    # Change figure size dynamically based on the number of iterations
-    fig.set_size_inches(8, 4 + 0.5 * len(df.index))
-
-    # Plot the time for each iteration as a bar plot on the first subplot
-    ax1.bar(df.index, df["time"], label="Time Per Iteration", color="royalblue")
+    # Plot the time for each iteration as a line plot with dots on the first subplot
+    ax1.plot(
+        df.index,
+        df["time"],
+        marker="o",
+        linestyle="-",
+        color="royalblue",
+        label="Time Per Iteration",
+    )
     ax1.set_xlabel(
         "Method's Iteration",
     )
@@ -290,17 +257,8 @@ def plot_time(data: List[Dict], path: str = "time.pdf", title: str = "") -> None
     mean_time = df["time"].iloc[1:].mean()
     ax1.axhline(mean_time, color="blue", linestyle="--", label="Average Time")
 
-    # Set the start of y-axis to the average time
-    # second_smallest_time = df["time"].nsmallest(2).iloc[1]
-    # ax1.set_ylim(bottom=min(mean_time * 0.75, second_smallest_time * 0.75))
-
     # Force x axis to only show integer values
     ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
-
-    # Replace 0 on x-axis with "No FE"
-    labels = [item.get_text() for item in ax1.get_xticklabels()]
-    labels[labels.index("0")] = "No Feature\nEngineering"
-    ax1.set_xticklabels(labels)
 
     # Create a second subplot that shares the same x-axis
     ax2 = ax1.twinx()
@@ -318,9 +276,6 @@ def plot_time(data: List[Dict], path: str = "time.pdf", title: str = "") -> None
         "Cumulative Time Taken [s]",
         color="red",
     )
-
-    # Set the start of y-axis to the average time
-    ax2.set_ylim(bottom=0)
 
     # Add a legend to each subplot
     ax1.legend(loc="upper left")
@@ -346,10 +301,12 @@ def plot_time(data: List[Dict], path: str = "time.pdf", title: str = "") -> None
 # import json
 
 # with open(
-#     r"C:\Users\matlaczj\Documents\Repozytoria\AutoFEASULMs\src\logs\0-MISTRAL-HOUSE_PRICES-LINEAR_REGRESSION\3\scores.json",
+#     r"C:\Users\matlaczj\Documents\Repozytoria\AutoFEASULMs\archive\logs-8-GOAT\27-MISTRAL-LETTER-GAUSSIAN_NAIVE_BAYES_CLASSIFIER\10\scores.json",
 #     "r",
 # ) as f:
 #     data = json.load(f)
+# # %%
+# plot_columns(data, "regression", title="Linear Regression\nHouse Prices")
 # # %%
 # plot_scores(
 #     data,
@@ -357,6 +314,4 @@ def plot_time(data: List[Dict], path: str = "time.pdf", title: str = "") -> None
 # )
 # # %%
 # plot_time(data, title="Linear Regression\nHouse Prices")
-# # %%
-# plot_columns(data, "regression", title="Linear Regression\nHouse Prices")
 # %%
