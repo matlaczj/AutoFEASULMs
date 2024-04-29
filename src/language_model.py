@@ -88,7 +88,6 @@ def create_chat_completion(
 
 def get_message_content(completion: Dict[str, Union[str, List[Dict[str, str]]]]) -> str:
     content = completion["choices"][0]["message"]["content"]
-    print(content)
     return content
 
 

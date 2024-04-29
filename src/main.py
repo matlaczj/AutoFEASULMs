@@ -20,6 +20,10 @@ from utils.data_operations_utils import (
 )
 from utils.validation_utils import cross_validate_model
 from utils.ast_utils import get_model_dict
+import warnings
+from colorama import Fore
+
+warnings.filterwarnings("ignore")
 
 # SECTION OF THINGS THAT NEED TO BE DONE:
 # TODO More column analysis in prompt.
@@ -38,26 +42,27 @@ from utils.ast_utils import get_model_dict
 # TODO: Use reduce_dimentionality function to reduce the number of columns.
 # TODO: Experiment with smaller mistral versions.
 # TODO: Improve dataset descriptions.
+# TODO: Colorful print statements.
 
 # DEFINE GLOBAL VARIABLES AND LOAD THE EXPERIMENTS
 global df, llm, scores
 experiments = prepare_experiments(datasets, classical_models, experiment_base)
 
 # PRINT THE NUMBER OF EXPERIMENTS AND THEIR IDS FOR CONVENIENCE
-print(f"Number of experiments: {len(experiments)}")
+print(f"{Fore.GREEN}Number of experiments: {len(experiments)}{Fore.RESET}\n")
 for experiment in experiments:
-    print(experiment["ID"])
+    print(f"{Fore.YELLOW}{experiment['ID']}{Fore.RESET}")
 
 # TEST IF ALL DATASETS CAN BE LOADED
-df_dict = {}
-for dataset in datasets:
-    name = dataset["name"]
-    df, target = load_openml_dataset(name)
-    df_dict[name] = df
+# df_dict = {}
+# for dataset in datasets:
+#     name = dataset["name"]
+#     df, target = load_openml_dataset(name)
+#     df_dict[name] = df
 # %%
 for experiment in experiments:
     # NOTE: TEMPORARY FOR DEBUGGING
-    # if int(experiment["ID"].split("-")[0]) < 27:
+    # if int(experiment["ID"].split("-")[0]) != 0:
     #     continue
 
     # CREATE THE DIRECTORY IF IT DOESN'T EXIST
@@ -117,7 +122,7 @@ for experiment in experiments:
 
     # RUN THE FEATURE ENGINEERING ITERATIONS
     for iteration in range(1, experiment["feature_engineering"]["iterations"] + 1):
-        print(f"ITERATION: {iteration}")
+        print(f"{Fore.GREEN}ITERATION: {iteration}{Fore.RESET}\n")
 
         # CREATE THE ITERATION DIRECTORY
         iter_base = exp_base + f"{iteration}\\"
@@ -150,7 +155,8 @@ for experiment in experiments:
                 n_sampled_corr=experiment["feature_engineering"]["n_sampled_corr"],
             )
         except FunctionTimedOut as e:
-            print(f"FunctionTimedOut: {e}")
+            print(f"{Fore.RED}FunctionTimedOut: {e}{Fore.RESET}")
+            print(f"{Fore.RED}Skipping iteration {iteration}.{Fore.RESET}\n")
             continue
 
         # EXECUTE THE TRANSFORMATIONS RETURNED BY LANGUAGE MODEL
@@ -211,15 +217,16 @@ for experiment in experiments:
             }
         )
 
-        print(f"Iteraion {iteration} completed.")
+        print(f"{Fore.GREEN}Iteration {iteration} completed.{Fore.RESET}\n")
 
         # SAVE THE SCORES AND VISUALIZATIONS
         with open(iter_base + "scores.json", "w") as f:
             f.write(json.dumps(scores))
 
+        title = f"""Results In Each Iteration\nDataset: {experiment["dataset"]["name"]} ML Model: {experiment["problem"]["model"]}"""
         plot_scores(
             scores,
-            big_title=f"""{experiment["dataset"]["name"]}\n{experiment["problem"]["model"]}""",
+            big_title=title,
             score_axis_title=(
                 f"""{experiment["validation"]["kfold"]}-Fold Cross-Val Accuracy Score With Std Dev"""
                 if experiment["problem"]["type"] == "classification"
@@ -231,17 +238,19 @@ for experiment in experiments:
             ),
         )
 
+        title = f"""Column Creation And Selection History\nDataset: {experiment["dataset"]["name"]} ML Model: {experiment["problem"]["model"]}"""
         plot_columns(
             data=scores,
-            title=f"""{experiment["dataset"]["name"]}\n{experiment["problem"]["model"]}""",
+            title=title,
             save_path=iter_base + "columns.pdf",
             problem_type=experiment["problem"]["type"],
         )
 
+        title = f"""Time Of Execution For Each Iteration\nDataset: {experiment["dataset"]["name"]} ML Model: {experiment["problem"]["model"]}"""
         plot_time(
             data=scores,
             path=iter_base + "time.pdf",
-            title=f"""{experiment["dataset"]["name"]}\n{experiment["problem"]["model"]}""",
+            title=title,
         )
 
         # EARLY STOPPING MECHANISM CHECK
@@ -250,17 +259,26 @@ for experiment in experiments:
         if iteration >= k:
             last_k_scores = [score["mean_score"] for score in scores[-k:]]
             percentage_changes = [
-                (last_k_scores[i] - last_k_scores[i + 1]) / last_k_scores[i + 1] * 100
+                (last_k_scores[i + 1] - last_k_scores[i]) / last_k_scores[i]
                 for i in range(len(last_k_scores) - 1)
             ]
-            if all(change < threshold for change in percentage_changes):
-                print("Early stopping mechanism triggered.")
+            if all(
+                (
+                    (change >= threshold)
+                    if experiment["problem"]["type"] == "regression"
+                    else (change <= -threshold)
+                )
+                for change in percentage_changes
+            ):
+                print(f"{Fore.RED}Early stopping mechanism triggered.{Fore.RESET}")
+                print(f"{Fore.RED}Reason 1: {last_k_scores}{Fore.RESET}")
+                print(f"{Fore.RED}Reason 2: {percentage_changes}{Fore.RESET}\n")
                 break
 
     # AFTER THE EXPERIMENT IS DONE DELETE THE VARIABLES TO FREE UP MEMORY FOR THE NEXT EXPERIMENT
     del llm
     del df
     del scores
-    print(f"Experiment {experiment['ID']} completed.")
+    print(f"{Fore.GREEN}Experiment {experiment['ID']} completed.{Fore.RESET}\n")
 
 # %%

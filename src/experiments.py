@@ -1,22 +1,13 @@
 from src.tools.response_schemas import schema
-import numpy as np
 import copy
 from sklearn.metrics import (
     accuracy_score,
     mean_absolute_percentage_error,
 )
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsRegressor
-from sklearn.tree import DecisionTreeRegressor
 from sklearn.linear_model import LinearRegression
-
-
-def median_absolute_percentage_error(y_true, y_pred):
-    y_true, y_pred = np.array(y_true), np.array(y_pred)
-    return np.median(np.abs((y_true - y_pred) / y_true))
 
 
 datasets = [
@@ -323,14 +314,14 @@ classical_models = [
     # Tree-based Models - They are less sensitive to the scale of the features and can handle a mix of binary and continuous features.
     {
         "type": "classification",
-        "machine_learning_model": "Decision Tree Classifier (criterion='entropy', splitter='best')",
-        "model": DecisionTreeClassifier(criterion="entropy", splitter="best"),
+        "machine_learning_model": "Decision Tree Classifier",
+        "model": DecisionTreeClassifier(),
     },
     # Distance-based Models - They require feature scaling because they rely on calculating the distance between instances.
     {
         "type": "regression",
-        "machine_learning_model": "K-Nearest Neighbors Regressor (algorithm='ball_tree')",
-        "model": KNeighborsRegressor(algorithm="ball_tree"),
+        "machine_learning_model": "K-Nearest Neighbors Regressor",
+        "model": KNeighborsRegressor(),
     },
     # Probabilistic Models - They often require data to be in a specific format or distribution.
     {
@@ -366,15 +357,15 @@ experiment_base = {
     },
     "feature_engineering": {
         "iterations": 10,  # Meaning: Run the FE process for X iterations.
-        "n_new_features": 5,  # Meaning: Suggest X new features in each iteration.
-        "n_unique_values": 10,  # Meaning: Describe each column with X unique values.
+        "n_new_features": 3,  # Meaning: Suggest X new features in each iteration.
+        "n_unique_values": 8,  # Meaning: Describe each column with X unique values.
         "perc_digits_after_decimal": 20,  # Meaning: Describe each column with X% of the digits after the decimal.
         "correlations_threshold": 0.4,  # Meaning: What is considered an interesting correlation to show on the prompt.
-        "temperature": 0.7,  # Meaning: The higher the temperature, the more creative the FE process.
-        "n_most_correlated": 30,  # Meaning: Select the X most correlated features with the target variable.
+        "temperature": 0.5,  # Meaning: The higher the temperature, the more creative the FE process.
+        "n_most_correlated": 20,  # Meaning: Select the X most correlated features with the target variable.
         "threshold_features": 0.95,  # Meaning: Drop features that are more than X% correlated with another feature.
-        "early_stopping": 3,  # Meaning: Stop the FE process if the relative performance does not improve for X iterations.
-        "delayed_deletion": 2,  # Meaning: Start dropping features after the Xnd iteration.
+        "early_stopping": 2,  # Meaning: Stop the FE process if the relative performance does not improve for X iterations.
+        "delayed_deletion": 1,  # Meaning: Start dropping features after the Xnd iteration.
         "n_sampled_corr": 40,  # Meaning: Sample X correlations into prompt.
         "percentage_change_threshold": 0.05,  # Meaning: Trigger early stopping counter if the relative performance does not improve by more than X%.
     },

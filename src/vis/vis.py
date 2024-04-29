@@ -33,8 +33,11 @@ def plot_scores(
     # Plot the mean_score, mean_std, and num_columns
     fig, ax1 = plt.subplots()
 
-    color = "tab:blue"
-    ax1.set_xlabel("Method's Iteration")
+    # Change figure size dynamically based on the number of iterations
+    fig.set_size_inches(8, 4 + 0.5 * len(df.index))
+
+    color = "royalblue"
+    ax1.set_xlabel("Method's Iteration", color="black")
     ax1.set_ylabel(score_axis_title, color=color)
     ax1.plot(df.index, df["mean_score"], color=color)
     ax1.fill_between(
@@ -42,7 +45,7 @@ def plot_scores(
         df["mean_score"] - df["mean_std"],
         df["mean_score"] + df["mean_std"],
         color=color,
-        alpha=0.1,
+        alpha=0.3,
     )
     ax1.tick_params(axis="y", labelcolor=color)
     ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
@@ -63,7 +66,7 @@ def plot_scores(
     ax1.text(
         0,
         starting_score,
-        f"{round(starting_score,2)}",
+        f"{round(starting_score, 4)}",
         color="red",
         va="bottom",
         ha="left",
@@ -71,7 +74,7 @@ def plot_scores(
     ax1.text(
         offset,  # Add the offset to the x-coordinate
         best_score,
-        f"{round(best_score,2)}",
+        f"{round(best_score, 4)}",
         color="green",
         va="bottom",
         ha="left",
@@ -79,7 +82,7 @@ def plot_scores(
     ax1.text(
         2 * offset,  # Add twice the offset to the x-coordinate
         avg_score,
-        f"{round(avg_score,2)}",
+        f"{round(avg_score, 4)}",
         color="purple",
         va="bottom",
         ha="left",
@@ -121,14 +124,25 @@ def plot_scores(
         [], [], color="orange", linestyle="--", label="Best Iteration"
     )
 
+    # Force x axis to only show integer values
+    ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
+
+    # Replace 0 on x-axis with "No FE"
+    labels = [item.get_text() for item in ax1.get_xticklabels()]
+    labels[labels.index("0")] = "No Feature\nEngineering"
+    ax1.set_xticklabels(labels)
+
     # Add the new handle to the legend
     ax1.legend(handles=[min_handle, max_handle, avg_handle, max_value_handle])
 
     # Create a secondary y-axis for num_columns
     ax2 = ax1.twinx()
-    ax2.set_ylabel("Total Number of Columns", color="tab:gray")
-    ax2.plot(df.index, df["num_columns"], color="tab:gray", alpha=0.6)
-    ax2.tick_params(axis="y", labelcolor="tab:gray")
+    ax2.set_ylabel(
+        "Total Number of Columns",
+        color="black",
+    )
+    ax2.plot(df.index, df["num_columns"], color="tab:gray", alpha=1)
+    ax2.tick_params(axis="y", labelcolor="black")
     plt.title(big_title)
 
     fig.tight_layout()
@@ -197,7 +211,7 @@ def plot_columns(
                 ax.scatter(j, i, color=color, s=200, marker="s")
 
     # Add a title to the plot
-    plt.title(title, pad=16)
+    plt.title(title)
 
     # Add labels to the x and y axes
     plt.xlabel("Method's Iteration")
@@ -221,6 +235,14 @@ def plot_columns(
 
     # Add padding between y-axis labels and the axis
     ax.tick_params(axis="y", which="major", pad=10)
+
+    # Force x axis to only show integer values
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+
+    # Replace 0 on x-axis with "No FE"
+    labels = [item.get_text() for item in ax.get_xticklabels()]
+    labels[labels.index("0")] = "No Feature\nEngineering"
+    ax.set_xticklabels(labels)
 
     # Add a grid to the plot
     plt.grid(True, which="both", color="grey", linewidth=0.5, linestyle="--")
@@ -253,6 +275,9 @@ def plot_time(data: List[Dict], path: str = "time.pdf", title: str = "") -> None
     # Create a figure with two subplots
     fig, ax1 = plt.subplots()
 
+    # Change figure size dynamically based on the number of iterations
+    fig.set_size_inches(8, 4 + 0.5 * len(df.index))
+
     # Plot the time for each iteration as a bar plot on the first subplot
     ax1.bar(df.index, df["time"], label="Time Per Iteration", color="royalblue")
     ax1.set_xlabel(
@@ -262,10 +287,15 @@ def plot_time(data: List[Dict], path: str = "time.pdf", title: str = "") -> None
         "Time Taken [s]",
         color="blue",
     )
-    ax1.axhline(df["time"].mean(), color="blue", linestyle="--", label="Average Time")
+    mean_time = df["time"].iloc[1:].mean()
+    ax1.axhline(mean_time, color="blue", linestyle="--", label="Average Time")
 
     # Set the start of y-axis to the average time
-    ax1.set_ylim(bottom=df["time"].mean() * 9 // 10)
+    # second_smallest_time = df["time"].nsmallest(2).iloc[1]
+    # ax1.set_ylim(bottom=min(mean_time * 0.75, second_smallest_time * 0.75))
+
+    # Force x axis to only show integer values
+    ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
 
     # Replace 0 on x-axis with "No FE"
     labels = [item.get_text() for item in ax1.get_xticklabels()]
@@ -310,3 +340,23 @@ def plot_time(data: List[Dict], path: str = "time.pdf", title: str = "") -> None
 
     # Save the plot as a pdf file
     plt.savefig(path)
+
+
+# %%
+# import json
+
+# with open(
+#     r"C:\Users\matlaczj\Documents\Repozytoria\AutoFEASULMs\src\logs\0-MISTRAL-HOUSE_PRICES-LINEAR_REGRESSION\3\scores.json",
+#     "r",
+# ) as f:
+#     data = json.load(f)
+# # %%
+# plot_scores(
+#     data,
+#     big_title="Linear Regression\nHouse Prices",
+# )
+# # %%
+# plot_time(data, title="Linear Regression\nHouse Prices")
+# # %%
+# plot_columns(data, "regression", title="Linear Regression\nHouse Prices")
+# %%

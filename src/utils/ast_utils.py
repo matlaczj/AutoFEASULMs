@@ -1,6 +1,7 @@
 from typing import Any, Dict, List
 import ast, os
 from functools import lru_cache
+from colorama import Fore
 
 
 def extract_functions_with_args_and_values(filename: str) -> Dict[str, Dict[str, Any]]:
@@ -64,10 +65,12 @@ def run_function_by_name(module, function_name: str, *args, **kwargs):
         func = getattr(module, function_name)
         return func(*args, **kwargs)
     except AttributeError:
-        print(f"No function '{function_name}' found in module: {module.__name__}")
+        print(
+            f"{Fore.RED}No function '{function_name}' found in module: {module.__name__}{Fore.RESET}\n"
+        )
         return None
     except ImportError:
-        print(f"No module found with name: {module.__name__}")
+        print(f"{Fore.RED}No module found with name: {module.__name__}{Fore.RESET}\n")
         return None
 
 
@@ -127,7 +130,7 @@ def get_model_dict(use_cache: bool = True) -> Dict[str, str]:
         model_dict = get_model_dict_with_cache(base_dir)
     else:
         model_dict = get_model_dict_no_cache(base_dir)
-    print("Model dictionary loaded. Available models:")
+    print(Fore.GREEN + f"Model dictionary loaded. Available models:\n" + Fore.RESET)
     for key in model_dict.keys():
-        print(key)
+        print(Fore.GREEN + key + Fore.RESET)
     return model_dict

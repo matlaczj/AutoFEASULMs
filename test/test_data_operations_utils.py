@@ -10,6 +10,7 @@ from src.utils.data_operations_utils import (
     handle_invalid_data,
     default_func,
     transform_date_columns,
+    bool_to_int,
 )
 
 
@@ -107,3 +108,20 @@ def test_transform_date_columns():
     assert "A_dayofweek" in df.columns
     assert "A_dayofyear" in df.columns
     assert "A" not in df.columns
+
+
+def test_bool_to_int():
+    # Create a DataFrame with boolean values
+    df = pd.DataFrame(
+        {
+            "A": [True, False, True],
+            "B": [False, False, True],
+            "C": [1, 2, 3],  # non-boolean column
+        }
+    )
+
+    # Convert boolean columns to integers
+    df = bool_to_int(df)
+
+    # Check that the data types of the columns are correct
+    assert df["A"].dtype == "int8"

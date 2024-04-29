@@ -4,11 +4,12 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from sklearn.datasets import fetch_openml
-from typing import Dict, List, Tuple
-from pandas import DataFrame, Series
+from typing import Dict, List
+from pandas import DataFrame
 from src.tools import tool_handlers
 from src.utils.ast_utils import run_function_by_name
 from src.utils.validation_utils import check_if_dtype
+from colorama import Fore
 
 
 def round_to_percent_digits(number: float, perc: int) -> float:
@@ -41,6 +42,14 @@ def one_hot_encode(df, max_columns=10):
             if len(dummies.columns) <= max_columns:
                 df = pd.concat([df, dummies], axis=1)
             df.drop(col, axis=1, inplace=True)
+    df = bool_to_int(df)
+    return df
+
+
+def bool_to_int(df):
+    for col in df.columns:
+        if df[col].dtype == "bool":
+            df[col] = df[col].astype("int8")
     return df
 
 
@@ -58,7 +67,9 @@ def load_openml_dataset(
         y (pd.Series): The target Series.
     """
     print(
-        f"Loading dataset: {name}, target_column: {target_column}, problem_type: {problem_type}"
+        Fore.YELLOW
+        + f"\nLoading dataset: {name}, target_column: {target_column}, problem_type: {problem_type}\n"
+        + Fore.RESET
     )
     data = fetch_openml(name, as_frame=True)
     X = data["data"]
@@ -85,7 +96,9 @@ def execute_transformations(
     for tr in transformations["transformations"]:
         try:
             columns_before = df.columns
-            print(f"Executing transformation: {tr['function']}")
+            print(
+                Fore.GREEN + f"Executing transformation: {tr['function']}" + Fore.RESET
+            )
             returned = run_function_by_name(
                 tool_handlers,
                 tr["function"] + "_handler",
@@ -95,11 +108,19 @@ def execute_transformations(
             )
             if returned is not None:
                 column_after = returned.columns
-                print(f"Added columns: {set(column_after) - set(columns_before)}")
+                print(
+                    Fore.GREEN
+                    + f"Added columns: {set(column_after) - set(columns_before)}"
+                    + Fore.RESET
+                )
                 df = returned
         except (ValueError, AttributeError) as e:
-            print(f"Error in executing transformation: {tr['function']}")
-            print(e)
+            print(
+                Fore.RED
+                + f"Error in executing transformation: {tr['function']}"
+                + Fore.RESET
+            )
+            print(Fore.RED + str(e) + "\n" + Fore.RESET)
     return df
 
 
@@ -128,13 +149,19 @@ def drop_correlated_columns(df, threshold_features=0.95):
             correlated_column = high_corr.idxmax()
             to_drop.append(correlated_column)
             print(
-                f"Dropping column '{correlated_column}' because of high correlation with '{column}'"
+                Fore.RED
+                + f"Dropping column '{correlated_column}' because of high correlation with '{column}'"
+                + Fore.RESET
             )
 
     # Drop the first column that has high correlation with any other variable
     df = df.drop(to_drop, axis=1)
     columns_after = df.columns
-    print(f"Removed columns: {set(columns_before) - set(columns_after)}")
+    print(
+        Fore.RED
+        + f"Removed columns: {set(columns_before) - set(columns_after)}\n"
+        + Fore.RESET
+    )
     return df
 
 
@@ -194,8 +221,9 @@ def transform_date_columns(df):
                 # Drop the original date column
                 df.drop(col, axis=1, inplace=True)
         except Exception as e:
-            print(f"Not Convertible To Datetime {col}: {e}")
+            print(Fore.RED + f"Not Convertible To Datetime {col}: {e}" + Fore.RESET)
             continue
+        print("\n")
     return df
 
 

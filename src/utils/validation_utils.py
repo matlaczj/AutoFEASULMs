@@ -2,6 +2,7 @@ import numpy as np
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import accuracy_score, mean_absolute_percentage_error, make_scorer
 from typing import Dict
+from colorama import Fore
 
 
 def check_if_dtype(df, column_name, dtype):
@@ -26,7 +27,6 @@ def check_dtype(df, column_name):
         "float64",
         "complex64",
         "complex128",
-        "bool",
     ]
     non_numeric_types = [
         "object",
@@ -36,6 +36,7 @@ def check_dtype(df, column_name):
         "period",
         "sparse",
         "interval",
+        "bool",
     ]
 
     if df[column_name].dtypes in numeric_types:
@@ -83,7 +84,7 @@ def cross_validate_model(
     mean_score = np.mean(scores)
     std_score = np.std(scores)
 
-    print(f"Mean of {scorer.__name__} scores: {mean_score:.2f}")
-    print(f"Std of {scorer.__name__} scores: {std_score:.2f}")
+    print(f"{Fore.GREEN}Mean of {scorer.__name__} scores: {mean_score:.2f}")
+    print(f"{Fore.GREEN}Std of {scorer.__name__} scores: {std_score:.2f}\n")
 
     return mean_score, std_score
