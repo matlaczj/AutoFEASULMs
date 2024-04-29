@@ -6,7 +6,6 @@ from func_timeout import FunctionTimedOut
 from src.config import config
 from language_model import initialize_llm, run_inference_iteration
 from experiments import prepare_experiments, datasets, classical_models, experiment_base
-from vis.vis import plot_scores, plot_columns, plot_time
 from utils.data_operations_utils import (
     handle_invalid_data,
     transform_date_columns,
@@ -20,6 +19,7 @@ from utils.data_operations_utils import (
 )
 from utils.validation_utils import cross_validate_model
 from utils.ast_utils import get_model_dict
+from utils.main_utils import check_early_stopping, plot_experiment_results
 import warnings
 from colorama import Fore
 
@@ -40,9 +40,9 @@ warnings.filterwarnings("ignore")
 # TODO: Seed and temperature to increase reproducibility and determinism.
 # TODO: Compare with SOTA Classical Methods
 # TODO: Use reduce_dimentionality function to reduce the number of columns.
-# TODO: Experiment with smaller mistral versions.
 # TODO: Improve dataset descriptions.
 # TODO: Colorful print statements.
+# TODO: Experiment with smaller mistral versions.
 
 # DEFINE GLOBAL VARIABLES AND LOAD THE EXPERIMENTS
 global df, llm, scores
@@ -62,7 +62,7 @@ for experiment in experiments:
 # %%
 for experiment in experiments:
     # NOTE: TEMPORARY FOR DEBUGGING
-    # if int(experiment["ID"].split("-")[0]) != 0:
+    # if int(experiment["ID"].split("-")[0]) < 20:
     #     continue
 
     # CREATE THE DIRECTORY IF IT DOESN'T EXIST
@@ -223,57 +223,24 @@ for experiment in experiments:
         with open(iter_base + "scores.json", "w") as f:
             f.write(json.dumps(scores))
 
-        title = f"""Results In Each Iteration\nDataset: {experiment["dataset"]["name"]} ML Model: {experiment["problem"]["model"]}"""
-        plot_scores(
-            scores,
-            big_title=title,
-            score_axis_title=(
-                f"""{experiment["validation"]["kfold"]}-Fold Cross-Val Accuracy Score With Std Dev"""
-                if experiment["problem"]["type"] == "classification"
-                else f"""{experiment["validation"]["kfold"]}-Fold Cross-Val MAPE With Std Dev"""
-            ),
-            path=iter_base + "scores.pdf",
-            if_score=(
-                True if experiment["problem"]["type"] == "classification" else False
-            ),
-        )
-
-        title = f"""Column Creation And Selection History\nDataset: {experiment["dataset"]["name"]} ML Model: {experiment["problem"]["model"]}"""
-        plot_columns(
-            data=scores,
-            title=title,
-            save_path=iter_base + "columns.pdf",
+        plot_experiment_results(
+            dataset_name=experiment["dataset"]["name"],
+            model_name=experiment["problem"]["model"],
             problem_type=experiment["problem"]["type"],
-        )
-
-        title = f"""Time Of Execution For Each Iteration\nDataset: {experiment["dataset"]["name"]} ML Model: {experiment["problem"]["model"]}"""
-        plot_time(
-            data=scores,
-            path=iter_base + "time.pdf",
-            title=title,
+            validation_kfold=experiment["validation"]["kfold"],
+            scores=scores,
+            iter_base=iter_base,
         )
 
         # EARLY STOPPING MECHANISM CHECK
-        k = experiment["feature_engineering"]["early_stopping"]
-        threshold = experiment["feature_engineering"]["percentage_change_threshold"]
-        if iteration >= k:
-            last_k_scores = [score["mean_score"] for score in scores[-k:]]
-            percentage_changes = [
-                (last_k_scores[i + 1] - last_k_scores[i]) / last_k_scores[i]
-                for i in range(len(last_k_scores) - 1)
-            ]
-            if all(
-                (
-                    (change >= threshold)
-                    if experiment["problem"]["type"] == "regression"
-                    else (change <= -threshold)
-                )
-                for change in percentage_changes
-            ):
-                print(f"{Fore.RED}Early stopping mechanism triggered.{Fore.RESET}")
-                print(f"{Fore.RED}Reason 1: {last_k_scores}{Fore.RESET}")
-                print(f"{Fore.RED}Reason 2: {percentage_changes}{Fore.RESET}\n")
-                break
+        if check_early_stopping(
+            k=experiment["feature_engineering"]["early_stopping"],
+            threshold=experiment["feature_engineering"]["percentage_change_threshold"],
+            problem_type=experiment["problem"]["type"],
+            scores=scores,
+            iteration=iteration,
+        ):
+            break
 
     # AFTER THE EXPERIMENT IS DONE DELETE THE VARIABLES TO FREE UP MEMORY FOR THE NEXT EXPERIMENT
     del llm

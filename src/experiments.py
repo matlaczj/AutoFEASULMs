@@ -357,17 +357,17 @@ experiment_base = {
     },
     "feature_engineering": {
         "iterations": 10,  # Meaning: Run the FE process for X iterations.
-        "n_new_features": 3,  # Meaning: Suggest X new features in each iteration.
+        "n_new_features": 4,  # Meaning: Suggest X new features in each iteration.
         "n_unique_values": 8,  # Meaning: Describe each column with X unique values.
         "perc_digits_after_decimal": 20,  # Meaning: Describe each column with X% of the digits after the decimal.
         "correlations_threshold": 0.4,  # Meaning: What is considered an interesting correlation to show on the prompt.
         "temperature": 0.5,  # Meaning: The higher the temperature, the more creative the FE process.
-        "n_most_correlated": 20,  # Meaning: Select the X most correlated features with the target variable.
+        "n_most_correlated": 30,  # Meaning: Select the X most correlated features with the target variable.
         "threshold_features": 0.95,  # Meaning: Drop features that are more than X% correlated with another feature.
-        "early_stopping": 2,  # Meaning: Stop the FE process if the relative performance does not improve for X iterations.
-        "delayed_deletion": 1,  # Meaning: Start dropping features after the Xnd iteration.
+        "early_stopping": 3,  # Meaning: Stop the FE process if the relative performance does not improve for X iterations.
+        "delayed_deletion": 2,  # Meaning: Start dropping features after the Xnd iteration.
         "n_sampled_corr": 40,  # Meaning: Sample X correlations into prompt.
-        "percentage_change_threshold": 0.05,  # Meaning: Trigger early stopping counter if the relative performance does not improve by more than X%.
+        "percentage_change_threshold": 0.01,  # Meaning: Tolerance. Trigger early stopping counter if the relative performance drops by X% in all early_stopping iterations.
     },
     "validation": {
         "kfold": 10,  # Meaning: Use 10-fold cross-validation for model evaluation.
