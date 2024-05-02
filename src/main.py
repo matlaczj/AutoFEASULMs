@@ -55,15 +55,18 @@ for experiment in experiments:
     print(f"{Fore.YELLOW}{experiment['ID']}{Fore.RESET}")
 
 # TEST IF ALL DATASETS CAN BE LOADED
-# df_dict = {}
-# for dataset in datasets:
-#     name = dataset["name"]
-#     df, target = load_openml_dataset(name)
-#     df_dict[name] = df
+df_dict = {}
+for dataset in datasets:
+    name = dataset["name"]
+    df, target = load_openml_dataset(
+        name,
+        max_records=experiment["dataset"]["max_records"],
+    )
+    df_dict[name] = df
 # %%
 for experiment in experiments:
     # NOTE: TEMPORARY FOR DEBUGGING
-    if int(experiment["ID"].split("-")[0]) < 3:
+    if int(experiment["ID"].split("-")[0]) < 6:
         continue
 
     # CREATE THE DIRECTORY IF IT DOESN'T EXIST
@@ -85,6 +88,7 @@ for experiment in experiments:
         experiment["dataset"]["name"],
         experiment["dataset"]["target_variable"],
         experiment["problem"]["type"],
+        experiment["dataset"]["max_records"],
     )
     df.columns = [col.lower().replace(" ", "_") for col in df.columns]
     df = handle_invalid_data(df)

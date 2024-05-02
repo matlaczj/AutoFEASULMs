@@ -341,6 +341,7 @@ experiment_base = {
     "dataset": {
         "noise_perc_of_range": 0.2,  # Meaning: Percent of range of column values to add as noise.
         "target_variable": "target",  # Target column name will be changed to this name.
+        "max_records": 1000,  # Meaning: Maximum number of records to sample from the dataset.
         "origin": "PLACEHOLDER",
         "predicted_variable": "PLACEHOLDER",
         "type": "PLACEHOLDER",

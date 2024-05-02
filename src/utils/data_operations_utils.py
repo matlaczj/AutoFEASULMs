@@ -56,6 +56,7 @@ def load_openml_dataset(
     name: str,
     target_column: str = "target",
     problem_type: str = None,
+    max_records: int = 1000,
 ):
     """Load a dataset from OpenML by name.
     https://www.openml.org/search?type=data&status=active
@@ -76,6 +77,10 @@ def load_openml_dataset(
     data = fetch_openml(name, as_frame=True)
     X = data["data"]
     X[target_column] = data["target"]
+
+    # If number of rows is greater than `max_records`, sample `max_records` rows.
+    if X.shape[0] > max_records:
+        X = X.sample(max_records, random_state=777)
 
     # Convert the target to numeric if it is non-numeric
     if check_if_dtype(
@@ -118,7 +123,14 @@ def execute_transformations(
                     + f"Added columns: {set(column_after) - set(columns_before)}"
                     + Fore.RESET
                 )
-                df = returned
+                if returned.shape[0] == df.shape[0]:
+                    df = returned
+                else:
+                    print(
+                        Fore.RED
+                        + f"Shape mismatch: {returned.shape[0]} vs {df.shape[0]}. Skipping transformation: {tr['function']}"
+                        + Fore.RESET
+                    )
         except (ValueError, AttributeError) as e:
             print(
                 Fore.RED
