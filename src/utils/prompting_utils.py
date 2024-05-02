@@ -3,6 +3,7 @@ import numpy as np
 import random
 from src.utils.ast_utils import extract_functions_with_args_and_values
 from src.utils.data_operations_utils import round_to_percent_digits
+from typing import List, Dict, Union
 
 
 def describe_transformations(
@@ -116,3 +117,33 @@ def describe_strong_correlations(
             for corr in sorted_correlations
         ]
     )
+
+
+def describe_optimization_history(
+    data: List[Dict[str, Union[float, List[str]]]], problem_type: str
+) -> None:
+    """
+    This function describes the optimization process based on the data from the optimization iterations.
+
+    Parameters:
+    data (List[Dict[str, Union[float, List[str]]]]): A list of dictionaries containing iteration data.
+    problem_type (str): The type of problem, either "classification" or "regression".
+
+    Returns:
+    None
+    """
+    # Get the data for the current and previous iterations
+    current_iter = data[-1]
+    previous_iter = data[-2]
+    # Extract the relevant information
+    current_score = current_iter["mean_score"]
+    current_columns = current_iter["columns"]
+    previous_score = previous_iter["mean_score"]
+    previous_columns = previous_iter["columns"]
+    # Calculate the changes in score and columns
+    added_columns = set(current_columns) - set(previous_columns)
+    removed_columns = set(previous_columns) - set(current_columns)
+    score_change_perc = (current_score - previous_score) / previous_score * 100
+    # Assemble the prompt
+    prompt = f"""{"Score" if problem_type == "classification" else "Error"} change relative to previous iteration: {score_change_perc:.2f}%\nAdded columns: {added_columns}\nRemoved columns: {removed_columns}\n"""
+    return prompt

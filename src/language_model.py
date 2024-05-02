@@ -5,6 +5,7 @@ from src.utils.prompting_utils import (
     describe_unique_values,
     describe_strong_correlations,
     describe_transformations,
+    describe_optimization_history,
 )
 import pandas as pd
 import json
@@ -101,6 +102,8 @@ def run_inference_iteration(
     n_new_features: int,
     schema: dict,
     exp_base: str,
+    iter: int,
+    scores: List[Dict[str, Union[float, List[str]]]],
     n_unique_values: int = 10,
     perc_digits_after_decimal: int = 25,
     correlations_threshold: float = 0.3,
@@ -120,6 +123,8 @@ def run_inference_iteration(
         n_new_features (int): Number of new features to suggest in each iteration.
         schema (dict): Schema to use for final json output.
         exp_base (str): Base directory for the experiment.
+        iter (int): Current iteration number.
+        scores (List[Dict[str, Union[float, List[str]]]): List of scores from optimization iterations.
         n_unique_values (int, optional): Number of unique values to describe each column in `df`. Defaults to 10.
         perc_digits_after_decimal (int, optional): Percentage of digits after decimal to describe each column in `df`. Defaults to 25.
         correlations_threshold (float, optional): Threshold for interesting correlations. Defaults to 0.3.
@@ -137,6 +142,15 @@ def run_inference_iteration(
     correlations = describe_strong_correlations(
         df=df, threshold=correlations_threshold, n_samples=n_sampled_corr
     )
+    optimization_history = (
+        (
+            "**OPTIMIZATION PROCESS:**\n"
+            + describe_optimization_history(data=scores, problem_type=problem_type)
+            + "\n"
+        )
+        if iter > 1
+        else ""
+    )
 
     function_headers = describe_transformations(
         filename=config["function_header_file_path"],
@@ -145,7 +159,7 @@ def run_inference_iteration(
         if_backtick=True,
     )
 
-    prompt1 = f"{short_description}**COLUMNS:**\n- *UNIQUE VALUES:*\n{unqiue_values}- *CORRELATIONS:*\n{correlations}\n\n**TOOLS:**\n{function_headers}\n\n**RULES:**\n- You are a feature engineering and selection program that works in iterations and one iteration at a time.\n- You create new features from existing columns to make ML {machine_learning_model} model better at predicting target variable '{target_variable}' in {problem_type} problem.\n- Target column should remain unchanged as it would be considered cheating.\n- Every iteration you suggest {n_new_features} new column-tool combinations.\n- You don't write code. Instead you suggest tools and their arguments.\n- You create columns that are highly correlated with target feature.\n\n**CURRENT ITERATION:**"
+    prompt1 = f"{short_description}**COLUMNS:**\n- *UNIQUE VALUES:*\n{unqiue_values}- *CORRELATIONS:*\n{correlations}\n\n{optimization_history}**TOOLS:**\n{function_headers}\n\n**RULES:**\n- You are a feature engineering and selection program that works in iterations and one iteration at a time.\n- You create new features from existing columns to make ML {machine_learning_model} model better at predicting target variable '{target_variable}' in {problem_type} problem.\n- Target column should remain unchanged as it would be considered cheating.\n- Every iteration you suggest {n_new_features} new column-tool combinations.\n- You don't write code. Instead you suggest tools and their arguments.\n- You create columns that are highly correlated with target feature.\n\n**CURRENT ITERATION:**"
 
     with open(exp_base + "prompt1.md", "w") as f:
         f.write(prompt1)

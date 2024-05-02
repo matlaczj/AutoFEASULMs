@@ -105,7 +105,9 @@ for experiment in experiments:
         {
             "mean_score": mean_score1,
             "mean_std": mean_std1,
-            "columns": list(df.columns),
+            "columns": list(
+                set(df.columns) - set([experiment["dataset"]["target_variable"]])
+            ),
             "time": 0,
         }
     )
@@ -144,6 +146,8 @@ for experiment in experiments:
                 n_new_features=experiment["feature_engineering"]["n_new_features"],
                 schema=experiment["schema"],
                 exp_base=iter_base,
+                iter=iteration,
+                scores=scores,
                 n_unique_values=experiment["feature_engineering"]["n_unique_values"],
                 perc_digits_after_decimal=experiment["feature_engineering"][
                     "perc_digits_after_decimal"

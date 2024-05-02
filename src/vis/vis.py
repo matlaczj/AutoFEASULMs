@@ -1,8 +1,6 @@
-# %%
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 from matplotlib.ticker import MaxNLocator
-import matplotlib as mpl
 from typing import List, Dict
 import pandas as pd
 import numpy as np
@@ -33,7 +31,7 @@ def plot_scores(
         df["mean_score"] - df["mean_std"],
         df["mean_score"] + df["mean_std"],
         color=color,
-        alpha=0.3,
+        alpha=0.1,
     )
     ax1.tick_params(axis="y", labelcolor=color)
     ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
@@ -144,7 +142,7 @@ def plot_columns(
     problem_type: str,
     title: str = "Columns Across Iterations",
     save_path: str = "columns.pdf",
-    column_threshold: int = 10,
+    column_threshold: int = 0,
 ) -> Dict[int, str]:
 
     # Get the unique columns across all iterations and their first appearance
@@ -203,9 +201,6 @@ def plot_columns(
         columns if len(columns) <= column_threshold else range(len(columns))
     )
 
-    # Create a dictionary to map the column index to the column name
-    column_mapping = {i: col for i, col in enumerate(columns)}
-
     # And the y-axis labels should be the unique columns, rotated
     plt.yticks(range(len(columns)), yticks_content, rotation="horizontal")
 
@@ -224,6 +219,9 @@ def plot_columns(
 
     # Save as pdf
     plt.savefig(save_path)
+
+    # Create a dictionary to map the column index to the column name
+    column_mapping = {i: col for i, col in enumerate(columns)}
 
     return column_mapping
 
@@ -254,8 +252,18 @@ def plot_time(data: List[Dict], path: str = "time.pdf", title: str = "") -> None
         "Time Taken [s]",
         color="blue",
     )
+
+    # Calculate the mean and standard deviation of the time
     mean_time = df["time"].iloc[1:].mean()
+    std_time = df["time"].iloc[1:].std()
+
+    # Plot the average time as a horizontal line
     ax1.axhline(mean_time, color="blue", linestyle="--", label="Average Time")
+
+    # Fill the area between mean_time - std_time and mean_time + std_time
+    ax1.fill_between(
+        df.index, mean_time - std_time, mean_time + std_time, color="blue", alpha=0.1
+    )
 
     # Force x axis to only show integer values
     ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
@@ -295,23 +303,3 @@ def plot_time(data: List[Dict], path: str = "time.pdf", title: str = "") -> None
 
     # Save the plot as a pdf file
     plt.savefig(path)
-
-
-# %%
-# import json
-
-# with open(
-#     r"C:\Users\matlaczj\Documents\Repozytoria\AutoFEASULMs\archive\logs-8-GOAT\27-MISTRAL-LETTER-GAUSSIAN_NAIVE_BAYES_CLASSIFIER\10\scores.json",
-#     "r",
-# ) as f:
-#     data = json.load(f)
-# # %%
-# plot_columns(data, "regression", title="Linear Regression\nHouse Prices")
-# # %%
-# plot_scores(
-#     data,
-#     big_title="Linear Regression\nHouse Prices",
-# )
-# # %%
-# plot_time(data, title="Linear Regression\nHouse Prices")
-# %%

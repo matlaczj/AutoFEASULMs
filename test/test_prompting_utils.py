@@ -3,8 +3,10 @@ from src.utils.prompting_utils import (
     describe_transformations,
     describe_unique_values,
     describe_strong_correlations,
+    describe_optimization_history,
 )
 from src.config import config
+from pytest import raises
 
 
 # Test for describe_transformations
@@ -39,3 +41,38 @@ def test_describe_strong_correlations():
     assert "correlation between 'B' and 'A': 1.0\n" in result
     assert "correlation between 'C' and 'A': -1.0\n" in result
     assert "correlation between 'C' and 'B': -1.0" in result
+
+
+def test_describe_optimization_history_classification():
+    data = [
+        {"mean_score": 0.8, "columns": ["col1", "col2", "col3"]},
+        {"mean_score": 0.85, "columns": ["col1", "col2", "col4"]},
+    ]
+    result = describe_optimization_history(data, "classification")
+    expected = "Score change relative to previous iteration: 6.25%\nAdded columns: {'col4'}\nRemoved columns: {'col3'}\n"
+    assert result == expected
+
+
+def test_describe_optimization_history_regression():
+    data = [
+        {"mean_score": 0.2, "columns": ["col1", "col2", "col3"]},
+        {"mean_score": 0.15, "columns": ["col1", "col2", "col4"]},
+    ]
+    result = describe_optimization_history(data, "regression")
+    expected = "Error change relative to previous iteration: -25.00%\nAdded columns: {'col4'}\nRemoved columns: {'col3'}\n"
+    assert result == expected
+
+
+def test_describe_optimization_history_no_change():
+    data = [
+        {"mean_score": 0.8, "columns": ["col1", "col2", "col3"]},
+        {"mean_score": 0.8, "columns": ["col1", "col2", "col3"]},
+    ]
+    result = describe_optimization_history(data, "classification")
+    expected = "Score change relative to previous iteration: 0.00%\nAdded columns: set()\nRemoved columns: set()\n"
+    assert result == expected
+
+
+def test_describe_optimization_history_empty_data():
+    with raises(IndexError):
+        describe_optimization_history([], "classification")
