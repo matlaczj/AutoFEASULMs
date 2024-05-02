@@ -1,5 +1,7 @@
+# %%
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
+import matplotlib.patches as mpatches
 from matplotlib.ticker import MaxNLocator
 from typing import List, Dict
 import pandas as pd
@@ -22,10 +24,11 @@ def plot_scores(
     # Plot the mean_score, mean_std, and num_columns
     fig, ax1 = plt.subplots()
 
+    # Plotting for validation scores
     color = "blue"
     ax1.set_xlabel("Method's Iteration", color="black")
-    ax1.set_ylabel(score_axis_title, color=color)
-    ax1.plot(df.index, df["mean_score"], color=color)
+    ax1.set_ylabel(score_axis_title, color="black")
+    ax1.plot(df.index, df["mean_score"], color=color, label="Validation Score")
     ax1.fill_between(
         df.index,
         df["mean_score"] - df["mean_std"],
@@ -33,46 +36,27 @@ def plot_scores(
         color=color,
         alpha=0.1,
     )
-    ax1.tick_params(axis="y", labelcolor=color)
+
+    # Plotting for training scores
+    color = "green"
+    ax1.plot(df.index, df["train_score"], color=color, label="Training Score")
+    ax1.fill_between(
+        df.index,
+        df["train_score"] - df["train_std"],
+        df["train_score"] + df["train_std"],
+        color=color,
+        alpha=0.1,
+    )
+
+    ax1.tick_params(axis="y")
     ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
 
     # Add lines for min, max and average of mean_score
     starting_score = df["mean_score"].iloc[0]
     best_score = df["mean_score"].max() if if_score else df["mean_score"].min()
-    avg_score = df["mean_score"].mean()
 
     ax1.axhline(starting_score, color="red", linestyle="--")
-    ax1.axhline(best_score, color="green", linestyle="--")
-    ax1.axhline(avg_score, color="purple", linestyle="--")
-
-    # Define an offset for the x-coordinate of the text annotation
-    offset = 0.02 * len(df.index) * 6
-
-    # Add text for min, max and average of mean_score
-    ax1.text(
-        0,
-        starting_score,
-        f"{round(starting_score, 4)}",
-        color="red",
-        va="bottom",
-        ha="left",
-    )
-    ax1.text(
-        offset,  # Add the offset to the x-coordinate
-        best_score,
-        f"{round(best_score, 4)}",
-        color="green",
-        va="bottom",
-        ha="left",
-    )
-    ax1.text(
-        2 * offset,  # Add twice the offset to the x-coordinate
-        avg_score,
-        f"{round(avg_score, 4)}",
-        color="purple",
-        va="bottom",
-        ha="left",
-    )
+    ax1.axhline(best_score, color="blue", linestyle="--")
 
     # Create custom legend handles
     min_handle = mlines.Line2D(
@@ -80,21 +64,14 @@ def plot_scores(
         [],
         color="red",
         linestyle="--",
-        label=f"""No FE {"Score" if if_score else "Error"}""",
+        label=f"""No FE {"Score" if if_score else "Error"} ({round(starting_score, 4)})""",
     )
     max_handle = mlines.Line2D(
         [],
         [],
-        color="green",
+        color="blue",
         linestyle="--",
-        label=f"""{"Highest Score" if if_score else "Smallest Error"}""",
-    )
-    avg_handle = mlines.Line2D(
-        [],
-        [],
-        color="purple",
-        linestyle="--",
-        label=f"""Avg {"Score" if if_score else "Error"}""",
+        label=f"""{"Highest Score" if if_score else "Smallest Error"}({round(best_score, 4)})""",
     )
 
     # Find the index of the max mean_score
@@ -107,7 +84,11 @@ def plot_scores(
 
     # Create a custom legend handle for the max value line
     max_value_handle = mlines.Line2D(
-        [], [], color="orange", linestyle="--", label="Best Iteration"
+        [],
+        [],
+        color="orange",
+        linestyle="--",
+        label=f"Best Iteration ({best_score_index})",
     )
 
     # Force x axis to only show integer values
@@ -115,20 +96,33 @@ def plot_scores(
 
     # Replace 0 on x-axis with "No FE"
     labels = [item.get_text() for item in ax1.get_xticklabels()]
-    labels[labels.index("0")] = "No Feature\nEngineering"
+    labels[labels.index("0")] = "No FE"
     ax1.set_xticklabels(labels)
 
+    # Create custom legend handles for validation and training scores
+    validation_handle = mpatches.Patch(color="blue", label="Validation Score ± Std Dev")
+    training_handle = mpatches.Patch(color="green", label="Training Score ± Std Dev")
+
     # Add the new handle to the legend
-    ax1.legend(handles=[min_handle, max_handle, avg_handle, max_value_handle])
+    ax1.legend(
+        handles=[
+            min_handle,
+            max_handle,
+            max_value_handle,
+            validation_handle,
+            training_handle,
+        ],
+        loc="best",
+    )
 
     # Create a secondary y-axis for num_columns
     ax2 = ax1.twinx()
     ax2.set_ylabel(
         "Total Number of Columns",
-        color="black",
+        color="purple",
     )
-    ax2.plot(df.index, df["num_columns"], color="tab:gray", alpha=1)
-    ax2.tick_params(axis="y", labelcolor="black")
+    ax2.plot(df.index, df["num_columns"], color="purple", alpha=0.5)
+    ax2.tick_params(axis="y", labelcolor="purple")
     plt.title(big_title)
 
     fig.tight_layout()
@@ -164,7 +158,7 @@ def plot_columns(
     matrix = np.transpose(matrix)
 
     # Increase the figure size
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(len(data) / 3, len(columns) / 3))
 
     # Extract the mean scores from the data
     scores = [d["mean_score"] for d in data]
@@ -209,7 +203,7 @@ def plot_columns(
 
     # Replace 0 on x-axis with "No FE"
     labels = [item.get_text() for item in ax.get_xticklabels()]
-    labels[labels.index("0")] = "No Feature\nEngineering"
+    labels[labels.index("0")] = "No FE"
     ax.set_xticklabels(labels)
 
     # Add a grid to the plot
@@ -303,3 +297,23 @@ def plot_time(data: List[Dict], path: str = "time.pdf", title: str = "") -> None
 
     # Save the plot as a pdf file
     plt.savefig(path)
+
+
+# %%
+# import json
+
+# with open(
+#     r"C:\Users\matlaczj\Documents\Repozytoria\AutoFEASULMs\logs\1-MISTRAL-AUTOPRICE-K-NEAREST_NEIGHBORS_REGRESSOR\10\scores.json",
+#     "r",
+# ) as file:
+#     data = json.load(file)
+
+# plot_scores(
+#     data,
+#     big_title="AUTOPRICE-K-NEAREST_NEIGHBORS_REGRESSOR",
+#     path="scores.pdf",
+#     if_score=False,
+#     score_axis_title="Mean Absolute Error [€] With Std Dev",
+# )
+
+# %%

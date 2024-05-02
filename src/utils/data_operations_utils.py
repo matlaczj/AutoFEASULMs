@@ -1,4 +1,3 @@
-# %%
 import json
 import numpy as np
 import pandas as pd
@@ -54,7 +53,9 @@ def bool_to_int(df):
 
 
 def load_openml_dataset(
-    name: str, target_column: str = "target", problem_type: str = None
+    name: str,
+    target_column: str = "target",
+    problem_type: str = None,
 ):
     """Load a dataset from OpenML by name.
     https://www.openml.org/search?type=data&status=active
@@ -71,9 +72,11 @@ def load_openml_dataset(
         + f"\nLoading dataset: {name}, target_column: {target_column}, problem_type: {problem_type}\n"
         + Fore.RESET
     )
+
     data = fetch_openml(name, as_frame=True)
     X = data["data"]
     X[target_column] = data["target"]
+
     # Convert the target to numeric if it is non-numeric
     if check_if_dtype(
         pd.DataFrame(X[target_column], columns=[target_column]),
@@ -81,10 +84,12 @@ def load_openml_dataset(
         "Non-numeric",
     ):
         X[target_column] = LabelEncoder().fit_transform(X[target_column])
+
     # Because we use MAPE for regression, we need to log-transform the target and add 1
     if problem_type == "regression":
         X[target_column] = np.log(X[target_column] + 1) + 1
     y = X[target_column]
+
     return X, y
 
 
@@ -227,4 +232,32 @@ def transform_date_columns(df):
     return df
 
 
-# %%
+def add_noise(df, target_column, noise_perc_of_range):
+    """Add Gaussian noise to numeric columns of a DataFrame.
+
+    Args:
+        df (pd.DataFrame): The DataFrame to add noise to.
+        target_column (str): The name of the target column. Noise will not be added to this column.
+        noise_perc_of_range (float): The standard deviation of the Gaussian noise as a fraction of the range of each column.
+
+    Returns:
+        df (pd.DataFrame): The DataFrame with noise added.
+    """
+    np.random.seed(777)
+
+    for col in df.columns:
+        if (
+            col != target_column
+            and np.issubdtype(df[col].dtype, np.number)
+            and df[col].nunique() > 2
+        ):
+            # Compute the range of this column
+            col_range = df[col].max() - df[col].min()
+
+            # Generate noise scaled by the range of this column
+            noise = np.random.normal(0, noise_perc_of_range * col_range, df[col].shape)
+
+            # Add the noise to this column
+            df[col] += noise
+
+    return df

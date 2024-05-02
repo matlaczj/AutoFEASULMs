@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_validate
 from sklearn.metrics import accuracy_score, mean_absolute_percentage_error, make_scorer
 from typing import Dict
 from colorama import Fore
@@ -47,12 +47,16 @@ def check_dtype(df, column_name):
         return "Unknown"
 
 
+from sklearn.model_selection import GridSearchCV
+
+
 def cross_validate_model(
     df,
     target,
     target_variable,
     model,
     problem_type,
+    param_grid,
     cross_val=5,
     scorers: Dict = {
         "classification": accuracy_score,
@@ -71,20 +75,42 @@ def cross_validate_model(
 
     scorer = scorers[problem_type]
 
-    # Perform cross-validation on the model
-    scores = cross_val_score(
+    # Perform hyperparameter tuning using GridSearchCV
+    grid_search = GridSearchCV(
         model,
+        param_grid,
+        cv=cross_val,
+        scoring=make_scorer(scorer),
+        return_train_score=True,
+    )
+    print(f"{Fore.GREEN}Performing GridSearchCV.")
+    grid_search.fit(X, y)
+    print(f"{Fore.GREEN}GridSearchCV completed.\n")
+
+    # Get the best model
+    best_model = grid_search.best_estimator_
+
+    # Perform cross-validation on the best model
+    scores = cross_validate(
+        best_model,
         X,
         y,
         cv=cross_val,
         scoring=make_scorer(scorer),
+        return_train_score=True,
     )
 
-    # # Calculate the mean and standard deviation of the cross-validation scores
-    mean_score = np.mean(scores)
-    std_score = np.std(scores)
+    # Calculate the mean and standard deviation of the cross-validation scores
+    mean_test_score = np.mean(scores["test_score"])
+    std_test_score = np.std(scores["test_score"])
 
-    print(f"{Fore.GREEN}Mean of {scorer.__name__} scores: {mean_score:.2f}")
-    print(f"{Fore.GREEN}Std of {scorer.__name__} scores: {std_score:.2f}\n")
+    mean_train_score = np.mean(scores["train_score"])
+    std_train_score = np.std(scores["train_score"])
 
-    return mean_score, std_score
+    print(f"{Fore.GREEN}Mean of test {scorer.__name__} scores: {mean_test_score:.2f}")
+    print(f"{Fore.GREEN}Std of test {scorer.__name__} scores: {std_test_score:.2f}\n")
+
+    print(f"{Fore.GREEN}Mean of train {scorer.__name__} scores: {mean_train_score:.2f}")
+    print(f"{Fore.GREEN}Std of train {scorer.__name__} scores: {std_train_score:.2f}\n")
+
+    return mean_test_score, std_test_score, mean_train_score, std_train_score

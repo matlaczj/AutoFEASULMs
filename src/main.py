@@ -16,6 +16,7 @@ from utils.data_operations_utils import (
     execute_transformations,
     default_func,
     remove_duplicate_columns,
+    add_noise,
 )
 from utils.validation_utils import cross_validate_model
 from utils.ast_utils import get_model_dict
@@ -35,14 +36,14 @@ warnings.filterwarnings("ignore")
 # TODO: Change what lines are printed on the visualization.
 # TODO: Handle only tabular numeric datasets.
 # TODO: Improve column names.
-# TODO: Reverse FE if score decreases. Like a tree search (add a parameter to the config).
 # TODO: Do hyperparameter tuning to show real value of FE. Or just set HP.
 # TODO: Seed and temperature to increase reproducibility and determinism.
-# TODO: Compare with SOTA Classical Methods
 # TODO: Use reduce_dimentionality function to reduce the number of columns.
-# TODO: Improve dataset descriptions.
 # TODO: Colorful print statements.
+# TODO: Improve dataset descriptions.
 # TODO: Experiment with smaller mistral versions.
+# TODO: Reverse FE if score decreases. Like a tree search (add a parameter to the config).
+# TODO: Compare with SOTA Classical Methods
 
 # DEFINE GLOBAL VARIABLES AND LOAD THE EXPERIMENTS
 global df, llm, scores
@@ -62,15 +63,15 @@ for experiment in experiments:
 # %%
 for experiment in experiments:
     # NOTE: TEMPORARY FOR DEBUGGING
-    # if int(experiment["ID"].split("-")[0]) < 20:
-    #     continue
+    if int(experiment["ID"].split("-")[0]) < 3:
+        continue
 
     # CREATE THE DIRECTORY IF IT DOESN'T EXIST
-    exp_base = config["project_base_dir"] + f"\\src\\logs\\{experiment['ID']}\\"
+    exp_base = config["project_base_dir"] + f"\\logs\\{experiment['ID']}\\"
     counter = 1
     while os.path.exists(exp_base):
         exp_base = (
-            config["project_base_dir"] + f"\\src\\logs\\{experiment['ID']}-{counter}\\"
+            config["project_base_dir"] + f"\\logs\\{experiment['ID']}-{counter}\\"
         )
         counter += 1
     os.makedirs(exp_base, exist_ok=True)
@@ -89,22 +90,32 @@ for experiment in experiments:
     df = handle_invalid_data(df)
     df = transform_date_columns(df)
     df = one_hot_encode(df)
+    df = add_noise(
+        df=df,
+        noise_perc_of_range=experiment["dataset"]["noise_perc_of_range"],
+        target_column=experiment["dataset"]["target_variable"],
+    )
 
     # RUN THE BASELINE MODEL
     scores = []
-    mean_score1, mean_std1 = cross_validate_model(
-        df=df,
-        target=target,
-        target_variable=experiment["dataset"]["target_variable"],
-        model=experiment["problem"]["model"],
-        problem_type=experiment["problem"]["type"],
-        cross_val=experiment["validation"]["kfold"],
-        scorers=experiment["validation"]["scorers"],
+    mean_val_score, std_val_score, mean_train_score, std_train_score = (
+        cross_validate_model(
+            df=df,
+            target=target,
+            target_variable=experiment["dataset"]["target_variable"],
+            model=experiment["problem"]["model"],
+            problem_type=experiment["problem"]["type"],
+            param_grid=experiment["problem"]["param_grid"],
+            cross_val=experiment["validation"]["kfold"],
+            scorers=experiment["validation"]["scorers"],
+        )
     )
     scores.append(
         {
-            "mean_score": mean_score1,
-            "mean_std": mean_std1,
+            "mean_score": mean_val_score,
+            "mean_std": std_val_score,
+            "train_score": mean_train_score,
+            "train_std": std_train_score,
             "columns": list(
                 set(df.columns) - set([experiment["dataset"]["target_variable"]])
             ),
@@ -200,22 +211,27 @@ for experiment in experiments:
         )
 
         # CALCULATE THE SCORES AFTER THE FEATURE ENGINEERING
-        mean_score2, mean_std2 = cross_validate_model(
-            df=df,
-            target=target,
-            target_variable=experiment["dataset"]["target_variable"],
-            model=experiment["problem"]["model"],
-            problem_type=experiment["problem"]["type"],
-            cross_val=experiment["validation"]["kfold"],
-            scorers=experiment["validation"]["scorers"],
+        mean_val_score, std_val_score, mean_train_score, std_train_score = (
+            cross_validate_model(
+                df=df,
+                target=target,
+                target_variable=experiment["dataset"]["target_variable"],
+                model=experiment["problem"]["model"],
+                problem_type=experiment["problem"]["type"],
+                param_grid=experiment["problem"]["param_grid"],
+                cross_val=experiment["validation"]["kfold"],
+                scorers=experiment["validation"]["scorers"],
+            )
         )
 
         # STOP THE TIMER
         end_time = time.time()
         scores.append(
             {
-                "mean_score": mean_score2,
-                "mean_std": mean_std2,
+                "mean_score": mean_val_score,
+                "mean_std": std_val_score,
+                "train_score": mean_train_score,
+                "train_std": std_train_score,
                 "columns": list(df.columns),
                 "time": end_time - start_time,
             }
