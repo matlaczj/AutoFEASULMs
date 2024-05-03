@@ -132,18 +132,26 @@ def describe_optimization_history(
     Returns:
     None
     """
-    # Get the data for the current and previous iterations
-    current_iter = data[-1]
-    previous_iter = data[-2]
-    # Extract the relevant information
-    current_score = current_iter["mean_score"]
-    current_columns = current_iter["columns"]
-    previous_score = previous_iter["mean_score"]
-    previous_columns = previous_iter["columns"]
-    # Calculate the changes in score and columns
-    added_columns = set(current_columns) - set(previous_columns)
-    removed_columns = set(previous_columns) - set(current_columns)
-    score_change_perc = (current_score - previous_score) / previous_score * 100
-    # Assemble the prompt
-    prompt = f"""{"Score" if problem_type == "classification" else "Error"} change relative to previous iteration: {score_change_perc:.2f}%\nAdded columns: {added_columns}\nRemoved columns: {removed_columns}\n"""
-    return prompt
+    # Initialize an empty string to store all prompts
+    all_prompts = ""
+
+    # Loop over the data list from the second element
+    for i in range(1, len(data)):
+        # Get the data for the current and previous iterations
+        current_iter = data[i]
+        previous_iter = data[i - 1]
+        # Extract the relevant information
+        current_score = current_iter["mean_score"]
+        current_columns = current_iter["columns"]
+        previous_score = previous_iter["mean_score"]
+        previous_columns = previous_iter["columns"]
+        # Calculate the changes in score and columns
+        added_columns = set(current_columns) - set(previous_columns)
+        removed_columns = set(previous_columns) - set(current_columns)
+        score_change_perc = (current_score - previous_score) / previous_score * 100
+        # Assemble the prompt for this iteration
+        prompt = f"""Iteration {i}:\n{"Score" if problem_type == "classification" else "Error"} change relative to previous iteration: {score_change_perc:.2f}%\nAdded columns: {added_columns}\nRemoved columns: {removed_columns}\n"""
+        # Add the prompt for this iteration to all_prompts
+        all_prompts += prompt
+
+    return all_prompts

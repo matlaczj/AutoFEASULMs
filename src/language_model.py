@@ -144,7 +144,7 @@ def run_inference_iteration(
     )
     optimization_history = (
         (
-            "**OPTIMIZATION PROCESS:**\n"
+            "**ITERATION HISTORY:**\n"
             + describe_optimization_history(data=scores, problem_type=problem_type)
             + "\n"
         )
@@ -159,7 +159,7 @@ def run_inference_iteration(
         if_backtick=True,
     )
 
-    prompt1 = f"{short_description}**COLUMNS:**\n- *UNIQUE VALUES:*\n{unqiue_values}- *CORRELATIONS:*\n{correlations}\n\n{optimization_history}**TOOLS:**\n{function_headers}\n\n**RULES:**\n- You are a feature engineering and selection program that works in iterations and one iteration at a time.\n- You create new features from existing columns to make ML {machine_learning_model} model better at predicting target variable '{target_variable}' in {problem_type} problem.\n- Target column should remain unchanged as it would be considered cheating.\n- Every iteration you suggest {n_new_features} new column-tool combinations.\n- You don't write code. Instead you suggest tools and their arguments.\n- You create columns that are highly correlated with target feature.\n\n**CURRENT ITERATION:**"
+    prompt1 = f"{short_description}**COLUMNS:**\n- *UNIQUE VALUES:*\n{unqiue_values}- *CORRELATIONS:*\n{correlations}\n\n{optimization_history}**TOOLS:**\n{function_headers}\n\n**RULES:**\n- You are a feature engineering and selection program that works in iterations and one iteration at a time.\n- You create new features from existing columns to make ML {machine_learning_model} model better at predicting target variable '{target_variable}' in {problem_type} problem.\n- Target column should remain unchanged as it would be considered cheating.\n- Every iteration you suggest {n_new_features} new column-tool combinations.\n- You don't write code. Instead you suggest tools and their arguments.\n- You create columns that are highly correlated with target feature.\n- You take into consideration column values, history of iterations, correlations etc. to make better judgements.\n\n**CURRENT ITERATION:**"
 
     with open(exp_base + "prompt1.md", "w") as f:
         f.write(prompt1)

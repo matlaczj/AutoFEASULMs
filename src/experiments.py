@@ -16,14 +16,14 @@ datasets = [
         "predicted_variable": "",
         "type": "regression",
         "name": "autoPrice",
-        "short_description": f"Predict the price of automobiles based on various features.\n",
+        "short_description": f"**INTRODUCTION:**\nPredict the price of automobiles based on various features.\n",
     },
     {
         "origin": "openml",
         "predicted_variable": "",
         "type": "regression",
         "name": "Bike_Sharing_Demand",
-        "short_description": f"""Predict the demand for shared bikes based on various features:\n
+        "short_description": f"""**INTRODUCTION:**\nPredict the demand for shared bikes based on various features:
 season : season (1:springer, 2:summer, 3:fall, 4:winter)
 yr : year (0: 2011, 1:2012)
 mnth : month ( 1 to 12)
@@ -50,7 +50,7 @@ cnt: count of total rental bikes including both casual and registered\n
         "predicted_variable": "",
         "type": "regression",
         "name": "wine-quality-red",
-        "short_description": f"""Predict the quality of red wine based on physicochemical tests:\n
+        "short_description": f"""**INTRODUCTION:**\nPredict the quality of red wine based on physicochemical tests:
 class (target): This column is the target variable or the label that you want to predict in your dataset. It likely represents different classes or categories.
 fixed_acidity: This column represents the amount of non-volatile acids in the wine. It's usually measured in grams per liter.
 volatile_acidity: This column represents the amount of volatile acids in the wine, which can contribute to the vinegar-like taste. It's also measured in grams per liter.
@@ -70,7 +70,7 @@ alcohol: This column represents the alcohol content of the wine, usually measure
         "predicted_variable": "",
         "type": "regression",
         "name": "forest_fires",
-        "short_description": f"""Predict the burned area of forest fires based on various features:\n
+        "short_description": f"""**INTRODUCTION:**\nPredict the burned area of forest fires based on various features:
 X - x-axis spatial coordinate within the Montesinho park map: 1 to 9
 Y - y-axis spatial coordinate within the Montesinho park map: 2 to 9
 month - month of the year: 'jan' to 'dec'
@@ -91,7 +91,7 @@ area - the burned area of the forest (in ha): 0.00 to 1090.84 (this output varia
         "predicted_variable": "",
         "type": "regression",
         "name": "abalone",
-        "short_description": f"""Predict the age of abalone based on physical measurements:\n
+        "short_description": f"""**INTRODUCTION:**\nPredict the age of abalone based on physical measurements:
 sex - sex of the abalone, possible values include M, F, and I (infant)
 length - longest shell measurement in mm
 diameter - perpendicular to length in mm
@@ -108,7 +108,7 @@ rings - the age in years of abalone, target feature\n
         "predicted_variable": "",
         "type": "regression",
         "name": "UCI-student-performance-mat",
-        "short_description": f"""Predict the final grade of students in a math course based on various features:\n
+        "short_description": f"""**INTRODUCTION:**\nPredict the final grade of students in a math course based on various features:
 1 school - student's school (binary: 'GP' - Gabriel Pereira or 'MS' - Mousinho da Silveira).
 2 sex - student's sex (binary: 'F' - female or 'M' - male)
 3 age - student's age (numeric: from 15 to 22)
@@ -146,7 +146,7 @@ rings - the age in years of abalone, target feature\n
         "predicted_variable": "",
         "type": "classification",
         "name": "titanic",
-        "short_description": f"""Predict whether a passenger survived the Titanic disaster based on features:\n
+        "short_description": f"""**INTRODUCTION:**\nPredict whether a passenger survived the Titanic disaster based on features:
 Survived (target): This column indicates whether a passenger survived the Titanic disaster or not. It has two distinct values: 0 for not survived and 1 for survived.
 Pclass: This column represents the passenger class or ticket class of the passenger. It has three distinct values, typically indicating first, second, or third class.
 Sex: This column represents the gender of the passenger. It has two distinct values: male and female.
@@ -162,7 +162,7 @@ Title: This column represents the title or honorific of the passenger (e.g., Mr.
         "predicted_variable": "",
         "type": "classification",
         "name": "glass",
-        "short_description": f"""Predict the type of glass based on features:\n
+        "short_description": f"""**INTRODUCTION:**\nPredict the type of glass based on features:
 binaryClass (target): This column is the target variable or the label you want to predict. It's a nominal variable with two distinct values, likely representing binary classes.
 RI: This column represents the refractive index of the material. Refractive index is a measure of how light bends as it passes through the material.
 Na: This column represents the sodium (Na) content of the material. Sodium content can influence various properties of the material.
@@ -180,7 +180,7 @@ Fe: This column represents the iron (Fe) content of the material. Iron is a comm
         "predicted_variable": "",
         "type": "classification",
         "name": "iris",
-        "short_description": f"""Predict the class of iris plants based on features:\n
+        "short_description": f"""**INTRODUCTION:**\nPredict the class of iris plants based on features:
 **Attribute Information**:
 1. sepal length in cm
 2. sepal width in cm
@@ -197,7 +197,7 @@ Fe: This column represents the iron (Fe) content of the material. Iron is a comm
         "predicted_variable": "",
         "type": "classification",
         "name": "credit-g",
-        "short_description": f"""Predict the credit risk of individuals based on features:\n
+        "short_description": f"""**INTRODUCTION:**\nPredict the credit risk of individuals based on features:
 Status of existing checking account, in Deutsche Mark.
 Duration in months
 Credit history (credits taken, paid back duly, delays, critical accounts)
@@ -225,7 +225,7 @@ Foreign worker (yes,no)\n
         "predicted_variable": "",
         "type": "classification",
         "name": "adult",
-        "short_description": f"""Predict whether an individual earns more than $50,000 a year based on features:\n
+        "short_description": f"""**INTRODUCTION:**\nPredict whether an individual earns more than $50,000 a year based on features:
 class (target): This column is the target variable or label that you want to predict. It's a nominal variable with two distinct values, likely representing different classes or categories.
 age: This column represents the age of individuals. It's a numeric variable with 74 distinct values.
 workclass: This column represents the type of employment or work class of individuals. It's a nominal variable with 8 distinct values and 2799 missing attributes.
@@ -240,7 +240,7 @@ marital-status: This column represents the marital status of individuals. It's a
         "predicted_variable": "",
         "type": "classification",
         "name": "mushroom",
-        "short_description": f"""Predict whether a mushroom is edible or poisonous based on features:\n
+        "short_description": f"""**INTRODUCTION:**\nPredict whether a mushroom is edible or poisonous based on features:
 class (target): This column is the target variable or label that you want to predict. It's a nominal variable with two distinct values, likely representing different classes or categories.
 cap_shape: This column represents the shape of the mushroom cap. It's a nominal variable with 6 distinct values.
 cap_surface: This column represents the surface texture of the mushroom cap. It's a nominal variable with 4 distinct values.
@@ -271,14 +271,14 @@ habitat: This column represents the habitat where the mushroom is typically foun
         "predicted_variable": "",
         "type": "classification",
         "name": "letter",
-        "short_description": f"""Predict the letter category based on features:\n
+        "short_description": f"""**INTRODUCTION:**\nPredict the letter category based on features:
 class (target): This column is the target variable or label that you want to predict. It's a nominal variable with 26 distinct values, representing different classes or categories.
 x-box: This column represents the horizontal position of the bounding box for a letter-like image. It's a numeric variable with 16 distinct values.
 y-box: This column represents the vertical position of the bounding box for a letter-like image. It's a numeric variable with 16 distinct values.
 width: This column represents the width of the bounding box for a letter-like image. It's a numeric variable with 16 distinct values.
 high: This column represents the height of the bounding box for a letter-like image. It's a numeric variable with 16 distinct values.
 onpix: This column represents the total number of "on" pixels (i.e., pixels that are part of the letter) in the bounding box. It's a numeric variable with 16 distinct values.
-x-bar: This column represents the mean x-coordinate of "on" pixels in the bounding box. It's a numeric variable with 16 distinct values.
+x-bar: This column represents the mean x-coordinate of "on" pixels in the bounding box. It's a numeric variable with 16 distinct values.\n
 """,
     },
 ]
@@ -332,14 +332,14 @@ classical_models = [
 experiment_base = {
     "ID": "PLACEHOLDER",
     "model": {
-        "name": "MISTRAL-7B-INSTRUCT-V0.2.Q3_K_S",  # "MISTRAL-7B-INSTRUCT-V0.2.Q6_K",  # Meaning: The model name.
+        "name": "MISTRAL-7B-INSTRUCT-V0.2.Q4_0",  # "MISTRAL-7B-INSTRUCT-V0.2.Q6_K",  # Meaning: The model name.
         "chat_format": "mistral-instruct",  # Meaning: The chat format to use. Improper chat formats can lead to unexpected results.
         "n_gpu_layers": -1,  # Meaning: Use all available GPUs.
         "n_ctx": 512 * 16,  # Meaning: Use a context window of X tokens.
         "n_batch": 512 * 8,  # Meaning: Use a batch size of X tokens.
     },
     "dataset": {
-        "noise_perc_of_range": 0.2,  # Meaning: Percent of range of column values to add as noise.
+        "noise_perc_of_range": 0.05,  # Meaning: Percent of range of column values to add as noise.
         "target_variable": "target",  # Target column name will be changed to this name.
         "max_records": 1000,  # Meaning: Maximum number of records to sample from the dataset.
         "origin": "PLACEHOLDER",
@@ -354,14 +354,14 @@ experiment_base = {
         "model": "PLACEHOLDER",
     },
     "feature_engineering": {
-        "iterations": 10,  # Meaning: Run the FE process for X iterations.
-        "early_stopping": 2,  # Meaning: Stop the FE process if the relative performance does not improve for X iterations.
+        "iterations": 15,  # Meaning: Run the FE process for X iterations.
+        "early_stopping": 3,  # Meaning: Stop the FE process if the relative performance does not improve for X iterations.
         "percentage_change_threshold": 0,  # Meaning: Tolerance. Trigger early stopping counter if the relative performance drops by over X% in all early_stopping iterations.
-        "n_new_features": 5,  # Meaning: Suggest X new features in each iteration.
-        "n_unique_values": 7,  # Meaning: Describe each column with X unique values.
-        "perc_digits_after_decimal": 20,  # Meaning: Describe each column with X% of the digits after the decimal.
+        "n_new_features": 10,  # Meaning: Suggest X new features in each iteration.
+        "n_unique_values": 5,  # Meaning: Describe each column with X unique values.
+        "perc_digits_after_decimal": 10,  # Meaning: Describe each column with X% of the digits after the decimal.
         "correlations_threshold": 0.3,  # Meaning: What is considered an interesting correlation to show on the prompt.
-        "temperature": 0.4,  # Meaning: The higher the temperature, the more creative the FE process.
+        "temperature": 0.8,  # Meaning: The higher the temperature, the more creative the FE process.
         "n_most_correlated": 50,  # Meaning: Select the X most correlated features with the target variable.
         "threshold_features": 0.95,  # Meaning: Drop features that are more than X% correlated with another feature.
         "delayed_deletion": 2,  # Meaning: Start dropping features after the Xnd iteration.

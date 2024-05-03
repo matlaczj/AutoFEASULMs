@@ -70,7 +70,7 @@ def load_openml_dataset(
     """
     print(
         Fore.YELLOW
-        + f"\nLoading dataset: {name}, target_column: {target_column}, problem_type: {problem_type}\n"
+        + f"Loading dataset: {name}, target_column: {target_column}, problem_type: {problem_type}"
         + Fore.RESET
     )
 
@@ -164,6 +164,18 @@ def drop_correlated_columns(df, threshold_features=0.95):
         if any(high_corr):
             # Get the name of the first highly correlated column
             correlated_column = high_corr.idxmax()
+            # Handle the case where the column is an object
+            try:
+                if df[correlated_column].dtype == "object":
+                    print(
+                        Fore.RED
+                        + f"Column '{correlated_column}' is object"
+                        + Fore.RESET
+                    )
+                    continue
+            except Exception as e:
+                print(Fore.RED + f"Error: {e}" + Fore.RESET)
+                continue
             to_drop.append(correlated_column)
             print(
                 Fore.RED
@@ -272,4 +284,33 @@ def add_noise(df, target_column, noise_perc_of_range):
             # Add the noise to this column
             df[col] += noise
 
+    return df
+
+
+def check_all_columns_are_series(df):
+    for column in df.columns:
+        if isinstance(df[column], pd.DataFrame):
+            print(
+                Fore.RED + f"Column '{column}' is a DataFrame. Dropping." + Fore.RESET
+            )
+            df = df.drop(column, axis=1)
+        if df[column].dtype == "object":
+            print(
+                Fore.RED
+                + f"Column '{column}' dtype is an object. Dropping."
+                + Fore.RESET
+            )
+            df = df.drop(column, axis=1)
+        if isinstance(df[column].iloc[0], pd.DataFrame):
+            print(
+                Fore.RED
+                + f"Column '{column}' contains a DataFrame. Dropping."
+                + Fore.RESET
+            )
+            df = df.drop(column, axis=1)
+        if not isinstance(df[column], pd.Series):
+            print(
+                Fore.RED + f"Column '{column}' is not a Series. Dropping." + Fore.RESET
+            )
+            df = df.drop(column, axis=1)
     return df

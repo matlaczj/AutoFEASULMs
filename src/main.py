@@ -17,6 +17,7 @@ from utils.data_operations_utils import (
     default_func,
     remove_duplicate_columns,
     add_noise,
+    check_all_columns_are_series,
 )
 from utils.validation_utils import cross_validate_model
 from utils.ast_utils import get_model_dict
@@ -66,7 +67,7 @@ for dataset in datasets:
 # %%
 for experiment in experiments:
     # NOTE: TEMPORARY FOR DEBUGGING
-    if int(experiment["ID"].split("-")[0]) < 6:
+    if int(experiment["ID"].split("-")[0]) != 24:
         continue
 
     # CREATE THE DIRECTORY IF IT DOESN'T EXIST
@@ -150,6 +151,7 @@ for experiment in experiments:
 
         # TRY TO RUN THE INFERENCE ITERATION
         df[experiment["dataset"]["target_variable"]] = target
+        df = check_all_columns_are_series(df)
         try:
             json_content = run_inference_iteration(
                 llm=llm,

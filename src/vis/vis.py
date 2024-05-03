@@ -157,8 +157,7 @@ def plot_columns(
     # Transpose the matrix
     matrix = np.transpose(matrix)
 
-    # Increase the figure size
-    fig, ax = plt.subplots(figsize=(len(data) / 3, len(columns) / 3))
+    fig, ax = plt.subplots()
 
     # Extract the mean scores from the data
     scores = [d["mean_score"] for d in data]
@@ -315,5 +314,7 @@ def plot_time(data: List[Dict], path: str = "time.pdf", title: str = "") -> None
 #     if_score=False,
 #     score_axis_title="Mean Absolute Error [€] With Std Dev",
 # )
+
+# plot_columns(data=data, problem_type="regression", column_threshold=10)
 
 # %%

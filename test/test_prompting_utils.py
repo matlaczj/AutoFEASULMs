@@ -43,36 +43,25 @@ def test_describe_strong_correlations():
     assert "correlation between 'C' and 'B': -1.0" in result
 
 
-def test_describe_optimization_history_classification():
+def test_describe_optimization_history():
+    # Define a simple optimization history
     data = [
-        {"mean_score": 0.8, "columns": ["col1", "col2", "col3"]},
-        {"mean_score": 0.85, "columns": ["col1", "col2", "col4"]},
+        {"mean_score": 0.8, "columns": ["A", "B", "C"]},
+        {"mean_score": 0.85, "columns": ["A", "B", "D"]},
+        {"mean_score": 0.9, "columns": ["A", "B", "D", "E"]},
     ]
-    result = describe_optimization_history(data, "classification")
-    expected = "Score change relative to previous iteration: 6.25%\nAdded columns: {'col4'}\nRemoved columns: {'col3'}\n"
-    assert result == expected
+    problem_type = "classification"
 
+    # Call the function with the test data
+    result = describe_optimization_history(data, problem_type)
 
-def test_describe_optimization_history_regression():
-    data = [
-        {"mean_score": 0.2, "columns": ["col1", "col2", "col3"]},
-        {"mean_score": 0.15, "columns": ["col1", "col2", "col4"]},
-    ]
-    result = describe_optimization_history(data, "regression")
-    expected = "Error change relative to previous iteration: -25.00%\nAdded columns: {'col4'}\nRemoved columns: {'col3'}\n"
-    assert result == expected
+    # Define the expected result
+    expected_result = (
+        "Iteration 1:\nScore change relative to previous iteration: 6.25%\n"
+        "Added columns: {'D'}\nRemoved columns: {'C'}\n"
+        "Iteration 2:\nScore change relative to previous iteration: 5.88%\n"
+        "Added columns: {'E'}\nRemoved columns: set()\n"
+    )
 
-
-def test_describe_optimization_history_no_change():
-    data = [
-        {"mean_score": 0.8, "columns": ["col1", "col2", "col3"]},
-        {"mean_score": 0.8, "columns": ["col1", "col2", "col3"]},
-    ]
-    result = describe_optimization_history(data, "classification")
-    expected = "Score change relative to previous iteration: 0.00%\nAdded columns: set()\nRemoved columns: set()\n"
-    assert result == expected
-
-
-def test_describe_optimization_history_empty_data():
-    with raises(IndexError):
-        describe_optimization_history([], "classification")
+    # Check if the result matches the expected result
+    assert result == expected_result

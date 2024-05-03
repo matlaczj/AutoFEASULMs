@@ -11,6 +11,7 @@ from src.utils.data_operations_utils import (
     default_func,
     transform_date_columns,
     bool_to_int,
+    check_all_columns_are_series,
 )
 
 
@@ -125,3 +126,15 @@ def test_bool_to_int():
 
     # Check that the data types of the columns are correct
     assert df["A"].dtype == "int8"
+
+
+def test_check_all_columns_are_series():
+    # Test 1: All columns are Series
+    df1 = pd.DataFrame({"A": pd.Series([1, 2, 3]), "B": pd.Series([4, 5, 6])})
+    assert check_all_columns_are_series(df1).equals(df1)
+
+    # Test 2: One column is not a Series
+    df2 = pd.DataFrame(
+        {"A": pd.Series([1, 2, 3]), "B": [4, 5, 6]}  # This column is not a Series
+    )
+    assert check_all_columns_are_series(df2).equals(df1)
