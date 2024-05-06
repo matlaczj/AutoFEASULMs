@@ -185,7 +185,7 @@ def plot_columns(
 
     # Add labels to the x and y axes
     plt.xlabel("Method's Iteration")
-    plt.ylabel("Column ID")
+    plt.ylabel("Each Square Represents a Unique Column")
 
     # Now the x-axis labels should be the iteration number
     plt.xticks(range(len(data)), range(0, len(data)))
@@ -207,6 +207,8 @@ def plot_columns(
 
     # Add a grid to the plot
     plt.grid(True, which="both", color="grey", linewidth=0.3, linestyle="--")
+
+    plt.yticks([])
 
     plt.tight_layout()
 
@@ -297,24 +299,5 @@ def plot_time(data: List[Dict], path: str = "time.pdf", title: str = "") -> None
     # Save the plot as a pdf file
     plt.savefig(path)
 
-
-# %%
-# import json
-
-# with open(
-#     r"C:\Users\matlaczj\Documents\Repozytoria\AutoFEASULMs\logs\1-MISTRAL-AUTOPRICE-K-NEAREST_NEIGHBORS_REGRESSOR\10\scores.json",
-#     "r",
-# ) as file:
-#     data = json.load(file)
-
-# plot_scores(
-#     data,
-#     big_title="AUTOPRICE-K-NEAREST_NEIGHBORS_REGRESSOR",
-#     path="scores.pdf",
-#     if_score=False,
-#     score_axis_title="Mean Absolute Error [€] With Std Dev",
-# )
-
-# plot_columns(data=data, problem_type="regression", column_threshold=10)
 
 # %%
