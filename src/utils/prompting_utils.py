@@ -150,7 +150,7 @@ def describe_optimization_history(
         removed_columns = set(previous_columns) - set(current_columns)
         score_change_perc = (current_score - previous_score) / previous_score * 100
         # Assemble the prompt for this iteration
-        prompt = f"""Iteration {i}:\n{"Score" if problem_type == "classification" else "Error"} change relative to previous iteration: {score_change_perc:.2f}%\nAdded columns: {added_columns}\nRemoved columns: {removed_columns}\n"""
+        prompt = f"""Iteration {i}:\n{"Score" if problem_type == "classification" else "Error"} change relative to previous iteration: {score_change_perc:.2f}%\nCurrent {"score" if problem_type == "classification" else "error"}: {current_score:.2f}\nAdded columns: {added_columns}\nRemoved columns: {removed_columns}\n"""
         # Add the prompt for this iteration to all_prompts
         all_prompts += prompt
 

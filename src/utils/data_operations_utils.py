@@ -293,24 +293,24 @@ def check_all_columns_are_series(df):
             print(
                 Fore.RED + f"Column '{column}' is a DataFrame. Dropping." + Fore.RESET
             )
-            df = df.drop(column, axis=1)
-        if df[column].dtype == "object":
+            df = df.drop(column, axis=1) if column in df.columns else df
+        elif df[column].dtype == "object":
             print(
                 Fore.RED
                 + f"Column '{column}' dtype is an object. Dropping."
                 + Fore.RESET
             )
-            df = df.drop(column, axis=1)
-        if isinstance(df[column].iloc[0], pd.DataFrame):
+            df = df.drop(column, axis=1) if column in df.columns else df
+        elif isinstance(df[column].iloc[0], pd.DataFrame):
             print(
                 Fore.RED
                 + f"Column '{column}' contains a DataFrame. Dropping."
                 + Fore.RESET
             )
-            df = df.drop(column, axis=1)
-        if not isinstance(df[column], pd.Series):
+            df = df.drop(column, axis=1) if column in df.columns else df
+        elif not isinstance(df[column], pd.Series):
             print(
                 Fore.RED + f"Column '{column}' is not a Series. Dropping." + Fore.RESET
             )
-            df = df.drop(column, axis=1)
+            df = df.drop(column, axis=1) if column in df.columns else df
     return df

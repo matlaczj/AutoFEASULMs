@@ -157,3 +157,4 @@ visualizing/columns.pdf
 visualizing/scores.pdf
 *.pdf
 *.svg
+src/reference/scores.json

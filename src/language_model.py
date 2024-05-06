@@ -159,7 +159,9 @@ def run_inference_iteration(
         if_backtick=True,
     )
 
-    prompt1 = f"{short_description}**COLUMNS:**\n- *UNIQUE VALUES:*\n{unqiue_values}- *CORRELATIONS:*\n{correlations}\n\n{optimization_history}**TOOLS:**\n{function_headers}\n\n**RULES:**\n- You are a feature engineering and selection program that works in iterations and one iteration at a time.\n- You create new features from existing columns to make ML {machine_learning_model} model better at predicting target variable '{target_variable}' in {problem_type} problem.\n- Target column should remain unchanged as it would be considered cheating.\n- Every iteration you suggest {n_new_features} new column-tool combinations.\n- You don't write code. Instead you suggest tools and their arguments.\n- You create columns that are highly correlated with target feature.\n- You take into consideration column values, history of iterations, correlations etc. to make better judgements.\n\n**CURRENT ITERATION:**"
+    rules = f"\n**RULES:**\n- You are a feature engineering and selection program that works in iterations and one iteration at a time.\n- You create new features from existing columns to make ML {machine_learning_model} model better at predicting target variable '{target_variable}' in {problem_type} problem.\n- Target column should remain unchanged as it would be considered cheating.\n- Every iteration you suggest {n_new_features} new column-tool combinations.\n- You don't write code. Instead you suggest tools and their arguments using your vast domain knowledge and thinking step by step before giving final answer.\n- You create columns that are highly correlated with target feature.\n- You take into consideration column values, history of iterations, correlations etc. to make better judgements.\n- You don't repeat the same mistake twice expecting different results.\n"
+
+    prompt1 = f"{short_description}**COLUMNS:**\n- *UNIQUE VALUES:*\n{unqiue_values}- *CORRELATIONS:*\n{correlations}\n\n{optimization_history}**TOOLS:**\n{function_headers}\n{rules}\n**CURRENT ITERATION:** Let's think step by step "
 
     with open(exp_base + "prompt1.md", "w") as f:
         f.write(prompt1)

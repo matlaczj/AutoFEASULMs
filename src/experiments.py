@@ -354,11 +354,11 @@ experiment_base = {
         "model": "PLACEHOLDER",
     },
     "feature_engineering": {
-        "iterations": 15,  # Meaning: Run the FE process for X iterations.
+        "iterations": 20,  # Meaning: Run the FE process for X iterations.
         "early_stopping": 3,  # Meaning: Stop the FE process if the relative performance does not improve for X iterations.
         "percentage_change_threshold": 0,  # Meaning: Tolerance. Trigger early stopping counter if the relative performance drops by over X% in all early_stopping iterations.
         "n_new_features": 10,  # Meaning: Suggest X new features in each iteration.
-        "n_unique_values": 5,  # Meaning: Describe each column with X unique values.
+        "n_unique_values": 10,  # Meaning: Describe each column with X unique values.
         "perc_digits_after_decimal": 10,  # Meaning: Describe each column with X% of the digits after the decimal.
         "correlations_threshold": 0.3,  # Meaning: What is considered an interesting correlation to show on the prompt.
         "temperature": 0.8,  # Meaning: The higher the temperature, the more creative the FE process.
@@ -366,6 +366,7 @@ experiment_base = {
         "threshold_features": 0.95,  # Meaning: Drop features that are more than X% correlated with another feature.
         "delayed_deletion": 2,  # Meaning: Start dropping features after the Xnd iteration.
         "n_sampled_corr": 50,  # Meaning: Sample X correlations into prompt.
+        "preserve_base_features": True,  # Meaning: Whether to allow the program to drop or change the base features that contain most of the information.
     },
     "validation": {
         "kfold": 10,  # Meaning: Use 10-fold cross-validation for model evaluation.

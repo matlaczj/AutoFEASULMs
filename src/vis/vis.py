@@ -185,7 +185,7 @@ def plot_columns(
 
     # Add labels to the x and y axes
     plt.xlabel("Method's Iteration")
-    plt.ylabel("Each Square Represents a Unique Column")
+    plt.ylabel(f"Each Square Represents a Unique Column\nSorted By First Appearance")
 
     # Now the x-axis labels should be the iteration number
     plt.xticks(range(len(data)), range(0, len(data)))

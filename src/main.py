@@ -44,7 +44,10 @@ warnings.filterwarnings("ignore")
 # TODO: Improve dataset descriptions.
 # TODO: Experiment with smaller mistral versions.
 # TODO: Reverse FE if score decreases. Like a tree search (add a parameter to the config).
-# TODO: Compare with SOTA Classical Methods
+# TODO: Compare with SOTA Classical Methods: Featurewiz
+# TODO: Improve vis and create table with results.
+# TODO: Add more tools.
+# TODO: Lock original columns.
 
 # DEFINE GLOBAL VARIABLES AND LOAD THE EXPERIMENTS
 global df, llm, scores
@@ -67,7 +70,7 @@ for dataset in datasets:
 # %%
 for experiment in experiments:
     # NOTE: TEMPORARY FOR DEBUGGING
-    if int(experiment["ID"].split("-")[0]) != 24:
+    if int(experiment["ID"].split("-")[0]) < 16:
         continue
 
     # CREATE THE DIRECTORY IF IT DOESN'T EXIST
@@ -100,6 +103,7 @@ for experiment in experiments:
         noise_perc_of_range=experiment["dataset"]["noise_perc_of_range"],
         target_column=experiment["dataset"]["target_variable"],
     )
+    df_base = df.copy(deep=True)
 
     # RUN THE BASELINE MODEL
     scores = []
@@ -207,7 +211,18 @@ for experiment in experiments:
                 ],
             )
 
+        # PRESERVING BASE COLUMNS TO PREVENT LOSS OF INFORMATION
+        print(Fore.YELLOW + "Preserving base columns." + Fore.RESET)
+        if experiment["feature_engineering"]["preserve_base_features"]:
+            for column in df_base.columns:
+                df[column] = df_base[column].copy(deep=True)
+            df = df[
+                df_base.columns.tolist()
+                + [col for col in df.columns if col not in df_base.columns]
+            ]
+
         # PREVENT THE TARGET VARIABLE LEAKAGE
+        print(Fore.YELLOW + "Preventing target variable leakage." + Fore.RESET)
         df = df.drop(
             columns=[
                 col

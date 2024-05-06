@@ -3,6 +3,7 @@ from sklearn.model_selection import cross_validate
 from sklearn.metrics import accuracy_score, mean_absolute_percentage_error, make_scorer
 from typing import Dict
 from colorama import Fore
+from pandas import Series
 
 
 def check_if_dtype(df, column_name, dtype):
@@ -52,8 +53,8 @@ from sklearn.model_selection import GridSearchCV
 
 def cross_validate_model(
     df,
-    target,
-    target_variable,
+    target: Series,
+    target_variable: str,
     model,
     problem_type,
     param_grid,
