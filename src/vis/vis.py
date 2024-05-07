@@ -10,7 +10,7 @@ import numpy as np
 
 def plot_scores(
     data: List[Dict],
-    score_axis_title: str = "10-Fold Cross-Val Accuracy Score [%]",
+    score_axis_title: str = "10-Fold Cross-Val Mean Accuracy Score [%]",
     path: str = "scores.pdf",
     big_title: str = "",
     if_score: bool = True,
@@ -27,7 +27,7 @@ def plot_scores(
     # Plotting for validation scores
     color = "blue"
     ax1.set_xlabel("Method's Iteration", color="black")
-    ax1.set_ylabel(score_axis_title, color="black")
+    ax1.set_ylabel(score_axis_title, color="blue")
     ax1.plot(df.index, df["mean_score"], color=color, label="Validation Score")
     # ax1.fill_between(
     #     df.index,
@@ -48,7 +48,7 @@ def plot_scores(
     #     alpha=0.1,
     # )
 
-    ax1.tick_params(axis="y")
+    ax1.tick_params(axis="y", labelcolor="blue")
     ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
 
     # Add lines for min, max and average of mean_score
@@ -109,7 +109,7 @@ def plot_scores(
             min_handle,
             max_handle,
             max_value_handle,
-            validation_handle,
+            # validation_handle,
             # training_handle,
         ],
         loc="best",

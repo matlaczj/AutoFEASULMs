@@ -332,7 +332,7 @@ classical_models = [
 experiment_base = {
     "ID": "PLACEHOLDER",
     "model": {
-        "name": "MISTRAL-7B-INSTRUCT-V0.2.Q4_K_S",  # Meaning: The model name.
+        "name": "MISTRAL-7B-INSTRUCT-V0.2.Q5_K_M",  # Meaning: The model name. Q5_K_M is recommended.
         "chat_format": "mistral-instruct",  # Meaning: The chat format to use. Valid formats: ['llama-2', 'alpaca', 'qwen', 'vicuna', 'oasst_llama', 'baichuan-2', 'baichuan', 'openbuddy', 'redpajama-incite', 'snoozy', 'phind', 'intel', 'open-orca', 'mistrallite', 'zephyr', 'pygmalion', 'chatml', 'mistral-instruct', 'chatglm3', 'openchat', 'saiga', 'gemma', 'functionary', 'functionary-v2', 'functionary-v1', 'chatml-function-calling'])
         "n_gpu_layers": -1,  # Meaning: Use all available GPUs.
         "n_ctx": 512 * 16,  # Meaning: Use a context window of X tokens.
@@ -354,14 +354,14 @@ experiment_base = {
         "model": "PLACEHOLDER",
     },
     "feature_engineering": {
-        "iterations": 10,  # Meaning: Run the FE process for X iterations.
+        "iterations": 5,  # Meaning: Run the FE process for X iterations.
         "early_stopping": 3,  # Meaning: Stop the FE process if the relative performance does not improve for X iterations.
         "percentage_change_threshold": 0,  # Meaning: Tolerance. Trigger early stopping counter if the relative performance drops by over X% in all early_stopping iterations.
         "n_new_features": 10,  # Meaning: Suggest X new features in each iteration. Depending on other parameters, final amount of added features can be much smaller in each iteration. Higher values might be advised for wider exploration.
         "n_unique_values": 10,  # Meaning: Describe each column with X unique values.
         "perc_digits_after_decimal": 10,  # Meaning: Describe each column with X% of the digits after the decimal.
         "correlations_threshold": 0.3,  # Meaning: What is considered an interesting correlation to show on the prompt.
-        "temperature": 0.9,  # Meaning: The higher the temperature, the more creative the FE process.
+        "temperature": 0.8,  # Meaning: The higher the temperature, the more creative the FE process.
         "n_most_correlated": 50,  # Meaning: Select the X most correlated features with the target variable.
         "threshold_features": 0.95,  # Meaning: Drop features that are more than X% correlated with another feature.
         "preserve_base_features": True,  # Meaning: Whether to allow the program to drop or change the base features that contain most of the information.

@@ -70,7 +70,7 @@ for dataset in datasets:
 # %%
 for experiment in experiments:
     # NOTE: TEMPORARY FOR DEBUGGING
-    # if int(experiment["ID"].split("-")[0]) < 13:
+    # if int(experiment["ID"].split("-")[0]) < 22:
     #     continue
 
     # CREATE THE DIRECTORY IF IT DOESN'T EXIST

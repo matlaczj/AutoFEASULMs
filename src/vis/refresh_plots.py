@@ -101,7 +101,7 @@ if __name__ == "__main__":
             big_title=title,
             if_score=True if problem_type == "classification" else False,
             score_axis_title=(
-                f"""10-Fold Cross-Val {'Accuracy Score' if problem_type == "classification" else 'MAPE Error'}"""
+                f"""10-Fold Cross-Val Mean {'Accuracy Score' if problem_type == "classification" else 'MAPE Error'}"""
             ),
             path=f"{image_path}\{title}_scores.svg",
         )
