@@ -77,8 +77,8 @@ if __name__ == "__main__":
         title = path.split("\\")[-3]
         problem_type = "regression" if "REGRES" in title else "classification"
 
-        # if title != "0-MISTRAL-AUTOPRICE-RIDGE_REGRESSION":
-        #     continue
+        if title != "0-MISTRAL-AUTOPRICE-RIDGE_REGRESSION":
+            continue
 
         df = pd.DataFrame(data)
         best_iteration = (
@@ -96,24 +96,24 @@ if __name__ == "__main__":
         ):
             n_improved += 1
 
-        # plot_scores(
-        #     data=data,
-        #     big_title=title,
-        #     if_score=True if problem_type == "classification" else False,
-        #     score_axis_title=(
-        #         f"""10-Fold Cross-Val {'Accuracy Score' if problem_type == "classification" else 'MAPE Error'} With Std Dev"""
-        #     ),
-        #     path=f"{image_path}\{title}_scores.svg",
-        # )
+        plot_scores(
+            data=data,
+            big_title=title,
+            if_score=True if problem_type == "classification" else False,
+            score_axis_title=(
+                f"""10-Fold Cross-Val {'Accuracy Score' if problem_type == "classification" else 'MAPE Error'}"""
+            ),
+            path=f"{image_path}\{title}_scores.svg",
+        )
 
-        # plot_time(data=data, title=title, path=f"{image_path}\{title}_time.svg")
+        plot_time(data=data, title=title, path=f"{image_path}\{title}_time.svg")
 
-        # plot_columns(
-        #     data=data,
-        #     problem_type=problem_type,
-        #     title=title,
-        #     save_path=f"{image_path}\{title}_columns.svg",
-        # )
+        plot_columns(
+            data=data,
+            problem_type=problem_type,
+            title=title,
+            save_path=f"{image_path}\{title}_columns.svg",
+        )
     print(
         f"Improved: {n_improved}/{len(scores_paths)} ({n_improved/len(scores_paths)*100:.2f}%)"
     )

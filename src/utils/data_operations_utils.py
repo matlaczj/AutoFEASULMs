@@ -289,28 +289,31 @@ def add_noise(df, target_column, noise_perc_of_range):
 
 def check_all_columns_are_series(df):
     for column in df.columns:
+        if column not in df.columns:
+            print(Fore.RED + f"Column '{column}' not in DataFrame." + Fore.RESET)
+            continue
         if isinstance(df[column], pd.DataFrame):
             print(
                 Fore.RED + f"Column '{column}' is a DataFrame. Dropping." + Fore.RESET
             )
-            df = df.drop(column, axis=1) if column in df.columns else df
+            df = df.drop(column, axis=1)
         elif df[column].dtype == "object":
             print(
                 Fore.RED
                 + f"Column '{column}' dtype is an object. Dropping."
                 + Fore.RESET
             )
-            df = df.drop(column, axis=1) if column in df.columns else df
+            df = df.drop(column, axis=1)
         elif isinstance(df[column].iloc[0], pd.DataFrame):
             print(
                 Fore.RED
                 + f"Column '{column}' contains a DataFrame. Dropping."
                 + Fore.RESET
             )
-            df = df.drop(column, axis=1) if column in df.columns else df
+            df = df.drop(column, axis=1)
         elif not isinstance(df[column], pd.Series):
             print(
                 Fore.RED + f"Column '{column}' is not a Series. Dropping." + Fore.RESET
             )
-            df = df.drop(column, axis=1) if column in df.columns else df
+            df = df.drop(column, axis=1)
     return df

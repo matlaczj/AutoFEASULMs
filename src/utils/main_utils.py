@@ -34,7 +34,7 @@ def plot_experiment_results(
         scores,
         big_title=title,
         score_axis_title=(
-            f"""{validation_kfold}-Fold Cross-Val {'Accuracy Score' if problem_type == "classification" else 'MAPE Error'} With Std Dev"""
+            f"""{validation_kfold}-Fold Cross-Val {'Accuracy Score' if problem_type == "classification" else 'MAPE Error'}"""
         ),
         path=iter_base + "scores.pdf",
         if_score=(True if problem_type == "classification" else False),

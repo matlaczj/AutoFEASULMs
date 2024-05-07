@@ -10,7 +10,7 @@ import numpy as np
 
 def plot_scores(
     data: List[Dict],
-    score_axis_title: str = "10-Fold Cross-Val Accuracy Score [%] With Std Dev",
+    score_axis_title: str = "10-Fold Cross-Val Accuracy Score [%]",
     path: str = "scores.pdf",
     big_title: str = "",
     if_score: bool = True,
@@ -29,24 +29,24 @@ def plot_scores(
     ax1.set_xlabel("Method's Iteration", color="black")
     ax1.set_ylabel(score_axis_title, color="black")
     ax1.plot(df.index, df["mean_score"], color=color, label="Validation Score")
-    ax1.fill_between(
-        df.index,
-        df["mean_score"] - df["mean_std"],
-        df["mean_score"] + df["mean_std"],
-        color=color,
-        alpha=0.1,
-    )
+    # ax1.fill_between(
+    #     df.index,
+    #     df["mean_score"] - df["mean_std"],
+    #     df["mean_score"] + df["mean_std"],
+    #     color=color,
+    #     alpha=0.1,
+    # )
 
     # Plotting for training scores
-    color = "green"
-    ax1.plot(df.index, df["train_score"], color=color, label="Training Score")
-    ax1.fill_between(
-        df.index,
-        df["train_score"] - df["train_std"],
-        df["train_score"] + df["train_std"],
-        color=color,
-        alpha=0.1,
-    )
+    # color = "green"
+    # ax1.plot(df.index, df["train_score"], color=color, label="Training Score")
+    # ax1.fill_between(
+    #     df.index,
+    #     df["train_score"] - df["train_std"],
+    #     df["train_score"] + df["train_std"],
+    #     color=color,
+    #     alpha=0.1,
+    # )
 
     ax1.tick_params(axis="y")
     ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
@@ -100,7 +100,7 @@ def plot_scores(
     ax1.set_xticklabels(labels)
 
     # Create custom legend handles for validation and training scores
-    validation_handle = mpatches.Patch(color="blue", label="Validation Score ± Std Dev")
+    validation_handle = mpatches.Patch(color="blue", label="Validation Score")
     training_handle = mpatches.Patch(color="green", label="Training Score ± Std Dev")
 
     # Add the new handle to the legend
@@ -110,7 +110,7 @@ def plot_scores(
             max_handle,
             max_value_handle,
             validation_handle,
-            training_handle,
+            # training_handle,
         ],
         loc="best",
     )
@@ -249,8 +249,8 @@ def plot_time(data: List[Dict], path: str = "time.pdf", title: str = "") -> None
     )
 
     # Calculate the mean and standard deviation of the time
-    mean_time = df["time"].iloc[1:].mean()
-    std_time = df["time"].iloc[1:].std()
+    mean_time = df["time"].mean()
+    std_time = df["time"].std()
 
     # Plot the average time as a horizontal line
     ax1.axhline(mean_time, color="blue", linestyle="--", label="Average Time")

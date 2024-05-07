@@ -123,7 +123,7 @@ for experiment in experiments:
         }
     )
 
-    with open("scores.json", "w") as f:
+    with open("scores.json", "w", encoding="utf-8") as f:
         json.dump(scores, f)
 
 # %%

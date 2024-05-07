@@ -58,8 +58,10 @@ def test_describe_optimization_history():
     # Define the expected result
     expected_result = (
         "Iteration 1:\nScore change relative to previous iteration: 6.25%\n"
+        "Score: 0.85\n"
         "Added columns: {'D'}\nRemoved columns: {'C'}\n"
         "Iteration 2:\nScore change relative to previous iteration: 5.88%\n"
+        "Score: 0.90\n"
         "Added columns: {'E'}\nRemoved columns: set()\n"
     )
 

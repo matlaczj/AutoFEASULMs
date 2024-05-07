@@ -53,7 +53,7 @@ def create_chat_completion(
     top_k: int = 40,
     min_p: float = 0.05,
     max_tokens: int = None,
-    repeat_penalty: float = 1.1,
+    repeat_penalty: float = 1,
 ) -> Dict[str, Union[str, List[Dict[str, str]]]]:
     """
     Creates a chat completion using the Llama language model.
@@ -159,11 +159,11 @@ def run_inference_iteration(
         if_backtick=True,
     )
 
-    rules = f"\n**RULES:**\n- You are a feature engineering and selection program that works in iterations and one iteration at a time.\n- You create new features from existing columns to make ML {machine_learning_model} model better at predicting target variable '{target_variable}' in {problem_type} problem.\n- Target column should remain unchanged as it would be considered cheating.\n- Every iteration you suggest {n_new_features} new column-tool combinations.\n- You don't write code. Instead you suggest tools and their arguments using your vast domain knowledge and thinking step by step before giving final answer.\n- You create columns that are highly correlated with target feature.\n- You take into consideration column values, history of iterations, correlations etc. to make better judgements.\n- You don't repeat the same mistake twice expecting different results.\n"
+    rules = f"\n**RULES:**\n- You are a feature engineering and selection program that works in iterations and one iteration at a time.\n- You create new features from existing columns to make ML {machine_learning_model} model better at predicting target variable '{target_variable}' in {problem_type} problem.\n- Target column should remain unchanged as it would be considered cheating.\n- Every iteration you suggest {n_new_features} new column-tool combinations.\n- You don't write code. Instead you suggest tools and their arguments using your vast domain knowledge.\n- You create columns that are highly correlated with target feature.\n- You take into consideration column values, history of iterations, correlations etc. to make better judgements.\n- You don't repeat the same mistake twice expecting different results.\n- Tool called `apply_math_function` expects `categorical_arguments` to be filled with one of accepted string values and `numerical_arguments` to be empty! Same goes for `normalizer` etc. Look at TOOLS section for accepted values.\n"
 
-    prompt1 = f"{short_description}**COLUMNS:**\n- *UNIQUE VALUES:*\n{unqiue_values}- *CORRELATIONS:*\n{correlations}\n\n{optimization_history}**TOOLS:**\n{function_headers}\n{rules}\n**CURRENT ITERATION:** Let's think step by step "
+    prompt1 = f"{short_description}**COLUMNS:**\n- *UNIQUE VALUES:*\n{unqiue_values}- *CORRELATIONS:*\n{correlations}\n\n{optimization_history}**TOOLS:**\n{function_headers}\n{rules}\n**CURRENT ITERATION:**"
 
-    with open(exp_base + "prompt1.md", "w") as f:
+    with open(exp_base + "prompt1.md", "w", encoding="utf-8") as f:
         f.write(prompt1)
 
     completion1 = create_chat_completion(
@@ -175,7 +175,7 @@ def run_inference_iteration(
     )
     message_content = get_message_content(completion1)
 
-    with open(exp_base + "output1.md", "w") as f:
+    with open(exp_base + "output1.md", "w", encoding="utf-8") as f:
         f.write(message_content)
 
     prompt2 = f"**TASK:**\nTurn the content into valid json like on the schema.\nRemember to put values of arguments in correct lists.\n**TOOLS:**\n{function_headers}\n**SCHEMA:**\n{schema}\n**CONTENT**:\n{message_content}\n**JSON:**\n"
@@ -184,10 +184,10 @@ def run_inference_iteration(
         "enum"
     ] = [col for col in df.columns]
 
-    with open(exp_base + "schema.json", "w") as f:
+    with open(exp_base + "schema.json", "w", encoding="utf-8") as f:
         f.write(json.dumps(schema))
 
-    with open(exp_base + "prompt2.md", "w") as f:
+    with open(exp_base + "prompt2.md", "w", encoding="utf-8") as f:
         f.write(prompt2)
 
     completion2 = create_chat_completion(
@@ -206,7 +206,7 @@ def run_inference_iteration(
     )
 
     json_content = json.loads(get_message_content(completion2))
-    with open(exp_base + "output2.json", "w") as f:
+    with open(exp_base + "output2.json", "w", encoding="utf-8") as f:
         json.dump(json_content, f)
 
     return json_content

@@ -70,8 +70,8 @@ for dataset in datasets:
 # %%
 for experiment in experiments:
     # NOTE: TEMPORARY FOR DEBUGGING
-    if int(experiment["ID"].split("-")[0]) < 16:
-        continue
+    # if int(experiment["ID"].split("-")[0]) < 13:
+    #     continue
 
     # CREATE THE DIRECTORY IF IT DOESN'T EXIST
     exp_base = config["project_base_dir"] + f"\\logs\\{experiment['ID']}\\"
@@ -84,7 +84,7 @@ for experiment in experiments:
     os.makedirs(exp_base, exist_ok=True)
 
     # SAVE THE EXPERIMENT JSON
-    with open(exp_base + "experiment.json", "w") as f:
+    with open(exp_base + "experiment.json", "w", encoding="utf-8") as f:
         f.write(json.dumps(experiment, default=default_func))
 
     # LOAD THE DATASET AND PREPROCESS IT
@@ -94,7 +94,6 @@ for experiment in experiments:
         experiment["problem"]["type"],
         experiment["dataset"]["max_records"],
     )
-    df.columns = [col.lower().replace(" ", "_") for col in df.columns]
     df = handle_invalid_data(df)
     df = transform_date_columns(df)
     df = one_hot_encode(df)
@@ -103,6 +102,7 @@ for experiment in experiments:
         noise_perc_of_range=experiment["dataset"]["noise_perc_of_range"],
         target_column=experiment["dataset"]["target_variable"],
     )
+    df.columns = [col.lower().replace(" ", "_") for col in df.columns]
     df_base = df.copy(deep=True)
 
     # RUN THE BASELINE MODEL
@@ -261,7 +261,7 @@ for experiment in experiments:
         print(f"{Fore.GREEN}Iteration {iteration} completed.{Fore.RESET}\n")
 
         # SAVE THE SCORES AND VISUALIZATIONS
-        with open(iter_base + "scores.json", "w") as f:
+        with open(iter_base + "scores.json", "w", encoding="utf-8") as f:
             f.write(json.dumps(scores))
 
         plot_experiment_results(
