@@ -1,8 +1,10 @@
+# %%
 from typing import List
 import os, json
 from vis import plot_scores, plot_time, plot_columns
 import numpy as np
 import pandas as pd
+import re
 
 
 def extract_scores(src_dir: str) -> List[str]:
@@ -22,6 +24,9 @@ def extract_scores(src_dir: str) -> List[str]:
         for dir_name in os.listdir(src_dir)
         if os.path.isdir(os.path.join(src_dir, dir_name))
     ]
+
+    # Sort directories by name by first number in name
+    directories = sorted(directories, key=lambda x: int(x.split("-")[0]))
 
     # Initialize list to store paths
     scores_paths = []
@@ -43,7 +48,9 @@ def extract_scores(src_dir: str) -> List[str]:
         max_subdirectory = max(
             subdirectories,
             key=lambda x: (
-                int(x) if os.path.isfile(os.path.join(x, "scores.json")) else -1
+                int(x)
+                if os.path.isfile(os.path.join(src_dir, directory, x, "scores.json"))
+                else -1
             ),
         )
 
@@ -62,10 +69,11 @@ def extract_scores(src_dir: str) -> List[str]:
 
 if __name__ == "__main__":
     scores_paths = extract_scores(
-        src_dir=r"C:\Users\matlaczj\Documents\Repozytoria\AutoFEASULMs\archive\logs-9"
+        src_dir=r"C:\Users\matlaczj\Documents\Repozytoria\AutoFEASULMs\logs"
     )
     image_path = r"C:\Users\matlaczj\Documents\Repozytoria\AutoFEASULMs\src\vis\images"
 
+    records = []
     n_improved = 0
     for path in scores_paths:
         with open(
@@ -74,11 +82,20 @@ if __name__ == "__main__":
         ) as file:
             data = json.load(file)
 
+        experiment_path = re.sub(
+            "\\\\[0-9]+\\\\scores.json", "\\\\experiment.json", path
+        )
+        with open(experiment_path, "r") as file:
+            experiment = json.load(file)
+
+        dataset_name = experiment["dataset"]["name"]
+        machine_learning_model = experiment["problem"]["machine_learning_model"]
+
         title = path.split("\\")[-3]
         problem_type = "regression" if "REGRES" in title else "classification"
 
-        if title != "0-MISTRAL-AUTOPRICE-RIDGE_REGRESSION":
-            continue
+        # if title != "23-MISTRAL-MUSHROOM-GAUSSIAN_NAIVE_BAYES_CLASSIFIER":
+        #     continue
 
         df = pd.DataFrame(data)
         best_iteration = (
@@ -90,11 +107,22 @@ if __name__ == "__main__":
         y = df.loc[best_iteration, "mean_score"]
         r = y / x
         percentage_change = r - 1
-        print(f"{title}: {percentage_change:.2f}")
-        if (problem_type == "classification" and percentage_change > 0) or (
-            problem_type == "regression" and percentage_change < 0
-        ):
-            n_improved += 1
+
+        record = {
+            "experiment_no": int(title.split("-")[0]),
+            "dataset_name": dataset_name,
+            "machine_learning_model": machine_learning_model,
+            "best_iteration": best_iteration,
+            "best_score_%": (y * 100).round(2),
+            "initial_score_%": (x * 100).round(2),
+            "percentage_change_%": (percentage_change * 100).round(2),
+            "whether_improved": (
+                percentage_change > 0
+                if problem_type == "classification"
+                else percentage_change < 0
+            ),
+        }
+        records.append(record)
 
         plot_scores(
             data=data,
@@ -114,6 +142,23 @@ if __name__ == "__main__":
             title=title,
             save_path=f"{image_path}\{title}_columns.svg",
         )
-    print(
-        f"Improved: {n_improved}/{len(scores_paths)} ({n_improved/len(scores_paths)*100:.2f}%)"
+
+    df = pd.DataFrame(records)
+    improved_ratio = (df["whether_improved"].sum() / len(df)).round(2)
+    mean_improvement = (
+        df[df["whether_improved"] == True]["percentage_change_%"].abs().mean().round(2)
     )
+    print(f"Percent of improved results: {improved_ratio}")
+    print(f"Mean improvement: {mean_improvement}")
+    df = df.sort_values(
+        by="percentage_change_%", key=lambda x: np.abs(x), ascending=False
+    )
+    df.to_csv(
+        r"C:\Users\matlaczj\Documents\Repozytoria\AutoFEASULMs\src\vis\scores.csv",
+        index=False,
+    )
+
+# %%
+
+
+# %%
