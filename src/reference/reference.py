@@ -17,6 +17,7 @@ from featurewiz import FeatureWiz
 import warnings, time, json
 from colorama import Fore
 
+# %%
 warnings.filterwarnings("ignore")
 
 experiments = prepare_experiments(datasets, classical_models, experiment_base)
@@ -133,10 +134,28 @@ import pandas as pd
 with open("scores.json", "r") as f:
     scores = json.load(f)
 df = pd.DataFrame(scores)
+# %%
 df_no_fe = df[df["time"] == 0].reset_index(drop=True)
 df_fe = df[df["time"] != 0].reset_index(drop=True)
 df_fe["gain"] = ((df_no_fe.mean_score - df_fe.mean_score) / df_no_fe.mean_score).round(
     2
 )
-
+table = pd.DataFrame(
+    {
+        "Experiment": df_fe.ID,
+        "Initial Score": (df_no_fe.mean_score * 100).round(2),
+        "Final Score": (df_fe.mean_score * 100).round(2),
+        "Gain": (df_fe.gain * 100).round(2),
+        "Time": df_fe.time.round(2),
+    }
+)
+# save to csv
+table.to_csv("scores.csv", index=False)
+# %%
+# load csv
+table = pd.read_csv("scores.csv")
+# sort table by column 'f' in descending order by absolute value
+table = table.reindex(table["f"].abs().sort_values(ascending=False).index).reset_index(
+    drop=True
+)
 # %%

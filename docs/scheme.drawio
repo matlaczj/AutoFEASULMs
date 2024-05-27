@@ -1,0 +1,115 @@
+<mxfile host="65bd71144e">
+    <diagram id="U4ozGd3XKI0bk9zgbJvz" name="Page-1">
+        <mxGraphModel dx="1626" dy="779" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" background="none" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="34" value="" style="edgeStyle=none;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;verticalAlign=middle;align=center;labelBorderColor=none;html=1;fontFamily=Helvetica;strokeColor=#6600CC;" parent="1" target="30" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="230" y="280" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="32" value="" style="edgeStyle=none;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;verticalAlign=middle;align=center;labelBorderColor=none;html=1;fontFamily=Helvetica;strokeColor=#6600CC;" parent="1" source="26" target="31" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="26" value="Opcjonalny Ręczny Opis Zbioru" style="rounded=1;verticalAlign=middle;align=center;labelBorderColor=none;whiteSpace=wrap;html=1;fontFamily=Helvetica;strokeColor=#7F00FF;" parent="1" vertex="1">
+                    <mxGeometry x="420" y="320" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="33" value="" style="edgeStyle=none;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;verticalAlign=middle;align=center;labelBorderColor=none;html=1;fontFamily=Helvetica;strokeColor=#6600CC;" parent="1" source="27" target="31" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="27" value="Automatyczny Opis Zbioru" style="rounded=1;verticalAlign=middle;align=center;labelBorderColor=none;whiteSpace=wrap;html=1;fontFamily=Helvetica;strokeColor=#7F00FF;" parent="1" vertex="1">
+                    <mxGeometry x="420" y="250" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="35" value="" style="edgeStyle=none;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;verticalAlign=middle;align=center;labelBorderColor=none;html=1;fontFamily=Helvetica;strokeColor=#6600CC;" parent="1" source="30" target="27" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="55" value="" style="edgeStyle=none;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;verticalAlign=middle;align=center;labelBorderColor=none;html=1;fontFamily=Helvetica;strokeColor=#FF0080;" parent="1" source="30" target="42" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="30" value="Dane Oczyszczone i Wstępnie Przetworzone" style="rounded=1;verticalAlign=middle;align=center;labelBorderColor=none;whiteSpace=wrap;html=1;fontFamily=Helvetica;strokeColor=#7F00FF;" parent="1" vertex="1">
+                    <mxGeometry x="275" y="250" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="51" value="" style="edgeStyle=none;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;verticalAlign=middle;align=center;labelBorderColor=none;html=1;fontFamily=Helvetica;strokeColor=#FF8000;" parent="1" source="31" target="36" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="31" value="Kontekst Dla Modelu Językowego" style="rounded=1;verticalAlign=middle;align=center;labelBorderColor=none;whiteSpace=wrap;html=1;fontFamily=Helvetica;strokeColor=#CC6600;" parent="1" vertex="1">
+                    <mxGeometry x="580" y="290" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="53" value="" style="edgeStyle=none;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontStyle=1;verticalAlign=middle;align=center;labelBorderColor=none;html=1;fontFamily=Helvetica;strokeColor=#FF8000;" parent="1" source="36" target="30" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="335" y="190"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="57" value="Wywołanie Narzędzi z Argumentami" style="edgeLabel;align=center;verticalAlign=middle;resizable=0;points=[];labelBorderColor=none;html=1;fontFamily=Helvetica;" parent="53" vertex="1" connectable="0">
+                    <mxGeometry x="-0.0557" y="-1" relative="1" as="geometry">
+                        <mxPoint x="34" y="-19" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="36" value="Selekcja Narzędzi Dla Tworzenia/Usuwania Cech" style="rounded=1;verticalAlign=middle;align=center;labelBorderColor=none;whiteSpace=wrap;html=1;fontFamily=Helvetica;strokeColor=#CC6600;" parent="1" vertex="1">
+                    <mxGeometry x="580" y="160" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="52" value="" style="edgeStyle=none;exitX=0;exitY=0.5;exitDx=0;exitDy=0;verticalAlign=middle;align=center;labelBorderColor=none;html=1;fontFamily=Helvetica;strokeColor=#FF8000;" parent="1" source="38" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="640" y="250" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="59" value="Rozumowanie i Wybór Narzędzi" style="edgeLabel;align=center;verticalAlign=middle;resizable=0;points=[];labelBorderColor=none;html=1;fontFamily=Helvetica;" parent="52" vertex="1" connectable="0">
+                    <mxGeometry x="0.2222" y="-3" relative="1" as="geometry">
+                        <mxPoint x="-35" y="23" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="38" value="Mały Lokalny Model Językowy" style="rounded=1;verticalAlign=middle;align=center;labelBorderColor=none;whiteSpace=wrap;html=1;fontFamily=Helvetica;strokeColor=#CC6600;" parent="1" vertex="1">
+                    <mxGeometry x="730" y="220" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="47" value="" style="edgeStyle=none;exitX=1;exitY=0.5;exitDx=0;exitDy=0;verticalAlign=middle;align=center;labelBorderColor=none;html=1;fontFamily=Helvetica;strokeColor=#FF0080;" parent="1" source="40" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="340" y="370" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="58" value="Trenowanie i Walidacja" style="edgeLabel;align=center;verticalAlign=middle;resizable=0;points=[];labelBorderColor=none;html=1;fontFamily=Helvetica;" parent="47" vertex="1" connectable="0">
+                    <mxGeometry x="-0.1818" relative="1" as="geometry">
+                        <mxPoint x="60" y="-20" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="40" value="Klasyczny Algorytm Uczenia Maszynowego" style="rounded=1;verticalAlign=middle;align=center;labelBorderColor=none;whiteSpace=wrap;html=1;fontFamily=Helvetica;strokeColor=#FF0080;" parent="1" vertex="1">
+                    <mxGeometry x="110" y="340" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="87" value="" style="edgeStyle=none;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;verticalAlign=middle;align=center;labelBorderColor=none;html=1;fontFamily=Helvetica;strokeColor=#FF0080;" parent="1" source="42" target="86" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="42" value="Wyniki Walidacji Krzyżowej" style="rounded=1;verticalAlign=middle;align=center;labelBorderColor=none;whiteSpace=wrap;html=1;fontFamily=Helvetica;strokeColor=#FF0080;" parent="1" vertex="1">
+                    <mxGeometry x="275" y="400" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="88" value="" style="edgeStyle=none;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;verticalAlign=middle;align=center;labelBorderColor=none;html=1;fontFamily=Helvetica;strokeColor=#FF0080;" parent="1" source="86" target="31" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="640" y="430"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="86" value="Historia Wyników" style="rounded=1;verticalAlign=middle;align=center;labelBorderColor=none;whiteSpace=wrap;html=1;fontFamily=Helvetica;strokeColor=#FF0080;" parent="1" vertex="1">
+                    <mxGeometry x="420" y="400" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="92" value="" style="shape=image;html=1;verticalLabelPosition=bottom;verticalAlign=middle;imageAspect=1;aspect=fixed;image=img/clipart/Gear_128x128.png;labelBorderColor=none;fontFamily=Helvetica;opacity=50;align=center;" parent="1" vertex="1">
+                    <mxGeometry x="823.5699999999999" y="249" width="26.43" height="31" as="geometry"/>
+                </mxCell>
+                <mxCell id="93" value="" style="shape=image;html=1;verticalLabelPosition=bottom;verticalAlign=middle;imageAspect=1;aspect=fixed;image=img/clipart/Gear_128x128.png;labelBorderColor=none;fontFamily=Helvetica;opacity=50;align=center;" parent="1" vertex="1">
+                    <mxGeometry x="203.56999999999994" y="369" width="26.43" height="31" as="geometry"/>
+                </mxCell>
+                <mxCell id="109" style="edgeStyle=none;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;align=center;verticalAlign=middle;" parent="1" source="30" target="30" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="290" y="330"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="111" value="Surowe Dane" style="rounded=1;verticalAlign=middle;align=center;labelBorderColor=none;whiteSpace=wrap;html=1;fontFamily=Helvetica;strokeColor=#7F00FF;" vertex="1" parent="1">
+                    <mxGeometry x="110" y="249" width="120" height="60" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

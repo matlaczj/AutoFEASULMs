@@ -91,8 +91,8 @@ if __name__ == "__main__":
         dataset_name = experiment["dataset"]["name"]
         machine_learning_model = experiment["problem"]["machine_learning_model"]
 
-        title = path.split("\\")[-3]
-        problem_type = "regression" if "REGRES" in title else "classification"
+        title = path.split("\\")[-3].replace("MISTRAL-", "").replace("_", " ").title()
+        problem_type = "regression" if "regres" in title.lower() else "classification"
 
         # if title != "23-MISTRAL-MUSHROOM-GAUSSIAN_NAIVE_BAYES_CLASSIFIER":
         #     continue
@@ -121,26 +121,29 @@ if __name__ == "__main__":
                 if problem_type == "classification"
                 else percentage_change < 0
             ),
+            "time": int(df.loc[best_iteration, "time"].round(0)),
         }
         records.append(record)
+
+        extention = "pdf"
 
         plot_scores(
             data=data,
             big_title=title,
             if_score=True if problem_type == "classification" else False,
             score_axis_title=(
-                f"""10-Fold Cross-Val Mean {'Accuracy Score' if problem_type == "classification" else 'MAPE Error'}"""
+                f"""Średni Wynik {'Dokładności Klasyfikacji' if problem_type == "classification" else 'Błędu MAPE'}\nz 10-Krotną Walidacją Krzyżową"""
             ),
-            path=f"{image_path}\{title}_scores.svg",
+            path=f"{image_path}\{title}_scores.{extention}",
         )
 
-        plot_time(data=data, title=title, path=f"{image_path}\{title}_time.svg")
+        plot_time(data=data, title="", path=f"{image_path}\{title}_time.{extention}")
 
         plot_columns(
             data=data,
             problem_type=problem_type,
-            title=title,
-            save_path=f"{image_path}\{title}_columns.svg",
+            title="",
+            save_path=f"{image_path}\{title}_columns.{extention}",
         )
 
     df = pd.DataFrame(records)
@@ -157,8 +160,5 @@ if __name__ == "__main__":
         r"C:\Users\matlaczj\Documents\Repozytoria\AutoFEASULMs\src\vis\scores.csv",
         index=False,
     )
-
-# %%
-
 
 # %%

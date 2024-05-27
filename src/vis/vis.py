@@ -7,6 +7,9 @@ from typing import List, Dict
 import pandas as pd
 import numpy as np
 
+# Get the current size
+current_size = plt.rcParams["font.size"]
+
 
 def plot_scores(
     data: List[Dict],
@@ -15,6 +18,10 @@ def plot_scores(
     big_title: str = "",
     if_score: bool = True,
 ) -> None:
+
+    # Set the new size as a ratio of the current size
+    plt.rcParams.update({"font.size": current_size * 1.11})
+
     # Convert the data into a DataFrame
     df = pd.DataFrame(data)
 
@@ -26,9 +33,9 @@ def plot_scores(
 
     # Plotting for validation scores
     color = "blue"
-    ax1.set_xlabel("Method's Iteration", color="black")
+    ax1.set_xlabel("Nr Iteracji Metody", color="black")
     ax1.set_ylabel(score_axis_title, color="blue")
-    ax1.plot(df.index, df["mean_score"], color=color, label="Validation Score")
+    ax1.plot(df.index, df["mean_score"], color=color, label="Wynik Walidacji")
     # ax1.fill_between(
     #     df.index,
     #     df["mean_score"] - df["mean_std"],
@@ -64,14 +71,14 @@ def plot_scores(
         [],
         color="red",
         linestyle="--",
-        label=f"""No FE {"Score" if if_score else "Error"} ({round(starting_score, 4)})""",
+        label=f"""{"Wynik" if if_score else "Błąd"} Bez IC ({round(starting_score, 4)})""",
     )
     max_handle = mlines.Line2D(
         [],
         [],
         color="blue",
         linestyle="--",
-        label=f"""{"Highest Score" if if_score else "Smallest Error"}({round(best_score, 4)})""",
+        label=f"""{"Najwyższy Wynik" if if_score else "Najniższy Błąd"}({round(best_score, 4)})""",
     )
 
     # Find the index of the max mean_score
@@ -88,7 +95,7 @@ def plot_scores(
         [],
         color="orange",
         linestyle="--",
-        label=f"Best Iteration ({best_score_index})",
+        label=f"Najlepsza Iteracja ({best_score_index})",
     )
 
     # Force x axis to only show integer values
@@ -96,12 +103,8 @@ def plot_scores(
 
     # Replace 0 on x-axis with "No FE"
     labels = [item.get_text() for item in ax1.get_xticklabels()]
-    labels[labels.index("0")] = "No FE"
+    labels[labels.index("0")] = "Bez IC"
     ax1.set_xticklabels(labels)
-
-    # Create custom legend handles for validation and training scores
-    validation_handle = mpatches.Patch(color="blue", label="Validation Score")
-    training_handle = mpatches.Patch(color="green", label="Training Score ± Std Dev")
 
     # Add the new handle to the legend
     ax1.legend(
@@ -118,7 +121,7 @@ def plot_scores(
     # Create a secondary y-axis for num_columns
     ax2 = ax1.twinx()
     ax2.set_ylabel(
-        "Total Number of Columns",
+        "Całkowita Liczba Kolumn",
         color="purple",
     )
     ax2.plot(df.index, df["num_columns"], color="purple", alpha=0.5)
@@ -138,6 +141,9 @@ def plot_columns(
     save_path: str = "columns.pdf",
     column_threshold: int = 0,
 ) -> Dict[int, str]:
+
+    # Set the new size as a ratio of the current size
+    plt.rcParams.update({"font.size": current_size * 1.66})
 
     # Get the unique columns across all iterations and their first appearance
     columns = {}
@@ -184,8 +190,8 @@ def plot_columns(
     plt.title(title)
 
     # Add labels to the x and y axes
-    plt.xlabel("Method's Iteration")
-    plt.ylabel(f"Each Square Represents a Unique Column\nSorted By First Appearance")
+    plt.xlabel("Nr Iteracji Metody")
+    plt.ylabel(f"Kwadraty to unikalne cechy\n sortowane wg 1. wystąpienia")
 
     # Now the x-axis labels should be the iteration number
     plt.xticks(range(len(data)), range(0, len(data)))
@@ -202,7 +208,7 @@ def plot_columns(
 
     # Replace 0 on x-axis with "No FE"
     labels = [item.get_text() for item in ax.get_xticklabels()]
-    labels[labels.index("0")] = "No FE"
+    labels[labels.index("0")] = "Bez IC"
     ax.set_xticklabels(labels)
 
     # Add a grid to the plot
@@ -222,6 +228,9 @@ def plot_columns(
 
 
 def plot_time(data: List[Dict], path: str = "time.pdf", title: str = "") -> None:
+    # Set the new size as a ratio of the current size
+    plt.rcParams.update({"font.size": current_size * 1.66})
+
     # Convert the data into a DataFrame and skip the first row
     df = pd.DataFrame(data)[1:]
 
@@ -238,13 +247,12 @@ def plot_time(data: List[Dict], path: str = "time.pdf", title: str = "") -> None
         marker="o",
         linestyle="-",
         color="royalblue",
-        label="Time Per Iteration",
     )
     ax1.set_xlabel(
-        "Method's Iteration",
+        "Nr Iteracji Metody",
     )
     ax1.set_ylabel(
-        "Time Taken [s]",
+        "Czas Iteracji [s]",
         color="blue",
     )
 
@@ -253,12 +261,12 @@ def plot_time(data: List[Dict], path: str = "time.pdf", title: str = "") -> None
     std_time = df["time"].std()
 
     # Plot the average time as a horizontal line
-    ax1.axhline(mean_time, color="blue", linestyle="--", label="Average Time")
+    ax1.axhline(mean_time, color="blue", linestyle="--", label="Średni Czas Iteracji")
 
     # Fill the area between mean_time - std_time and mean_time + std_time
-    ax1.fill_between(
-        df.index, mean_time - std_time, mean_time + std_time, color="blue", alpha=0.1
-    )
+    # ax1.fill_between(
+    #     df.index, mean_time - std_time, mean_time + std_time, color="blue", alpha=0.1
+    # )
 
     # Force x axis to only show integer values
     ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
@@ -271,12 +279,11 @@ def plot_time(data: List[Dict], path: str = "time.pdf", title: str = "") -> None
         df.index,
         df["cumulative_time"],
         color="r",
-        label="Cumulative Time",
         marker="o",
         linestyle="-",
     )
     ax2.set_ylabel(
-        "Cumulative Time Taken [s]",
+        "Skumulowany Czas Iteracji [s]",
         color="red",
     )
 
@@ -300,4 +307,68 @@ def plot_time(data: List[Dict], path: str = "time.pdf", title: str = "") -> None
     plt.savefig(path)
 
 
+# %%
+def calculate_model_stats(file_path, groupby="machine_learning_model"):
+    # Read the CSV file into a DataFrame
+    df = pd.read_csv(file_path)
+
+    # Add type of problem depending on model name. If it contains 'regression', it is a regression problem.
+    df["problem_type"] = df["machine_learning_model"].apply(
+        lambda x: "cls" if "Classifier" in x else "reg"
+    )
+
+    # Group by 'machine_learning_model'
+    grouped = df.groupby(groupby)
+
+    # Calculate statistics for each group
+    stats = grouped.agg(
+        {
+            "experiment_no": "count",
+            "problem_type": "first",
+            "best_score_%": lambda x: x[df["whether_improved"] == True].mean(),
+            "initial_score_%": lambda x: x[df["whether_improved"] == True].mean(),
+            "percentage_change_%": lambda x: x[df["whether_improved"] == True].mean(),
+            "whether_improved": lambda x: x.sum()
+            / len(x)
+            * 100,  # percentage of True values
+        }
+    )
+
+    # Rename columns for clarity
+    stats.rename(
+        columns={
+            "experiment_no": "experiment_count",
+            "best_score_%": "average_best_metric",
+            "initial_score_%": "average_initial_metric",
+            "percentage_change_%": "average_percentage_change_%",
+            "whether_improved": "improvement_rate_%",
+        },
+        inplace=True,
+    )
+
+    # Sort the DataFrame by absolute value of 'average_percentage_change_%'
+    # by abs
+    stats = stats.reindex(
+        stats["average_percentage_change_%"].abs().sort_values(ascending=False).index
+    )
+
+    return stats.round(2)
+
+
+# %%
+# calculate_model_stats("scores.csv", groupby="machine_learning_model")
+# # %%
+# calculate_model_stats("scores.csv", groupby="dataset_name")
+# # %%
+# calculate_model_stats("scores.csv", groupby="problem_type")
+# # %%
+# df = pd.read_csv("scores.csv")
+# %%
+# %%
+# import pandas as pd
+
+# df = pd.read_csv("caafe.csv")
+# df["GAIN_PERC_3_5"] = (df.CAAFE_GPT_3_5 - df.No_FE) / df.No_FE * 100
+# df["GAIN_PERC_4"] = (df.CAAFE_GPT_4 - df.No_FE) / df.No_FE * 100
+# df.round(2).sort_values("GAIN_PERC_4", ascending=False)
 # %%

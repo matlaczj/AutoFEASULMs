@@ -1,0 +1,27 @@
+a,b,c,d,e,f,g
+0,Autoprice,Ridge Regression,1.45,1.52,5.0,10.37
+1,Autoprice,KNN Regressor,1.72,2.20,22.0,8.54
+2,Bike Sharing Demand,Ridge Regression,17.96,18.32,2.0,18.44
+3,Bike Sharing Demand,KNN Regressor,21.55,21.25,-1.0,18.05
+4,Wine Quality Red,Ridge Regression,8.46,7.30,-16.0,9.86
+5,Wine Quality Red,KNN Regressor,9.68,8.87,-9.0,14.86
+6,Forest Fires,Ridge Regression,77.63,77.52,-0.0,12.05
+7,Forest Fires,KNN Regressor,92.00,94.71,3.0,11.77
+8,Abalone,Ridge Regression,59.06,53.31,-11.0,9.13
+9,Abalone,KNN Regressor,57.88,54.45,-6.0,5.24
+10,Uci Student Performance Mat,Ridge Regression,37.16,20.92,-78.0,82.64
+11,Uci Student Performance Mat,KNN Regressor,19.90,20.96,5.0,39.07
+12,Titanic,Decision Tree Classifier,78.70,79.90,2.0,5.44
+13,Titanic,GNB Classifier,77.70,77.80,0.0,1.10
+14,Glass,Decision Tree Classifier,55.19,54.61,-1.0,6.34
+15,Glass,GNB Classifier,47.75,46.77,-2.0,2.95
+16,Iris,Decision Tree Classifier,96.67,96.00,-1.0,3.89
+17,Iris,GNB Classifier,94.67,95.33,1.0,1.11
+18,Credit G,Decision Tree Classifier,71.30,71.20,-0.0,118.42
+19,Credit G,GNB Classifier,69.70,73.10,5.0,14.83
+20,Adult,Decision Tree Classifier,85.60,85.40,-0.0,28.51
+21,Adult,GNB Classifier,65.20,76.10,14.0,10.27
+22,Mushroom,Decision Tree Classifier,100.00,99.60,-0.0,33.52
+23,Mushroom,GNB Classifier,98.10,97.20,-1.0,24.97
+24,Letter,Decision Tree Classifier,45.70,45.80,0.0,50.08
+25,Letter,GNB Classifier,57.50,56.90,-1.0,13.40
