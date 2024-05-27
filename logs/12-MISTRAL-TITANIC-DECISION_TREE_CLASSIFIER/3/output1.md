@@ -1,0 +1,12 @@
+ Based on the current dataset and previous iteration history, here are ten new column-tool combinations that could potentially improve the ML Decision Tree Classifier model for predicting the 'target' variable:
+
+1. `log_transformer(column_name='fare', output_distribution='exp')`: This transformation can help normalize extreme values in the 'fare' column, making it more suitable for the decision tree classifier algorithm. The exponential distribution is used to ensure positivity of the transformed values.
+2. `create_interaction(column_name_1='Pclass', column_name_2='sex')`: Creating an interaction term between 'Pclass' and 'sex' may provide valuable information about how the gender of a passenger impacts their survival chances based on their class.
+3. `k_bins_discretizer(column_name='age', n_bins=5, encode='ordinal')`: Discretizing the 'age' column into five bins using an ordinal encoder can help simplify the data and improve model performance by reducing dimensionality while retaining important information.
+4. `quantile_transformer(column_name='fare', n_quantiles=5, output_distribution='uniform')`: Transforming 'fare' into quintiles may provide valuable insights about fare distribution and its correlation with the target variable.
+5. `polynomial_features(column_name='age', degree=2)`: Adding polynomial features to the 'age' column can help capture non-linear relationships between age and the target variable.
+6. `subtract_columns(column_name_1='class', column_name_2='Pclass')`: Subtracting 'Pclass' from 'class' might create a new feature that is informative, considering their high correlation and could potentially improve model performance.
+7. `ordinal_encoder(column_name='sex')`: Encode gender as an ordinal variable to ensure consistent encoding (male=0, female=1) and make it easier for the decision tree classifier to process.
+8. `max_abs_scaler(column_name='age')`: Scaling 'age' using maximum absolute scaling can help normalize the data and reduce the impact of large differences in age on model performance.
+9. `create_interaction(column_name_1='class', column_name_2='title')`: Creating an interaction term between 'class' and 'title' may provide valuable insights about how social status impacts survival based on passenger class.
+10. `reduce_dimentionality(columns=['age_log', 'class_sex_age_PCA', 'age_min_max_scaled'], method='PCA')`: Using PCA to reduce the dimensionality of these columns could help improve model performance by retaining essential information while reducing noise and complexity.

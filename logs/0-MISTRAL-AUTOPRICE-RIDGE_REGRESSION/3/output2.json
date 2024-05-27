@@ -1,0 +1,54 @@
+{
+    "transformations": [
+        {
+            "function": "create_interaction",
+            "columns": [
+                "symboling",
+                "normalized-losses_log"
+            ],
+            "numerical_arguments": [],
+            "categorical_arguments": []
+        },
+        {
+            "function": "subtract_columns",
+            "columns": [
+                "city-mpg",
+                "highway-mpg"
+            ],
+            "numerical_arguments": [],
+            "categorical_arguments": []
+        },
+        {
+            "function": "polynomial_features",
+            "columns": [
+                "symboling"
+            ],
+            "numerical_arguments": [],
+            "categorical_arguments": []
+        },
+        {
+            "function": "polynomial_features",
+            "columns": [
+                "normalized-losses_log"
+            ],
+            "numerical_arguments": [],
+            "categorical_arguments": []
+        },
+        {
+            "function": "polynomial_features",
+            "columns": [
+                "bore_power_transformed_box-cox"
+            ],
+            "numerical_arguments": [],
+            "categorical_arguments": []
+        },
+        {
+            "function": "reduce_dimentionality",
+            "columns": [],
+            "numerical_arguments": [],
+            "categorical_arguments": [
+                "PCA"
+            ]
+        }
+    ]
+}

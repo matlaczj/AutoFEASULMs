@@ -1,0 +1,106 @@
+{
+    "transformations": [
+        {
+            "function": "one_hot_encoder",
+            "columns": [
+                "sex"
+            ],
+            "numerical_arguments": [],
+            "categorical_arguments": []
+        },
+        {
+            "function": "ordinal_encoder",
+            "columns": [
+                "class"
+            ],
+            "numerical_arguments": [],
+            "categorical_arguments": []
+        },
+        {
+            "function": "k_bins_discretizer",
+            "columns": [
+                "age"
+            ],
+            "numerical_arguments": [
+                10
+            ],
+            "categorical_arguments": [
+                "ordinal"
+            ]
+        },
+        {
+            "function": "create_interaction",
+            "columns": [
+                "sex",
+                "class"
+            ],
+            "numerical_arguments": [],
+            "categorical_arguments": []
+        },
+        {
+            "function": "subtract_columns",
+            "columns": [
+                "age",
+                "age"
+            ],
+            "numerical_arguments": [
+                0
+            ],
+            "categorical_arguments": [
+                "FactorAnalysis"
+            ]
+        },
+        {
+            "function": "apply_math_function",
+            "columns": [
+                "age"
+            ],
+            "numerical_arguments": [],
+            "categorical_arguments": [
+                "log"
+            ]
+        },
+        {
+            "function": "linear_combination",
+            "columns": [
+                "class",
+                "age"
+            ],
+            "numerical_arguments": [
+                0.8,
+                -0.5
+            ],
+            "categorical_arguments": []
+        },
+        {
+            "function": "min_max_scaler",
+            "columns": [
+                "age"
+            ],
+            "numerical_arguments": [],
+            "categorical_arguments": []
+        },
+        {
+            "function": "power_transformer",
+            "columns": [
+                "age"
+            ],
+            "numerical_arguments": [],
+            "categorical_arguments": [
+                "box-cox"
+            ]
+        },
+        {
+            "function": "reduce_dimentionality",
+            "columns": [
+                "class",
+                "sex",
+                "age"
+            ],
+            "numerical_arguments": [],
+            "categorical_arguments": [
+                "PCA"
+            ]
+        }
+    ]
+}

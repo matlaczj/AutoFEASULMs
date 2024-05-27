@@ -1,0 +1,31 @@
+{
+    "transformations": [
+        {
+            "function": "create_interaction",
+            "columns": [
+                "sex",
+                "class"
+            ],
+            "numerical_arguments": [],
+            "categorical_arguments": []
+        },
+        {
+            "function": "subtract_columns",
+            "columns": [
+                "class",
+                "age"
+            ],
+            "numerical_arguments": [],
+            "categorical_arguments": []
+        },
+        {
+            "function": "create_interaction",
+            "columns": [
+                "class",
+                "target"
+            ],
+            "numerical_arguments": [],
+            "categorical_arguments": []
+        }
+    ]
+}

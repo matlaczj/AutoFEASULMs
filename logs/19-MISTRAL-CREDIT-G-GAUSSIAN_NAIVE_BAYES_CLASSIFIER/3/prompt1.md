@@ -1,0 +1,195 @@
+**INTRODUCTION:**
+Predict the credit risk of individuals based on features (these columns might not exist, use columns from COLUMNS section):
+Status of existing checking account, in Deutsche Mark.
+Duration in months
+Credit history (credits taken, paid back duly, delays, critical accounts)
+Purpose of the credit (car, television,...)
+Credit amount
+Status of savings account/bonds, in Deutsche Mark.
+Present employment, in number of years.
+Installment rate in percentage of disposable income
+Personal status (married, single,...) and sex
+Other debtors / guarantors
+Present residence since X years
+Property (e.g. real estate)
+Age in years
+Other installment plans (banks, stores)
+Housing (rent, own,...)
+Number of existing credits at this bank
+Job
+Number of people being liable to provide maintenance for
+Telephone (yes,no)
+Foreign worker (yes,no)
+
+**COLUMNS:**
+- *UNIQUE VALUES:*
+example unique values in 'duration': 1.31, 11.36, 0.1, 10.39, 19.48, 20.69, 15.84, 10.03, 28.3, 36.13 ...
+example unique values in 'credit_amount': 1293.36, 4193.33, 1654.74, 8073.76, 15128.65, 3000.73, 828.17, 12228.62, 10683.01, 1258.82 ...
+example unique values in 'installment_commitment': 4.04, 2.22, 3.87, 4.04, 1.84, 0.91, 1.3, 2.03, 4.36, 2.99 ...
+example unique values in 'residence_since': 4.31, 1.27, 2.04, 2.98, 1.03, 3.34, 4.15, 1.64, 2.01, 3.99 ...
+example unique values in 'age': 32.19, 28.57, 36.34, 43.95, 46.03, 31.06, 18.58, 32.93, 41.06, 48.0 ...
+example unique values in 'existing_credits': 1.91, 1.33, 1.1, 1.02, 1.29, 1.11, 2.01, 0.94, 3.93, 1.05 ...
+all unique values in 'num_dependents': 1.0, 2.0
+all unique values in 'checking_status_0<=x<200': 0, 1
+all unique values in 'checking_status_<0': 1, 0
+all unique values in 'checking_status_>=200': 0, 1
+all unique values in 'checking_status_no_checking': 0, 1
+all unique values in 'credit_history_all_paid': 0, 1
+all unique values in 'credit_history_critical/other_existing_credit': 1, 0
+all unique values in 'credit_history_delayed_previously': 0, 1
+all unique values in 'credit_history_existing_paid': 0, 1
+all unique values in 'credit_history_no_credits/all_paid': 0, 1
+all unique values in 'purpose_business': 0, 1
+all unique values in 'purpose_domestic_appliance': 0, 1
+all unique values in 'purpose_education': 0, 1
+all unique values in 'purpose_furniture/equipment': 0, 1
+all unique values in 'purpose_new_car': 0, 1
+all unique values in 'purpose_other': 0, 1
+all unique values in 'purpose_radio/tv': 1, 0
+all unique values in 'purpose_repairs': 0, 1
+all unique values in 'purpose_retraining': 0, 1
+all unique values in 'purpose_used_car': 0, 1
+all unique values in 'savings_status_100<=x<500': 0, 1
+all unique values in 'savings_status_500<=x<1000': 0, 1
+all unique values in 'savings_status_<100': 0, 1
+all unique values in 'savings_status_>=1000': 0, 1
+all unique values in 'savings_status_no_known_savings': 1, 0
+all unique values in 'employment_1<=x<4': 0, 1
+all unique values in 'employment_4<=x<7': 0, 1
+all unique values in 'employment_<1': 0, 1
+all unique values in 'employment_>=7': 1, 0
+all unique values in 'employment_unemployed': 0, 1
+all unique values in 'personal_status_female_div/dep/mar': 0, 1
+all unique values in 'personal_status_male_div/sep': 0, 1
+all unique values in 'personal_status_male_mar/wid': 0, 1
+all unique values in 'personal_status_male_single': 1, 0
+all unique values in 'other_parties_co_applicant': 0, 1
+all unique values in 'other_parties_guarantor': 0, 1
+all unique values in 'other_parties_none': 1, 0
+all unique values in 'property_magnitude_car': 0, 1
+all unique values in 'property_magnitude_life_insurance': 0, 1
+all unique values in 'property_magnitude_no_known_property': 0, 1
+all unique values in 'property_magnitude_real_estate': 1, 0
+all unique values in 'other_payment_plans_bank': 0, 1
+all unique values in 'other_payment_plans_none': 1, 0
+all unique values in 'other_payment_plans_stores': 0, 1
+all unique values in 'housing_for_free': 0, 1
+all unique values in 'housing_own': 1, 0
+all unique values in 'housing_rent': 0, 1
+all unique values in 'job_high_qualif/self_emp/mgmt': 0, 1
+all unique values in 'job_skilled': 1, 0
+all unique values in 'job_unemp/unskilled_non_res': 0, 1
+all unique values in 'job_unskilled_resident': 0, 1
+all unique values in 'own_telephone_none': 0, 1
+all unique values in 'own_telephone_yes': 1, 0
+all unique values in 'foreign_worker_no': 0, 1
+all unique values in 'foreign_worker_yes': 1, 0
+example unique values in 'installment_commitment_duration_inter': 106.86, 37.43, 144.07, 56.21, 77.33, 76.24, 150.94, 89.57, 34.93, 77.24 ...
+example unique values in 'credit_amount_log': 6.76, 6.81, 8.51, 7.69, 8.48, 8.26, 8.49, 8.09, 7.33, 5.31 ...
+example unique values in 'age_poly_2': 652.46, 1504.25, 2304.11, 453.62, 1770.32, 834.14, 2118.02, 1520.28, 520.4, 648.91 ...
+example unique values in 'existing_credits_poly_2': 3.92, 4.65, 0.83, 0.87, 1.38, 1.47, 0.59, 1.54, 0.74, 4.78 ...
+example unique values in 'duration_power_transformed_yeo-johnson': 0.73, -0.37, 0.59, 1.74, 0.7, -2.13, -1.03, -0.55, 0.19, 1.75 ...
+all unique values in 'employment_<1_binarized_th=4': 0
+example unique values in 'age_residence_since_sub': 65.48, 22.42, 34.43, 58.8, 23.94, 43.14, 43.4, 31.73, 36.45, 28.08 ...
+example unique values in 'checking_status_0<=x<200_credit_history_no_credits/all_paid_savings_status_<100_employment_<1_personal_status_male_single_personal_status_female_div/dep/mar_PCA': 1.09, -0.57, 0.3, 0.18, -0.35, 0.81, 0.43, 0.95, -0.43, -0.63 ...
+example unique values in 'age_poly_2_installment_commitment_duration_inter_inter': 68294.24, 84189.1, 364835.93, 22340.29, 28686.62, 53713.69, 485105.94, 290443.08, 4296.76, 108621.66 ...
+example unique values in 'age_residence_since_sub_power_transformed_yeo-johnson': -0.41, 1.32, -0.9, 0.01, 0.44, -0.47, 1.12, 0.35, -0.88, 0.56 ...
+example unique values in 'savings_status_no_known_savings_duration_combination': 44.29, 19.51, 51.94, 21.58, 30.38, 24.72, 19.23, 18.34, 42.17, 28.06 ...
+example unique values in 'checking_status_<0_existing_credits_sub': -2.04, 0.04, -1.87, -1.21, -2.06, -0.91, -0.93, -1.17, -3.25, -0.83 ...
+example unique values in 'age_min_max_scaled': 0.23, 0.16, 0.16, 0.31, 0.4, 0.14, 0.94, 0.26, 0.22, 0.19 ...
+all unique values in 'installment_commitment_binarized_n=5_enc=ordinal_strat=quantile': 3.0, 1.0, 0.0, 2.0, 4.0
+all unique values in 'checking_status_0<=x<200_credit_history_no_credits/all_paid_PCA': -0.27, 0.73, -0.22, 0.77
+all unique values in 'target': 1, 0
+- *CORRELATIONS:*
+correlation between 'savings_status_no_known_savings_duration_combination' and 'duration': 1.0
+correlation between 'own_telephone_yes' and 'own_telephone_none': -1.0
+correlation between 'age_min_max_scaled' and 'age': 1.0
+correlation between 'age_poly_2' and 'age': 0.98
+correlation between 'age_residence_since_sub' and 'age_poly_2': 0.98
+correlation between 'duration_power_transformed_yeo-johnson' and 'duration': 0.97
+correlation between 'age_residence_since_sub_power_transformed_yeo-johnson' and 'age_residence_since_sub': 0.97
+correlation between 'existing_credits_poly_2' and 'existing_credits': 0.97
+correlation between 'savings_status_no_known_savings_duration_combination' and 'duration_power_transformed_yeo-johnson': 0.97
+correlation between 'installment_commitment_binarized_n=5_enc=ordinal_strat=quantile' and 'installment_commitment': 0.94
+correlation between 'checking_status_0<=x<200_credit_history_no_credits/all_paid_savings_status_<100_employment_<1_personal_status_male_single_personal_status_female_div/dep/mar_PCA' and 'personal_status_male_single': -0.94
+correlation between 'age_residence_since_sub_power_transformed_yeo-johnson' and 'age_poly_2': 0.91
+correlation between 'checking_status_<0_existing_credits_sub' and 'existing_credits': -0.81
+correlation between 'duration_power_transformed_yeo-johnson' and 'installment_commitment_duration_inter': 0.8
+correlation between 'housing_for_free' and 'property_magnitude_no_known_property': 0.78
+correlation between 'checking_status_<0_existing_credits_sub' and 'existing_credits_poly_2': -0.78
+correlation between 'housing_rent' and 'housing_own': -0.74
+correlation between 'personal_status_male_single' and 'personal_status_female_div/dep/mar': -0.74
+correlation between 'credit_history_existing_paid' and 'credit_history_critical/other_existing_credit': -0.68
+correlation between 'job_unskilled_resident' and 'job_skilled': -0.65
+correlation between 'checking_status_<0_existing_credits_sub' and 'checking_status_<0': 0.62
+correlation between 'credit_amount' and 'duration': 0.58
+correlation between 'age_poly_2_installment_commitment_duration_inter_inter' and 'age_residence_since_sub': 0.58
+correlation between 'savings_status_no_known_savings_duration_combination' and 'credit_amount': 0.58
+correlation between 'installment_commitment_duration_inter' and 'installment_commitment': 0.55
+correlation between 'housing_own' and 'housing_for_free': -0.55
+correlation between 'job_skilled' and 'job_high_qualif/self_emp/mgmt': -0.54
+correlation between 'credit_history_existing_paid' and 'existing_credits': -0.53
+correlation between 'age_poly_2_installment_commitment_duration_inter_inter' and 'duration': 0.52
+correlation between 'savings_status_no_known_savings_duration_combination' and 'age_poly_2_installment_commitment_duration_inter_inter': 0.52
+correlation between 'installment_commitment_binarized_n=5_enc=ordinal_strat=quantile' and 'installment_commitment_duration_inter': 0.51
+correlation between 'age_poly_2_installment_commitment_duration_inter_inter' and 'duration_power_transformed_yeo-johnson': 0.51
+correlation between 'savings_status_no_known_savings_duration_combination' and 'credit_amount_log': 0.5
+correlation between 'checking_status_0<=x<200_credit_history_no_credits/all_paid_PCA' and 'checking_status_no_checking': -0.49
+correlation between 'credit_history_critical/other_existing_credit' and 'existing_credits': 0.49
+correlation between 'checking_status_<0_existing_credits_sub' and 'credit_history_existing_paid': 0.46
+correlation between 'property_magnitude_real_estate' and 'property_magnitude_car': -0.44
+correlation between 'checking_status_<0_existing_credits_sub' and 'credit_history_critical/other_existing_credit': -0.42
+correlation between 'employment_>=7' and 'employment_1<=x<4': -0.42
+correlation between 'savings_status_<100' and 'savings_status_100<=x<500': -0.42
+correlation between 'own_telephone_none' and 'job_high_qualif/self_emp/mgmt': -0.39
+correlation between 'own_telephone_yes' and 'job_high_qualif/self_emp/mgmt': 0.39
+correlation between 'checking_status_0<=x<200_credit_history_no_credits/all_paid_PCA' and 'checking_status_<0': -0.37
+correlation between 'employment_>=7' and 'age': 0.36
+correlation between 'installment_commitment_binarized_n=5_enc=ordinal_strat=quantile' and 'age_poly_2_installment_commitment_duration_inter_inter': 0.36
+correlation between 'age_min_max_scaled' and 'employment_>=7': 0.36
+correlation between 'personal_status_male_single' and 'personal_status_male_mar/wid': -0.35
+correlation between 'age_poly_2' and 'employment_>=7': 0.33
+correlation between 'employment_<1' and 'employment_1<=x<4': -0.33
+correlation between 'savings_status_<100' and 'savings_status_500<=x<1000': -0.32
+
+**ITERATION HISTORY:**
+Iteration 1:
+Score change relative to previous iteration: 2.33%
+Score: 0.7480
+Added columns: {'installment_commitment_duration_inter', 'age_poly_2', 'age_residence_since_sub', 'duration_power_transformed_yeo-johnson', 'existing_credits_poly_2', 'checking_status_0<=x<200_credit_history_no_credits/all_paid_savings_status_<100_employment_<1_personal_status_male_single_personal_status_female_div/dep/mar_PCA', 'credit_amount_log', 'employment_<1_binarized_th=4'}
+Removed columns: set()
+Iteration 2:
+Score change relative to previous iteration: -6.28%
+Score: 0.7010
+Added columns: {'installment_commitment_binarized_n=5_enc=ordinal_strat=quantile', 'age_residence_since_sub_power_transformed_yeo-johnson', 'savings_status_no_known_savings_duration_combination', 'age_poly_2_installment_commitment_duration_inter_inter', 'age_min_max_scaled', 'checking_status_0<=x<200_credit_history_no_credits/all_paid_PCA', 'checking_status_<0_existing_credits_sub'}
+Removed columns: set()
+
+**TOOLS:**
+- `standard_scaler(column_name:)`
+- `min_max_scaler(column_name:)`
+- `max_abs_scaler(column_name:)`
+- `quantile_transformer(column_name:, n_quantiles:, output_distribution:['uniform', 'normal'])`
+- `power_transformer(column_name:, method:['yeo-johnson', 'box-cox'])`
+- `apply_math_function(column_name:, function:['log', 'sqrt', 'exp', 'square', 'cube', 'inverse', 'log2', 'log10', 'abs', 'ceil', 'floor', 'round'])`
+- `normalizer(column_name:, norm:['l1', 'l2', 'max'])`
+- `binarizer(column_name:, threshold:)`
+- `polynomial_features(column_name:, degree:)`
+- `k_bins_discretizer(column_name:, n_bins:, encode:['ordinal'], strategy:['uniform', 'quantile', 'kmeans'])`
+- `ordinal_encoder(column_name:)`
+- `one_hot_encoder(column_name:)`
+- `linear_combination(column_name_1:, column_name_2:, weight_1:, weight_2:)`
+- `create_interaction(column_name_1:, column_name_2:)`
+- `subtract_columns(column_name_1:, column_name_2:)`
+- `reduce_dimentionality(columns:, method:['PCA', 'TruncatedSVD', 'FastICA', 'FactorAnalysis'])`
+
+**RULES:**
+- You are a feature engineering and selection program that works in iterations and one iteration at a time.
+- You create new features from existing columns to make ML Gaussian Naive Bayes Classifier model better at predicting target variable 'target' in classification problem.
+- Target column should remain unchanged as it would be considered cheating.
+- Every iteration you suggest 10 new column-tool combinations.
+- You don't write code. Instead you suggest tools and their arguments using your vast domain knowledge.
+- You create columns that are highly correlated with target feature.
+- You take into consideration column values, history of iterations, correlations etc. to make better judgements.
+- You don't repeat the same mistake twice expecting different results.
+
+**CURRENT ITERATION:**
