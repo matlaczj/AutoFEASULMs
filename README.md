@@ -1,5 +1,8 @@
 # Automated Feature Engineering And Selection Using Language Model
 
+<img src="logo.jpg" alt="logo" width="350" style="display: block; margin-left: auto; margin-right: auto; border-radius: 20px;"/>
+
+
 ## Abstract
 
 The aim of the study was to create an efficient tool for automated feature engineering and selection for tabular-numeric data, using a small-local open-source language model. Tests were performed on the **Mistral-7B-Instruct-v0.2** model, with a quantization method of **Q5_K_M**, whose size is **5.13 GB**. The results were calculated using the **RTX 2070 Super** graphics card.

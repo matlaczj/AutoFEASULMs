@@ -365,10 +365,3 @@ def calculate_model_stats(file_path, groupby="machine_learning_model"):
 # df = pd.read_csv("scores.csv")
 # %%
 # %%
-# import pandas as pd
-
-# df = pd.read_csv("caafe.csv")
-# df["GAIN_PERC_3_5"] = (df.CAAFE_GPT_3_5 - df.No_FE) / df.No_FE * 100
-# df["GAIN_PERC_4"] = (df.CAAFE_GPT_4 - df.No_FE) / df.No_FE * 100
-# df.round(2).sort_values("GAIN_PERC_4", ascending=False)
-# %%
