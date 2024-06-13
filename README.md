@@ -1,16 +1,7 @@
 # Automated Feature Engineering And Selection Using Language Model
 
-<style>
-.centered-rounded-image {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    border-radius: 20px; /* Adjust the value for more or less rounded corners */
-}
-</style>
-
 <div style="text-align: center;">
-    <img src="logo.jpg" alt="logo" width="350" class="centered-rounded-image"/>
+    <img src="logo.jpg" alt="logo" width="350"/>
 </div>
 
 ## Abstract
